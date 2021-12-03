@@ -5,9 +5,10 @@ import Reference from './Reference';
 import './App.css';
 
 function App() {
-  const [opacity, setOpacity] = useState(0.25);
+  const [opacity, setOpacity] = useState(0);
   const [backgroundColor, setBackgroundColor] = useState(null);
   const [borderColor, setBorderColor] = useState(null);
+  const [cardName, setCardName] = useState('Colossal Dreadmaw');
 
   return (
     <div className="App">
@@ -26,39 +27,31 @@ function App() {
         padding: '10px',
         zIndex: '0',
       }}>
-        <Card borderColor={borderColor} backgroundColor={backgroundColor} />
+
+        {/*<Card cardName="Emrakul, the Aeons Torn" borderColor={borderColor} backgroundColor={backgroundColor} devoid={devoid} />*/}
+        <Card cardName={cardName} borderColor={borderColor} backgroundColor={backgroundColor} />
+
       </div>
       <div style={{ position: 'fixed', bottom: 10, right: 10 }}>
+        <form action="#" style={{display: 'inline-block', padding: '0 1em' }} onSubmit={(e) => setCardName(e.target.cardName.value)}>
+          <label htmlFor="cardName">Card name</label>
+          <input id="cardName" style={{ width: '20em' }} type="text" />
+          <input type="submit" value="Search" />
+        </form>
+        {/*<div style={{display: 'inline-block', padding: '0 1em'}}>*/}
+        {/*  <input id="devoid" type="checkbox" onChange={(e) => setDevoid(e.target.checked)} />*/}
+        {/*  <label htmlFor="devoid">Devoid</label>*/}
+        {/*</div>*/}
         <select name="borderColor" onChange={(e) => setBorderColor(e.target.value)}>
-          <option value="null" selected>none</option>
+          <option value="" selected>default</option>
+          <option>none</option>
           <option>white</option>
           <option>blue</option>
           <option>black</option>
           <option>red</option>
           <option>green</option>
           <option>multi</option>
-          <option>colorless</option>
-          <option>gruul</option>
-          <option>izzet</option>
-          <option>orzhov</option>
-          <option>simic</option>
-          <option>golgari</option>
-          <option>azorius</option>
-          <option>selesnya</option>
-          <option>rakdos</option>
-          <option>dimir</option>
-          <option>boros</option>
-        </select>
-        <select name="backgroundColor" onChange={(e) => setBackgroundColor(e.target.value)}>
-          <option value="null" selected>none</option>
-          <option>land</option>
-          <option>white</option>
-          <option>blue</option>
-          <option>black</option>
-          <option>red</option>
-          <option>green</option>
-          <option>multi</option>
-          <option>colorless</option>
+          <option>artifact</option>
           <option>gruul</option>
           <option>izzet</option>
           <option>orzhov</option>

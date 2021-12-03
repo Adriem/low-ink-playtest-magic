@@ -31,7 +31,7 @@
   background-color: rgb(184, 171, 128);
 }
 
-.card-background.colorless {
+.card-background.artifact {
   background-color: rgb(169, 169, 169);
 }
 
@@ -80,9 +80,8 @@
 }
 
 .content-border.white {
-  background-color: rgb(255, 247, 242);
   /*background-color: rgb(255, 247, 242);*/
-  /*background-color: rgb(255, 247, 242);*/
+  background-color: rgb(213, 194, 167);
 }
 
 .content-border.blue {
@@ -90,7 +89,8 @@
 }
 
 .content-border.black {
-  background-color: rgb(84, 84, 84);
+  /*background-color: rgb(84, 84, 84);*/
+  background-color: rgb(105, 92, 114);
 }
 
 .content-border.red {
@@ -106,47 +106,103 @@
   background-color: rgb(239, 164, 0);
 }
 
-.content-border.colorless {
-  background-color: rgb(236, 239, 248);
+.content-border.artifact {
+  /*background-color: rgb(236, 239, 248);*/
+  background-color: rgb(176, 184, 203);
+}
+
+.content-border.land {
+  /*background-color: rgb(236, 239, 248);*/
+  background-color: rgb(143, 120, 90);
 }
 
 .content-border.gruul {
   background-image: linear-gradient(90deg, rgb(211, 14, 14) 40%, rgb(6, 147, 45) 60%);
 }
 
+.card-stats-border.content-border.gruul {
+  background-color: rgb(6, 147, 45);
+  background-image: none;
+}
+
 .content-border.izzet {
   background-image: linear-gradient(90deg, rgb(41, 133, 225) 40%, rgb(211, 14, 14) 60%);
 }
 
+.card-stats-border.content-border.izzet {
+  background-color: rgb(211, 14, 14);
+  background-image: none;
+}
+
 .content-border.rakdos {
-  background-image: linear-gradient(90deg, rgb(84, 84, 84) 40%, rgb(211, 14, 14) 60%);
+  background-image: linear-gradient(90deg, rgb(105, 92, 114) 40%, rgb(211, 14, 14) 60%);
+}
+
+.card-stats-border.content-border.rakdos {
+  background-color: rgb(211, 14, 14);
+  background-image: none;
 }
 
 .content-border.orzhov {
-  background-image: linear-gradient(90deg, rgb(255, 247, 242) 40%, rgb(84, 84, 84) 60%);
+  background-image: linear-gradient(90deg, rgb(213, 194, 167) 40%, rgb(105, 92, 114) 60%);
+}
+
+.card-stats-border.content-border.orzhov {
+  background-color: rgb(105, 92, 114);
+  background-image: none;
 }
 
 .content-border.golgari {
-  background-image: linear-gradient(90deg, rgb(84, 84, 84) 40%, rgb(6, 147, 45) 60%);
+  background-image: linear-gradient(90deg, rgb(105, 92, 114) 40%, rgb(6, 147, 45) 60%);
+}
+
+.card-stats-border.content-border.golgari {
+  background-color: rgb(6, 147, 45);
+  background-image: none;
 }
 
 .content-border.azorius {
-  background-image: linear-gradient(90deg, rgb(255, 247, 242) 40%, rgb(41, 133, 225) 60%);
+  background-image: linear-gradient(90deg, rgb(213, 194, 167) 40%, rgb(41, 133, 225) 60%);
+}
+
+.card-stats-border.content-border.azorius {
+  background-color: rgb(41, 133, 225);
+  background-image: none;
 }
 
 .content-border.simic {
   background-image: linear-gradient(90deg, rgb(6, 147, 45) 40%, rgb(41, 133, 225) 60%);
 }
 
+.card-stats-border.content-border.simic {
+  background-color: rgb(41, 133, 225);
+  background-image: none;
+}
+
 .content-border.selesnya {
-  background-image: linear-gradient(90deg, rgb(6, 147, 45) 40%, rgb(255, 247, 242) 60%);
+  background-image: linear-gradient(90deg, rgb(6, 147, 45) 40%, rgb(213, 194, 167) 60%);
+}
+
+.card-stats-border.content-border.selesnya {
+  background-color: rgb(213, 194, 167);
+  background-image: none;
 }
 
 .content-border.dimir {
-  background-image: linear-gradient(90deg, rgb(41, 133, 225) 40%, rgb(84, 84, 84) 60%);
+  background-image: linear-gradient(90deg, rgb(41, 133, 225) 40%, rgb(105, 92, 114) 60%);
+}
+
+.card-stats-border.content-border.dimir {
+  background-color: rgb(105, 92, 114);
+  background-image: none;
 }
 
 .content-border.boros {
-  background-image: linear-gradient(90deg, rgb(211, 14, 14) 40%, rgb(255, 247, 242) 60%);
+  background-image: linear-gradient(90deg, rgb(211, 14, 14) 40%, rgb(213, 194, 167) 60%);
+}
+
+.card-stats-border.content-border.boros {
+  background-color: rgb(213, 194, 167);
+  background-image: none;
 }
 

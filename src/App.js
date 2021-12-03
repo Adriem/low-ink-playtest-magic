@@ -7,6 +7,7 @@ import './App.css';
 function App() {
   const [opacity, setOpacity] = useState(0);
   const [backgroundColor, setBackgroundColor] = useState(null);
+  const [blackBordered, setBlackBordered] = useState(false);
   const [borderColor, setBorderColor] = useState(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
 
@@ -29,19 +30,19 @@ function App() {
       }}>
 
         {/*<Card cardName="Emrakul, the Aeons Torn" borderColor={borderColor} backgroundColor={backgroundColor} devoid={devoid} />*/}
-        <Card cardName={cardName} borderColor={borderColor} backgroundColor={backgroundColor} />
+        <Card cardName={cardName} borderColor={borderColor} backgroundColor={backgroundColor} blackBordered={blackBordered}/>
 
       </div>
       <div style={{ position: 'fixed', bottom: 10, right: 10 }}>
         <form action="#" style={{display: 'inline-block', padding: '0 1em' }} onSubmit={(e) => setCardName(e.target.cardName.value)}>
           <label htmlFor="cardName">Card name</label>
-          <input id="cardName" style={{ width: '20em' }} type="text" />
+          <input id="cardName" style={{ width: '18em' }} type="text" />
           <input type="submit" value="Search" />
         </form>
-        {/*<div style={{display: 'inline-block', padding: '0 1em'}}>*/}
-        {/*  <input id="devoid" type="checkbox" onChange={(e) => setDevoid(e.target.checked)} />*/}
-        {/*  <label htmlFor="devoid">Devoid</label>*/}
-        {/*</div>*/}
+        <div style={{display: 'inline-block', padding: '0 1em'}}>
+          <input id="blackBordered" type="checkbox" onChange={(e) => setBlackBordered(e.target.checked)} />
+          <label htmlFor="blackBordered">Black border</label>
+        </div>
         <select name="borderColor" onChange={(e) => setBorderColor(e.target.value)}>
           <option value="" selected>default</option>
           <option>none</option>

@@ -31,6 +31,7 @@ const Card = ({
   borderColor,
   backgroundColor,
   devoid,
+  blackBordered,
 }) => {
   const [cardData, setCardData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ const Card = ({
       });
   }, [cardName]);
 
-  if (!cardData || cardData === {}) return <div>NO CARD DATA</div>
+  if (!cardData || Object.keys(cardData).length === 0) return <div>NO CARD DATA</div>
   if (loading) return <div>LOADING...</div>
   if (error) return <div>ERROR ({error.name}): {error.message}</div>
 
@@ -75,7 +76,7 @@ const Card = ({
         right: 0,
         border: '4px solid black',
         borderRadius: '4.9%/3.5%',
-        backgroundColor: 'white',
+        backgroundColor: blackBordered ? 'black' : 'white',
       }}>
         <div className={`card-background ${backgroundColor || ''} ${devoid ? 'devoid' : ''}`} style={{
           position: 'absolute',

@@ -1,4 +1,26 @@
-import { useEffect, useState } from 'react';
+import { useLayoutEffect, useRef } from 'react';
+
+import './Card.css';
+import './ColorIdentities.css';
+import './Symbols.css';
+
+const useAutoShrinkText = (ref, textContent, minSize = 0) => {
+  useLayoutEffect(() => {
+    const cardTitleElem = ref.current;
+
+    cardTitleElem.style.fontSize = '';
+
+    while (Number.parseFloat(getComputedStyle(cardTitleElem).fontSize) > minSize
+        && (cardTitleElem.offsetHeight < cardTitleElem.scrollHeight
+          || cardTitleElem.offsetWidth < cardTitleElem.scrollWidth)) {
+      const computedFontSize = cardTitleElem.style.fontSize !== ''
+        ? Number.parseFloat(cardTitleElem.style.fontSize)
+        : Number.parseFloat(getComputedStyle(cardTitleElem).fontSize);
+
+      cardTitleElem.style.fontSize = `${computedFontSize - 1}px`;
+    }
+  }, [textContent]);
+};
 
 const getColorMappings = (cardColors, cardTypeLine) => {
   if (!cardColors) return '';
@@ -24,202 +46,121 @@ const getColorMappings = (cardColors, cardTypeLine) => {
   if (cardColors.length === 2 && cardColors.includes('R') && cardColors.includes('G')) return 'gruul';
 
   if (cardColors.length > 2) return 'multi';
-}
+};
+
+const formatTextSymbols = (text) => {
+  return text
+    .replace(/{(\d)}/g, '<span class="symbol mana generic">$1</span>')
+    .replace(/{(\d\d)}/g, '<span class="symbol mana generic plus-10">$1</span>')
+    .replace(/{C}/g, '<span class="symbol mana colorless"><i class="far fa-square"></i></span>')
+    .replace(/{W}/g, '<span class="symbol mana white"><i class="fa fa-sun"></i></span>')
+    .replace(/{U}/g, '<span class="symbol mana blue"><i class="fa fa-tint"></i></span>')
+    .replace(/{B}/g, '<span class="symbol mana black"><i class="fa fa-skull"></i></span>')
+    .replace(/{R}/g, '<span class="symbol mana red"><i class="fa fa-fire"></i></span>')
+    .replace(/{G}/g, '<span class="symbol mana green"><i class="fa fa-tree"></i></span>')
+    .replace(/{W\/U}/g, '<span class="symbol mana azorius"><i class="fa fa-percentage"></i></span>')
+    .replace(/{W\/B}/g, '<span class="symbol mana orzhov"><i class="fa fa-percentage"></i></span>')
+    .replace(/{R\/W}/g, '<span class="symbol mana boros"><i class="fa fa-percentage"></i></span>')
+    .replace(/{G\/W}/g, '<span class="symbol mana selesnya"><i class="fa fa-percentage"></i></span>')
+    .replace(/{U\/B}/g, '<span class="symbol mana dimir"><i class="fa fa-percentage"></i></span>')
+    .replace(/{U\/R}/g, '<span class="symbol mana izzet"><i class="fa fa-percentage"></i></span>')
+    .replace(/{G\/U}/g, '<span class="symbol mana simic"><i class="fa fa-percentage"></i></span>')
+    .replace(/{B\/R}/g, '<span class="symbol mana rakdos"><i class="fa fa-percentage"></i></span>')
+    .replace(/{B\/G}/g, '<span class="symbol mana golgari"><i class="fa fa-percentage"></i></span>')
+    .replace(/{R\/G}/g, '<span class="symbol mana gruul"><i class="fa fa-percentage"></i></span>')
+    .replace(/{P}/g, '<span class="symbol mana generic phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{W\/P}/g, '<span class="symbol mana white phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{U\/P}/g, '<span class="symbol mana blue phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{B\/P}/g, '<span class="symbol mana black phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{R\/P}/g, '<span class="symbol mana red phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{G\/P}/g, '<span class="symbol mana green phyrexian"><i class="fa fa-ban"></i></span>')
+    .replace(/{S}/g, '<span class="symbol mana generic snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{W\/S}/g, '<span class="symbol mana white snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{U\/S}/g, '<span class="symbol mana blue snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{B\/S}/g, '<span class="symbol mana black snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{R\/S}/g, '<span class="symbol mana red snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{G\/S}/g, '<span class="symbol mana green snow"><i class="fa fa-snowflake"></i></span>')
+    .replace(/{T}/g, '<span class="symbol generic tap"><i class="fa fa-share"></i></span>')
+    .replace(/{Q}/g, '<span class="symbol generic untap"><i class="fa fa-share"></i></span>')
+    .replace(/\((.*?)\)/g, '<i>($1)</i>');
+};
 
 const Card = ({
   cardName,
-  borderColor,
-  backgroundColor,
+  cardManaCost,
+  cardArtUrl,
+  cardColors,
+  cardTypeLine,
+  cardOracleText,
+  cardPower,
+  cardToughness,
+  cardLoyalty,
   devoid,
   blackBordered,
 }) => {
-  const [cardData, setCardData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const borderColor = getColorMappings(cardColors, cardTypeLine);
 
-  useEffect(() => {
-    if (!cardName) return;
+  const cardTitleRef = useRef();
+  const cardTypeRef = useRef();
+  const cardOracleTextRef = useRef();
 
-    setLoading(true);
-
-    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`)
-      .then(async r => r.ok ? await r.json() : Promise.reject(await r.json()))
-      .then(data => {
-        setLoading(false);
-        setError(null);
-        setCardData(data);
-      })
-      .catch(error => {
-        setLoading(false);
-        setError(error);
-      });
-  }, [cardName]);
-
-  if (!cardData || Object.keys(cardData).length === 0) return <div>NO CARD DATA</div>
-  if (loading) return <div>LOADING...</div>
-  if (error) return <div>ERROR ({error.name}): {error.message}</div>
-
-  borderColor = borderColor || getColorMappings(cardData.colors, cardData.type_line);
+  useAutoShrinkText(cardTitleRef, cardName);
+  useAutoShrinkText(cardTypeRef, cardTypeLine);
+  useAutoShrinkText(cardOracleTextRef, cardOracleText);
 
   return (
-    <div className="card-container" style={{
-      position: 'relative',
-      width: '100%',
-      paddingTop: '140%',
-      fontFamily: 'serif',
-    }}>
-      <div className="card-frame" style={{
-        position: 'absolute',
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        border: '4px solid black',
-        borderRadius: '4.9%/3.5%',
-        backgroundColor: blackBordered ? 'black' : 'white',
-      }}>
-        <div className={`card-background ${backgroundColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-          position: 'absolute',
-          top: '2%',
-          bottom: '9%',
-          left: '3%',
-          right: '3%',
-          border: '2px solid black',
-          borderTopLeftRadius: '2.8% 2%',
-          borderTopRightRadius: '2.8% 2%',
-          borderBottomRightRadius: '9% 8%',
-          borderBottomLeftRadius: '9% 8%',
-        }}>
+    <div className={`card ${borderColor || ''} ${devoid ? 'devoid' : ''}`}>
+      <div className={`card-frame ${blackBordered ? 'black-bordered' : ''}`}>
+        <div className="card-background">
 
-          <div className={`card-title-border content-border ${borderColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-            position: 'absolute',
-            top: '1.5%',
-            height: '6.75%',
-            left: '1%',
-            right: '1%',
-            borderRadius: '2.5% / 50%',
-            padding: '.75%',
-          }}>
-            <div className="card-title-box" style={{
-              borderRadius: '2.5% / 50%',
-              backgroundColor: 'white',
-              width: '100%',
-              height: '100%',
-              border: '2px solid black',
-              boxSizing: 'border-box',
-              display: 'flex',
-              padding: '1%',
-              fontWeight: 'bold',
-              fontSize: '175%'
-            }}>
-              <div className="card-title-container" style={{ padding: '0 1.5%' }}>{cardData.name}</div>
-              <div style={{ flex: 1 }} />
-              <div className="card-mana-container">{cardData.mana_cost.replace(/[{}]/g, '')}</div>
+          <div className="card-title-box">
+            <div className="card-rounded-box-border color-identity-border">
+              <div className="card-rounded-box-content">
+                <div ref={cardTitleRef} className="card-title shrink-text-size">{cardName}</div>
+                <div className="card-mana-cost" dangerouslySetInnerHTML={{
+                  __html: formatTextSymbols(cardManaCost)
+                }} />
+              </div>
             </div>
           </div>
 
-          <div className={`card-art-border content-border ${borderColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-            position: 'absolute',
-            top: '9%',
-            height: '51%',
-            left: '3%',
-            right: '3%',
-            padding: '0.5% 1%'
-          }}>
-            <div className="card-art-box" style={{
-              backgroundColor: 'white',
-              width: '100%',
-              height: '100%',
-              border: '2px solid black',
-              boxSizing: 'border-box',
-            }}>
-              <img
-                alt="Art"
-                src={cardData.image_uris.art_crop}
-                height="100%"
-                width="100%"
-                style={{
-                  filter: 'brightness(1.5) grayscale(1) contrast(20)',
-                  opacity: '0.5',
-                }}
-              />
+          <div className="card-art-box">
+            <div className="card-square-box-border color-identity-border">
+              <div className="card-square-box-content">
+                <img className="card-art-image" alt="Card art" src={cardArtUrl} />
+              </div>
             </div>
           </div>
 
-          <div className={`card-type-border content-border ${borderColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-            position: 'absolute',
-            top: '60.5%',
-            height: '6.75%',
-            left: '1%',
-            right: '1%',
-            borderRadius: '2.5% / 50%',
-            padding: '.75%',
-          }}>
-            <div className="card-type-box" style={{
-              borderRadius: '2.5% / 50%',
-              backgroundColor: 'white',
-              width: '100%',
-              height: '100%',
-              border: '2px solid black',
-              boxSizing: 'border-box',
-              display: 'flex',
-              padding: '1%',
-              fontWeight: 'bold',
-              fontSize: '140%'
-            }}>
-              <div className="card-type-container" style={{ padding: '0 1.5%' }}>{cardData.type_line}</div>
-              <div style={{ flex: 1 }} />
-              <div className="card-set-container">[P]</div>
+          <div className="card-type-box">
+            <div className="card-rounded-box-border color-identity-border">
+              <div className="card-rounded-box-content">
+                <div ref={cardTypeRef} className="card-type shrink-text-size">{cardTypeLine}</div>
+                <div className="card-expansion-symbol">PXY</div>
+              </div>
             </div>
           </div>
 
-          <div className={`card-oracle-border content-border ${borderColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-            position: 'absolute',
-            top: '68%',
-            height: '34%',
-            left: '3%',
-            right: '3%',
-            padding: '0.5% 1% 1%'
-          }}>
-            <div className="card-oracle-box" style={{
-              backgroundColor: 'white',
-              width: '100%',
-              height: '100%',
-              border: '2px solid black',
-              boxSizing: 'border-box',
-              fontSize: '140%',
-              lineHeight: .9,
-              padding: '5% 1%',
-            }}>
-              {(cardData.oracle_text || '').split('\n').map(paragraph => (
-                <p style={{ margin: '1.5% 0' }}>{paragraph}</p>
-              ))}
+          <div className="card-oracle-text-box">
+            <div className="card-square-box-border color-identity-border">
+              <div className="card-square-box-content">
+                <div ref={cardOracleTextRef} className="card-oracle-text shrink-text-size">
+                    {(cardOracleText || '').split('\n').map(paragraph => (
+                      <p dangerouslySetInnerHTML={{ __html: formatTextSymbols(paragraph) }} />
+                    ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {(cardData.power != null && cardData.toughness != null || cardData.loyalty) && (
-            <div className={`card-stats-border content-border ${borderColor || ''} ${devoid ? 'devoid' : ''}`} style={{
-              position: 'absolute',
-              top: '98%',
-              height: '6%',
-              width: '17%',
-              right: '1.5%',
-              borderRadius: '8.5% / 50%',
-              padding: '1%',
-            }}>
-              <div className="card-stats-box" style={{
-                borderRadius: '8.5% / 50%',
-                backgroundColor: 'white',
-                width: '100%',
-                height: '100%',
-                border: '2px solid black',
-                boxSizing: 'border-box',
-                fontWeight: 'bold',
-                fontSize: '190%',
-                textAlign: 'center',
-                lineHeight: 1,
-              }}>
-                {cardData.loyalty ? cardData.loyalty : `${cardData.power}/${cardData.toughness}`}
+          {(cardPower != null && cardToughness != null || cardLoyalty) && (
+            <div className="card-stats-box">
+              <div className="card-rounded-box-border color-identity-border">
+                <div className="card-rounded-box-content">
+                  <div className="card-stats">
+                    {cardLoyalty ? cardLoyalty : `${cardPower}/${cardToughness}`}
+                  </div>
+                </div>
               </div>
             </div>
           )}

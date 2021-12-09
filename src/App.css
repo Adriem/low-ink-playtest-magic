@@ -1,3 +1,10 @@
+
+.workbench {
+  width: 500px;
+  background: lightgray;
+  padding: 10px;
+}
+
 .card-background {
   background-color: white;
 }
@@ -73,136 +80,5 @@
 
 .card-background.boros {
   background-image: linear-gradient(90deg, rgb(217, 152, 143) 40%, rgb(215, 211, 193) 60%);
-}
-
-.content-border {
-  background-color: rgb(145, 145, 145);
-}
-
-.content-border.white {
-  /*background-color: rgb(255, 247, 242);*/
-  background-color: rgb(213, 194, 167);
-}
-
-.content-border.blue {
-  background-color: rgb(41, 133, 225);
-}
-
-.content-border.black {
-  /*background-color: rgb(84, 84, 84);*/
-  background-color: rgb(105, 92, 114);
-}
-
-.content-border.red {
-  background-color: rgb(211, 14, 14);
-}
-
-.content-border.green {
-  /*background-color: rgb(51, 118, 70);*/
-  background-color: rgb(6, 147, 45);
-}
-
-.content-border.multi {
-  background-color: rgb(239, 164, 0);
-}
-
-.content-border.artifact {
-  /*background-color: rgb(236, 239, 248);*/
-  background-color: rgb(176, 184, 203);
-}
-
-.content-border.land {
-  /*background-color: rgb(236, 239, 248);*/
-  background-color: rgb(143, 120, 90);
-}
-
-.content-border.gruul {
-  background-image: linear-gradient(90deg, rgb(211, 14, 14) 40%, rgb(6, 147, 45) 60%);
-}
-
-.card-stats-border.content-border.gruul {
-  background-color: rgb(6, 147, 45);
-  background-image: none;
-}
-
-.content-border.izzet {
-  background-image: linear-gradient(90deg, rgb(41, 133, 225) 40%, rgb(211, 14, 14) 60%);
-}
-
-.card-stats-border.content-border.izzet {
-  background-color: rgb(211, 14, 14);
-  background-image: none;
-}
-
-.content-border.rakdos {
-  background-image: linear-gradient(90deg, rgb(105, 92, 114) 40%, rgb(211, 14, 14) 60%);
-}
-
-.card-stats-border.content-border.rakdos {
-  background-color: rgb(211, 14, 14);
-  background-image: none;
-}
-
-.content-border.orzhov {
-  background-image: linear-gradient(90deg, rgb(213, 194, 167) 40%, rgb(105, 92, 114) 60%);
-}
-
-.card-stats-border.content-border.orzhov {
-  background-color: rgb(105, 92, 114);
-  background-image: none;
-}
-
-.content-border.golgari {
-  background-image: linear-gradient(90deg, rgb(105, 92, 114) 40%, rgb(6, 147, 45) 60%);
-}
-
-.card-stats-border.content-border.golgari {
-  background-color: rgb(6, 147, 45);
-  background-image: none;
-}
-
-.content-border.azorius {
-  background-image: linear-gradient(90deg, rgb(213, 194, 167) 40%, rgb(41, 133, 225) 60%);
-}
-
-.card-stats-border.content-border.azorius {
-  background-color: rgb(41, 133, 225);
-  background-image: none;
-}
-
-.content-border.simic {
-  background-image: linear-gradient(90deg, rgb(6, 147, 45) 40%, rgb(41, 133, 225) 60%);
-}
-
-.card-stats-border.content-border.simic {
-  background-color: rgb(41, 133, 225);
-  background-image: none;
-}
-
-.content-border.selesnya {
-  background-image: linear-gradient(90deg, rgb(6, 147, 45) 40%, rgb(213, 194, 167) 60%);
-}
-
-.card-stats-border.content-border.selesnya {
-  background-color: rgb(213, 194, 167);
-  background-image: none;
-}
-
-.content-border.dimir {
-  background-image: linear-gradient(90deg, rgb(41, 133, 225) 40%, rgb(105, 92, 114) 60%);
-}
-
-.card-stats-border.content-border.dimir {
-  background-color: rgb(105, 92, 114);
-  background-image: none;
-}
-
-.content-border.boros {
-  background-image: linear-gradient(90deg, rgb(211, 14, 14) 40%, rgb(213, 194, 167) 60%);
-}
-
-.card-stats-border.content-border.boros {
-  background-color: rgb(213, 194, 167);
-  background-image: none;
 }
 

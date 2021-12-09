@@ -1,0 +1,127 @@
+.color-identity-border {
+    background-color: var(--colorless);
+}
+
+.white .color-identity-border {
+    background-color: var(--white);
+}
+
+.blue .color-identity-border {
+    background-color: var(--blue);
+}
+
+.black .color-identity-border {
+    background-color: var(--black);
+}
+
+.red .color-identity-border {
+    background-color: var(--red);
+}
+
+.green .color-identity-border {
+    background-color: var(--green);
+}
+
+.multi .color-identity-border {
+    background-color: var(--multi);
+}
+
+.artifact .color-identity-border {
+    background-color: var(--artifact);
+}
+
+.land .color-identity-border {
+    /*background-color: rgb(236, 239, 248);*/
+    background-color: var(--land);
+}
+
+.gruul .color-identity-border {
+    background-image: linear-gradient(90deg, var(--red) 40%, var(--green) 60%);
+}
+
+.gruul .card-stats-box .color-identity-border {
+    background-color: var(--green);
+    background-image: none;
+}
+
+.izzet .color-identity-border {
+    background-image: linear-gradient(90deg, var(--blue) 40%, var(--red) 60%);
+}
+
+.izzet .card-stats-box .color-identity-border {
+    background-color: var(--red);
+    background-image: none;
+}
+
+.rakdos .color-identity-border {
+    background-image: linear-gradient(90deg, var(--black) 40%, var(--red) 60%);
+}
+
+.rakdos .card-stats-box .color-identity-border {
+    background-color: var(--red);
+    background-image: none;
+}
+
+.orzhov .color-identity-border {
+    background-image: linear-gradient(90deg, var(--white) 40%, var(--black) 60%);
+}
+
+.orzhov .card-stats-box .color-identity-border {
+    background-color: var(--black);
+    background-image: none;
+}
+
+.golgari .color-identity-border {
+    background-image: linear-gradient(90deg, var(--black) 40%, var(--green) 60%);
+}
+
+.golgari .card-stats-box .color-identity-border {
+    background-color: var(--green);
+    background-image: none;
+}
+
+.azorius .color-identity-border {
+    background-image: linear-gradient(90deg, var(--white) 40%, var(--blue) 60%);
+}
+
+.azorius .card-stats-box .color-identity-border {
+    background-color: var(--blue);
+    background-image: none;
+}
+
+.simic .color-identity-border {
+    background-image: linear-gradient(90deg, var(--green) 40%, var(--blue) 60%);
+}
+
+.simic .card-stats-box .color-identity-border {
+    background-color: var(--blue);
+    background-image: none;
+}
+
+.selesnya .color-identity-border {
+    background-image: linear-gradient(90deg, var(--green) 40%, var(--white) 60%);
+}
+
+.selesnya .card-stats-box .color-identity-border {
+    background-color: var(--white);
+    background-image: none;
+}
+
+.dimir .color-identity-border {
+    background-image: linear-gradient(90deg, var(--blue) 40%, var(--black) 60%);
+}
+
+.dimir .card-stats-box .color-identity-border {
+    background-color: var(--black);
+    background-image: none;
+}
+
+.boros .color-identity-border {
+    background-image: linear-gradient(90deg, var(--red) 40%, var(--white) 60%);
+}
+
+.boros .card-stats-box .color-identity-border {
+    background-color: var(--white);
+    background-image: none;
+}
+

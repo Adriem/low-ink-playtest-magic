@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import '@fortawesome/fontawesome-free/js/all.min.js';
+
+import { useEffect, useState } from 'react';
 import Card from './Card';
 import Reference from './Reference';
 
@@ -6,33 +8,64 @@ import './App.css';
 
 function App() {
   const [opacity, setOpacity] = useState(0);
-  const [backgroundColor, setBackgroundColor] = useState(null);
   const [blackBordered, setBlackBordered] = useState(false);
-  const [borderColor, setBorderColor] = useState(null);
+  const [cardColors, setCardColors] = useState(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
+
+  const [cardData, setCardData] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!cardName) return;
+
+    setLoading(true);
+
+    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`)
+      .then(async r => r.ok ? await r.json() : Promise.reject(await r.json()))
+      .then(data => {
+        setLoading(false);
+        setError(null);
+        setCardData(data);
+      })
+      .catch(error => {
+        setLoading(false);
+        setError(error);
+      });
+  }, [cardName]);
 
   return (
     <div className="App">
-      <div style={{
-        position: 'absolute',
-        width: '500px',
-        padding: '10px',
-        zIndex: '10',
-        opacity,
-      }}>
-        <Reference />
-      </div>
-      <div style={{
-        position: 'absolute',
-        width: '500px',
-        padding: '10px',
-        zIndex: '0',
-      }}>
+        {(!cardData || Object.keys(cardData).length === 0) ? <div>NO CARD DATA</div>
+          : (loading) ? <div>LOADING...</div>
+          : (error) ? <div>ERROR ({error.name}): {error.message}</div>
+          : (
+            <div className="workbench">
+              <div style={{
+                position: 'absolute',
+                width: '500px',
+                zIndex: '10',
+                opacity,
+              }}>
+                <Reference multiverseId={cardData.multiverse_ids[0]}/>
+              </div>
 
-        {/*<Card cardName="Emrakul, the Aeons Torn" borderColor={borderColor} backgroundColor={backgroundColor} devoid={devoid} />*/}
-        <Card cardName={cardName} borderColor={borderColor} backgroundColor={backgroundColor} blackBordered={blackBordered}/>
-
-      </div>
+              <div style={{ marginTop: '-2px', zIndex: '0' }}>
+                <Card
+                  cardName={cardData.name}
+                  cardManaCost={cardData.mana_cost}
+                  cardColors={cardColors || cardData.colors}
+                  cardOracleText={cardData.oracle_text}
+                  cardTypeLine={cardData.type_line}
+                  cardArtUrl={cardData.image_uris.art_crop}
+                  cardLoyalty={cardData.loyalty}
+                  cardPower={cardData.power}
+                  cardToughness={cardData.toughness}
+                  blackBordered={blackBordered}
+                />
+              </div>
+            </div>
+        )}
       <div style={{ position: 'fixed', bottom: 10, right: 10 }}>
         <form action="#" style={{display: 'inline-block', padding: '0 1em' }} onSubmit={(e) => setCardName(e.target.cardName.value)}>
           <label htmlFor="cardName">Card name</label>
@@ -43,29 +76,28 @@ function App() {
           <input id="blackBordered" type="checkbox" onChange={(e) => setBlackBordered(e.target.checked)} />
           <label htmlFor="blackBordered">Black border</label>
         </div>
-        <select name="borderColor" onChange={(e) => setBorderColor(e.target.value)}>
+        <select name="borderColor" onChange={(e) => setCardColors(e.target.value)}>
           <option value="" selected>default</option>
-          <option>none</option>
-          <option>white</option>
-          <option>blue</option>
-          <option>black</option>
-          <option>red</option>
-          <option>green</option>
-          <option>multi</option>
-          <option>artifact</option>
-          <option>gruul</option>
-          <option>izzet</option>
-          <option>orzhov</option>
-          <option>simic</option>
-          <option>golgari</option>
-          <option>azorius</option>
-          <option>selesnya</option>
-          <option>rakdos</option>
-          <option>dimir</option>
-          <option>boros</option>
+          <option value={[]}>none</option>
+          <option value={["W"]}>white</option>
+          <option value={["U"]}>blue</option>
+          <option value={["B"]}>black</option>
+          <option value={["R"]}>red</option>
+          <option value={["G"]}>green</option>
+          <option value={["W","U","B","R","G"]}>multi</option>
+          <option value={["R","G"]}>gruul</option>
+          <option value={["U","R"]}>izzet</option>
+          <option value={["W","B"]}>orzhov</option>
+          <option value={["G","U"]}>simic</option>
+          <option value={["G","B"]}>golgari</option>
+          <option value={["W","U"]}>azorius</option>
+          <option value={["W","G"]}>selesnya</option>
+          <option value={["B","R"]}>rakdos</option>
+          <option value={["B","U"]}>dimir</option>
+          <option value={["W","R"]}>boros</option>
         </select>
         <button onClick={() => setOpacity(1)}>Opaque</button>
-        <button onClick={() => setOpacity(0.25)}>Transparent</button>
+        <button onClick={() => setOpacity(0.5)}>Transparent</button>
         <button onClick={() => setOpacity(0)}>Invisible</button>
       </div>
     </div>

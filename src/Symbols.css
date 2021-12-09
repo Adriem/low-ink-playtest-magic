@@ -1,0 +1,211 @@
+.symbol {
+    border-radius: 100%;
+    height: 22px;
+    width: 22px;
+    display: inline-block;
+    margin-left: 1px;
+    margin-right: 1px;
+    font-size: 18pt;
+    padding: 0;
+    line-height: 1;
+    text-align: center;
+    letter-spacing: -2px;
+    font-style: normal !important;
+    background-color: var(--colorless);
+    filter: brightness(1.4);
+}
+
+.card-title-box .symbol {
+    box-shadow: 0 2px 0 0 black;
+    height: 24px;
+    width: 24px;
+}
+
+.symbol.mana.phyrexian svg {
+    transform: rotate(45deg);
+    width: unset !important;
+    height: 60% !important;
+    position: relative;
+    top: -16%;
+}
+.symbol.mana.phyrexian:before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 12%;
+    right: 45%;
+    background-color: black;
+    width: 6%;
+    height: 80%;
+}
+.card-oracle-text .symbol.mana.phyrexian svg {
+    top: -24%;
+}
+
+.symbol.mana.snow svg {
+    width: unset !important;
+    height: 80% !important;
+    position: relative;
+    top: -12%;
+    color: lightgray;
+}
+
+.symbol.mana.generic  {
+    background-color: var(--colorless);
+    filter: brightness(1.4);
+}
+.symbol.mana.generic.plus-10 {
+    font-size: 15pt;
+    line-height: 1.3;
+}
+.card-oracle-text .symbol.mana.generic.plus-10 {
+    font-size: 13pt;
+    line-height: 1.3;
+}
+
+.symbol.mana.colorless  {
+    background-color: var(--colorless);
+    filter: brightness(1.4);
+}
+.symbol.mana.colorless:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 58% !important;
+    transform: rotate(45deg);
+    position: relative;
+    top: -26%;
+}
+
+.symbol.mana.white {
+    background-color: var(--white);
+    filter: brightness(1.1);
+}
+.symbol.mana.white:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 85% !important;
+    position: relative;
+}
+.card-oracle-text .symbol.mana.white:not(.phyrexian):not(.snow) svg {
+    top: -12%;
+}
+
+.symbol.mana.blue {
+    background-color: var(--blue);
+    filter: brightness(1.75) saturate(0.5);
+}
+.symbol.mana.blue:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 70% !important;
+    position: relative;
+    top: -6%;
+}
+.card-oracle-text .symbol.mana.blue:not(.phyrexian):not(.snow) svg {
+    top: -18%;
+}
+
+.symbol.mana.black {
+    background-color: var(--black);
+    filter: brightness(1.5) saturate(0.7);
+}
+.symbol.mana.black:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 70% !important;
+    position: relative;
+    top: -6%;
+}
+.card-oracle-text .symbol.mana.black:not(.phyrexian):not(.snow) svg {
+    top: -20%;
+    right: 2%;
+}
+
+.symbol.mana.red {
+    background-color: var(--red);
+    filter: brightness(3.5) hue-rotate(-10deg) saturate(0.7);
+}
+.symbol.mana.red:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 75% !important;
+    position: relative;
+    top: -4%;
+    right: -6%;
+    transform: scaleX(-1) rotate(-35deg);
+}
+.card-oracle-text .symbol.mana.red:not(.phyrexian):not(.snow) svg {
+    top: -18%;
+    right: -8%;
+}
+
+.symbol.mana.green {
+    background-color: var(--green);
+    filter: brightness(1.5) hue-rotate(-10deg) saturate(0.7);
+}
+.symbol.mana.green:not(.phyrexian):not(.snow) svg {
+    width: unset !important;
+    height: 85% !important;
+    position: relative;
+    top: -4%;
+}
+.card-oracle-text .symbol.mana.green:not(.phyrexian):not(.snow) svg {
+    top: -12%;
+}
+
+
+.symbol.mana.azorius {
+    background-image: linear-gradient(-45deg, var(--white) 40%, var(--blue) 60%);
+}
+.symbol.mana.orzhov {
+    background-image: linear-gradient(-45deg, var(--white) 40%, var(--black) 60%);
+}
+.symbol.mana.boros {
+    background-image: linear-gradient(-45deg, var(--red) 40%, var(--white) 60%);
+}
+.symbol.mana.selesnya {
+    background-image: linear-gradient(-45deg, var(--green) 40%, var(--white) 60%);
+}
+.symbol.mana.dimir {
+    background-image: linear-gradient(-45deg, var(--blue) 40%, var(--black) 60%);
+}
+.symbol.mana.izzet {
+    background-image: linear-gradient(-45deg, var(--blue) 40%, var(--red) 60%);
+}
+.symbol.mana.simic {
+    background-image: linear-gradient(-45deg, var(--green) 40%, var(--blue) 60%);
+}
+.symbol.mana.rakdos {
+    background-image: linear-gradient(-45deg, var(--black) 40%, var(--red) 60%);
+}
+.symbol.mana.golgari {
+    background-image: linear-gradient(-45deg, var(--black) 40%, var(--green) 60%);
+}
+.symbol.mana.gruul {
+    background-image: linear-gradient(-45deg, var(--red) 40%, var(--green) 60%);
+}
+.symbol.mana.azorius:not(.phyrexian):not(.snow) svg,
+.symbol.mana.orzhov:not(.phyrexian):not(.snow) svg,
+.symbol.mana.boros:not(.phyrexian):not(.snow) svg,
+.symbol.mana.selesnya:not(.phyrexian):not(.snow) svg,
+.symbol.mana.dimir:not(.phyrexian):not(.snow) svg,
+.symbol.mana.izzet:not(.phyrexian):not(.snow) svg,
+.symbol.mana.simic:not(.phyrexian):not(.snow) svg,
+.symbol.mana.rakdos:not(.phyrexian):not(.snow) svg,
+.symbol.mana.golgari:not(.phyrexian):not(.snow) svg,
+.symbol.mana.gruul :not(.phyrexian):not(.snow) svg{
+    width: unset !important;
+    height: 75% !important;
+    position: relative;
+    top: -7%;
+}
+
+.symbol.tap svg {
+    width: unset !important;
+    height: 70% !important;
+    transform: rotate(30deg);
+    position: relative;
+    top: -18%;
+}
+.symbol.untap svg {
+    width: unset !important;
+    height: 70% !important;
+    transform: scaleX(-1) rotate(-30deg);
+    position: relative;
+    top: -18%;
+}

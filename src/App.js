@@ -61,6 +61,7 @@ function App() {
                   cardLoyalty={cardData.loyalty}
                   cardPower={cardData.power}
                   cardToughness={cardData.toughness}
+                  cardSet={cardData.set.toUpperCase()}
                   blackBordered={blackBordered}
                 />
               </div>

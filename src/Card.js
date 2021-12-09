@@ -95,6 +95,7 @@ const Card = ({
   cardPower,
   cardToughness,
   cardLoyalty,
+  cardSet = 'PXY',
   devoid,
   blackBordered,
 }) => {
@@ -136,7 +137,7 @@ const Card = ({
             <div className="card-rounded-box-border color-identity-border">
               <div className="card-rounded-box-content">
                 <div ref={cardTypeRef} className="card-type shrink-text-size">{cardTypeLine}</div>
-                <div className="card-expansion-symbol">PXY</div>
+                <div className="card-expansion-symbol">{cardSet}</div>
               </div>
             </div>
           </div>

@@ -53,6 +53,7 @@ const formatTextSymbols = (text) => {
     .replace(/{(\d)}/g, '<span class="symbol mana generic">$1</span>')
     .replace(/{(\d\d)}/g, '<span class="symbol mana generic plus-10">$1</span>')
     .replace(/{C}/g, '<span class="symbol mana colorless"><i class="far fa-square"></i></span>')
+    .replace(/{X}/g, '<span class="symbol mana colorless">X</span>')
     .replace(/{W}/g, '<span class="symbol mana white"><i class="fa fa-sun"></i></span>')
     .replace(/{U}/g, '<span class="symbol mana blue"><i class="fa fa-tint"></i></span>')
     .replace(/{B}/g, '<span class="symbol mana black"><i class="fa fa-skull"></i></span>')

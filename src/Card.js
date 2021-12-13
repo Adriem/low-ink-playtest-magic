@@ -120,7 +120,7 @@ const Card = ({
               <div className="card-rounded-box-content">
                 <div ref={cardTitleRef} className="card-title shrink-text-size">{cardName}</div>
                 <div className="card-mana-cost" dangerouslySetInnerHTML={{
-                  __html: formatTextSymbols(cardManaCost)
+                  __html: formatTextSymbols(cardManaCost || '')
                 }} />
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import CanvasCard from './CanvasCard';
 import Card from './Card';
 import useCardData from './hooks/useCardData';
 import Reference from './Reference';
@@ -28,7 +29,8 @@ const Workbench = () => {
                 </div>
 
                 <div style={{ marginTop: '-2px', zIndex: '0' }}>
-                  <Card
+                  {/*<Card*/}
+                  <CanvasCard
                     cardName={cardData.name}
                     cardManaCost={cardData.mana_cost}
                     cardColors={cardColors || cardData.colors}
@@ -54,8 +56,8 @@ const Workbench = () => {
           <input id="blackBordered" type="checkbox" onChange={(e) => setBlackBordered(e.target.checked)} />
           <label htmlFor="blackBordered">Black border</label>
         </div>
-        <select name="borderColor" onChange={(e) => setCardColors(e.target.value)}>
-          <option value="" selected>default</option>
+        <select name="borderColor" defaultValue="" onChange={(e) => setCardColors(e.target.value)}>
+          <option value="">default</option>
           <option value={[]}>none</option>
           <option value={["W"]}>white</option>
           <option value={["U"]}>blue</option>

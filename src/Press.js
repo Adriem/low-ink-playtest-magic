@@ -30,7 +30,9 @@ const Press = () => {
   const fetchSingleCard = useCallback(async (cardName) => {
     if (!cardName) return;
 
-    const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`);
+    const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
+      headers: { Origin: window.location.origin }
+    });
 
     if (!response.ok) {
       const error = await response.json();

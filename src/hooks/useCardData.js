@@ -10,12 +10,16 @@ const useCardData = (cardName) => {
 
     setLoading(true);
 
-    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`)
+    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
+      headers: { Origin: window.location.origin }
+    })
       .then(async r => r.ok ? await r.json() : Promise.reject(await r.json()))
       .then(data => {
         setLoading(false);
         setError(null);
-        setCardData(data);
+        setCardData(data.card_faces
+          ? { ...data, ...data.card_faces[0], reverse_name: data.card_faces[1].card_name }
+          : data);
       })
       .catch(error => {
         setLoading(false);

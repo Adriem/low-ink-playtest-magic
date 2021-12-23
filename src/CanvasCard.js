@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY, wrapText } from './utils/canvasText';
-
+import { getSymbolImage } from './utils/symbols';
 
 const Colors = {
   COLORLESS: 'rgb(145, 145, 145)',
@@ -282,7 +282,7 @@ const drawTitleBox = (ctx, {
   fitFontSizeInX(ctx, cardName, titleEndX - titleOriginX)
   ctx.fillText(cardName, 40, 65);
 
-  manaSymbols.forEach((symbol, i) => {
+  manaSymbols.forEach(async (symbol, i) => {
     const yOffset = 2;
     const shadowYOffset = 2;
     const radius = manaSymbolWidth / 2;
@@ -297,11 +297,20 @@ const drawTitleBox = (ctx, {
     ctx.arc(originX, originY + shadowYOffset, radius, 0, 2 * Math.PI);
     ctx.fill();
 
-    // Actual symbol
+    // Symbol placeholder
     ctx.beginPath();
-    ctx.fillStyle = 'magenta';
+    ctx.fillStyle = 'lightgray';
     ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
     ctx.fill();
+
+    ctx.drawImage(
+      await getSymbolImage(symbol),
+      originX - radius,
+      originY - radius,
+      2 * radius,
+      2 * radius,
+    );
+
   });
 };
 
@@ -451,7 +460,29 @@ const drawStatsBox = (ctx, { cardPower, cardToughness, cardColorIdentity }) => {
   ctx.fillText(`${cardPower}/${cardToughness}`, 389 + 40, 654);
 };
 
-const drawLoyaltyBox = (ctx) => {
+const drawLoyaltyBox = (ctx, { cardLoyalty, cardColorIdentity }) => {
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.moveTo(439, 664);
+  ctx.arc(378, 645, 29, 0.075 * Math.PI, 1.765 * Math.PI, true);
+  ctx.arc(439, 612, 11, 0.90 * Math.PI, 0.1 * Math.PI, true);
+  ctx.arc(499, 645, 29, 1.225 * Math.PI, 0.925 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.moveTo(439, 659);
+  ctx.arc(379, 645, 32, 0.045 * Math.PI, 1.82 * Math.PI, true);
+  ctx.arc(439, 613, 15, 0.825 * Math.PI, 0.175 * Math.PI, true);
+  ctx.arc(498, 645, 32, 1.18 * Math.PI, 0.955 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = "bold 27px Serif";
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  ctx.fillText(cardLoyalty, 439, 652);
 };
 
 const CanvasCard = ({
@@ -492,30 +523,12 @@ const CanvasCard = ({
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
     drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity })
 
-    // Power and thoughness box
     if (cardPower && cardToughness) {
       drawStatsBox(ctx, { cardPower, cardToughness, cardColorIdentity });
     }
 
-    // Power and thoughness box
     if (cardLoyalty) {
-      drawRoundedBox(ctx, {
-        x: 385,
-        y: 624,
-        width: 88,
-        height: 41,
-        lineWidth: 0,
-        fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-      });
-      drawRoundedBox(ctx, {
-        x: 389,
-        y: 628,
-        width: 80,
-        height: 31,
-        lineWidth: BORDER_STROKE / 2,
-        strokeStyle: 'black',
-        fillStyle: 'white',
-      });
+      drawLoyaltyBox(ctx, { cardLoyalty, cardColorIdentity });
     }
   }, [
     canvas,

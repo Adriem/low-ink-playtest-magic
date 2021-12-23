@@ -1,3 +1,5 @@
+import { getSymbolImage } from './symbols';
+
 const EMPTY_LINE_RELATIVE_SIZE = .25;
 /**
  * Automatically wrap a given text to fit inside an specified maximum width on
@@ -94,7 +96,11 @@ export const fillMultilineText = (ctx, lines, originX, originY) => {
   let previousFontSize = null;
 
   for (const line of lines) {
-    const currentFontSize = ctx.measureText(line);
+    // Convert any symbol codes to a fixed-length character sequence that is
+    // equivalent enough in width to the rendered images for the symbols. This
+    // will help measuring the text length more accurately.
+    const convertedLine = line.replace(/{.+?}/g, '‹::›');
+    const currentFontSize = ctx.measureText(convertedLine);
 
     if (previousFontSize) {
       const previousLineFontDescent = previousFontSize.fontBoundingBoxDescent;
@@ -107,6 +113,44 @@ export const fillMultilineText = (ctx, lines, originX, originY) => {
 
     previousFontSize = currentFontSize;
 
-    ctx.fillText(line, originX, currentBaseLine);
+    renderTextWithSymbols(ctx, line, originX, currentBaseLine);
+    // ctx.fillText(convertedLine, originX, currentBaseLine);
   }
-}
+};
+
+export const renderTextWithSymbols = (ctx, text, x, y) => {
+  const trimmedText = text.trim();
+  const symbolChunksRegex = /(?:{.+?})+/g;
+  const textChunks = trimmedText.split(symbolChunksRegex);
+  const [...symbolChunks] = trimmedText.match(symbolChunksRegex) || [];
+
+  const { fontBoundingBoxAscent, fontBoundingBoxDescent } = ctx.measureText('');
+  const symbolSize = fontBoundingBoxAscent;
+  const symbolPadding = 1;
+
+  let currentX = x;
+
+  for (let i = 0; i < textChunks.length; i++) {
+    const textChunk = textChunks[i];
+
+    ctx.fillText(textChunk, currentX, y);
+    currentX += ctx.measureText(textChunk).width
+
+    const symbolsChunk = symbolChunks[i];
+    const [...symbolsList] = (symbolsChunk || '').match(/({.+?})/g) || [];
+
+    for (const symbol of symbolsList) {
+      const symbolX = currentX;
+      const symbolY = y - symbolSize + (fontBoundingBoxAscent + fontBoundingBoxDescent - symbolSize) / 2;
+
+      // Do not await
+      getSymbolImage(symbol)
+        .then(img => ctx.drawImage(img, symbolX, symbolY, symbolSize, symbolSize));
+
+      currentX += symbolSize + symbolPadding;
+    }
+
+    // Correct last (unnecessary) padding
+    if (symbolsList.length > 0) currentX -= symbolPadding;
+  }
+};

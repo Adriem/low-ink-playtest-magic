@@ -528,7 +528,7 @@ const CanvasCard = ({
     blackBordered,
   ]);
 
-  return <canvas ref={canvasRef} height={HEIGHT} width={WIDTH} style={{ background: 'white' }} />
+  return <canvas className="card" ref={canvasRef} height={HEIGHT} width={WIDTH} style={{ background: 'white' }} />
 };
 
 export default CanvasCard;

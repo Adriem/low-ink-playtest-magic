@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import useCardData from './hooks/useCardData';
-import Card from './Card';
+import Card from './CanvasCard';
 
 import './Press.css';
+import exportToPDF from './utils/exportToPdf';
 
 const Press = () => {
   const [multipleSearch, setMultipleSearch] = useState(false);
@@ -67,7 +68,13 @@ const Press = () => {
     } finally {
       setLoading(false);
     }
-  }, [fetchSingleCard]);
+  }, [fetchSingleCard, multipleSearch]);
+
+  const exportPress = useCallback(() => {
+    const canvases = document.querySelectorAll('canvas.card');
+
+    exportToPDF(canvases);
+  }, [setCardList])
 
   return (
     <>
@@ -141,6 +148,9 @@ const Press = () => {
           ))}
         </div>
       ))}
+      <div>
+        <button onClick={exportPress}>EXPORT</button>
+      </div>
     </>
   )
 };

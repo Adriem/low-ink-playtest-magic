@@ -1,16 +1,20 @@
 import { useLayoutEffect, useRef } from 'react';
+import { midBrightnessPass } from './utils/canvasFilters';
 import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY, wrapText } from './utils/canvasText';
 import { getSymbolImage } from './utils/symbols';
 
 const Colors = {
-  COLORLESS: 'rgb(145, 145, 145)',
+  COLORLESS: 'rgb(210,210,210)',
+  // COLORLESS: 'rgb(145, 145, 145)',
   WHITE: 'rgb(213, 194, 167)',
   BLUE: 'rgb(41, 133, 225)',
   BLACK: 'rgb(105, 92, 114)',
   RED: 'rgb(211, 14, 14)',
   GREEN: 'rgb(6, 147, 45)',
   MULTI: 'rgb(239, 164, 0)',
-  ARTIFACT: 'rgb(176, 184, 203)',
+  ARTIFACT: 'rgb(156,168,182)',
+  // ARTIFACT: 'rgb(138,145,162)',
+  // ARTIFACT: 'rgb(176, 184, 203)',
   LAND: 'rgb(143, 120, 90)',
 };
 
@@ -40,7 +44,7 @@ const getColorMappings = (cardColors, cardTypeLine) => {
   if (cardColors.length > 2) return 'multi';
 };
 
-const getColorIdentityStyle = (ctx, colorIdentity) => {
+const getColorIdentityStyle = (ctx, colorIdentity, { devoid } = {}) => {
   switch (colorIdentity) {
     case 'white': return Colors.WHITE;
     case 'blue': return Colors.BLUE;
@@ -410,29 +414,7 @@ const drawArtBox = (ctx, {
   artImage.crossOrigin = 'Anonymous';
   artImage.onload = () => {
     ctx.drawImage(artImage, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
-
-    // Filter
-    const imagePixels = ctx.getImageData(39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
-    const data = imagePixels.data;
-    for (let i = 0; i < data.length; i += 4) {
-      const r = data[i];
-      const g = data[i+1];
-      const b = data[i+2];
-      const computedBrightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-      if (computedBrightness > 170) {
-        data[i] = data[i+1] = data[i+2] = 255;
-      } else if (computedBrightness > 128) {
-        data[i] = data[i+1] = data[i+2] = 215;
-      } else if (computedBrightness > 95) {
-        data[i] = data[i+1] = data[i+2] = 170;
-      } else if (computedBrightness > 60) {
-        data[i] = data[i+1] = data[i+2] = 215;
-      } else {
-        data[i] = data[i+1] = data[i+2] = 255;
-      }
-    }
-    ctx.putImageData(imagePixels, 39, 82);
+    midBrightnessPass(ctx, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
   };
 }
 

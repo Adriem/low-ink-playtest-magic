@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import useCardData from './hooks/useCardData';
 import Card from './CanvasCard';
+// import Card from './cards/Minimal';
 
 import './Press.css';
 import exportToPDF from './utils/exportToPdf';

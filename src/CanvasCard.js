@@ -232,17 +232,17 @@ const drawOuterFrame = (ctx, { blackBordered }) => {
     fillStyle: blackBordered ? 'black' : 'white',
     borderRadiusTop: OUTER_BORDER_RADIUS,
   });
-  drawRectangle(ctx, {
-    x: INNER_BORDER_MARGIN,
-    y: INNER_BORDER_MARGIN,
-    width: ctx.canvas.width - INNER_BORDER_MARGIN * 2,
-    height: ctx.canvas.height - INNER_BORDER_MARGIN * 2 - INNER_BORDER_MARGIN_BOTTOM,
-    lineWidth: INNER_BORDER_STROKE,
-    strokeStyle: 'black',
-    fillStyle: 'white',
-    borderRadiusTop: INNER_BORDER_RADIUS_TOP,
-    borderRadiusBottom: INNER_BORDER_RADIUS_BOTTOM,
-  });
+  // drawRectangle(ctx, {
+  //   x: INNER_BORDER_MARGIN,
+  //   y: INNER_BORDER_MARGIN,
+  //   width: ctx.canvas.width - INNER_BORDER_MARGIN * 2,
+  //   height: ctx.canvas.height - INNER_BORDER_MARGIN * 2 - INNER_BORDER_MARGIN_BOTTOM,
+  //   lineWidth: INNER_BORDER_STROKE,
+  //   strokeStyle: 'black',
+  //   fillStyle: 'white',
+  //   borderRadiusTop: INNER_BORDER_RADIUS_TOP,
+  //   borderRadiusBottom: INNER_BORDER_RADIUS_BOTTOM,
+  // });
 };
 
 const drawTitleBox = (ctx, {

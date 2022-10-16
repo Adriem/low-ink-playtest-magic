@@ -33,6 +33,44 @@ export const wrapText = (ctx, text, maxWidth) => {
 }
 
 /**
+ * Get the font size (in pixels) of the current canvas context
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+ * @returns {number} Font size
+ */
+export const getFontSize = (ctx) => {
+  const [, currentFont] = ctx.font.match(/(\d+)px/);
+  return currentFont;
+}
+
+/**
+ * Reduce the text size on the current canvas by the specified amount (by
+ * default, 1px)
+ *
+ * NOTE: This method updates the canvas configuration
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+ * @param {number} reduceAmount - Amount (in pixels) to reduce the font size by
+ */
+export const reduceTextSize = (ctx, reduceAmount = 1) => {
+  const currentFont = getFontSize(ctx)
+  ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - reduceAmount}px`);
+}
+
+/**
+ * Calculate the line height (in pixels) from a TextMetrics
+ * fits within a specified max width.
+ *
+ * NOTE: This method updates the canvas configuration
+ *
+ * @param {TextMetrics} textMetrics - Text metrics
+ * @returns {number} Height in pixels of the given measures
+ */
+export const getLineHeight = (textMetrics) => {
+  return textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent;
+}
+
+/**
  * Automatically reduce the font size of the canvas until a given text
  * fits within a specified max width.
  *
@@ -43,10 +81,7 @@ export const wrapText = (ctx, text, maxWidth) => {
  * @param {number} maxWidth - Maximum width where the text must be placed
  */
 export const fitFontSizeInX = (ctx, text, maxWidth) => {
-  while(ctx.measureText(text).width > maxWidth) {
-    const [, currentFont] = ctx.font.match(/(\d+)px/);
-    ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - 1}px`);
-  }
+  while (ctx.measureText(text).width > maxWidth) reduceTextSize(ctx)
 };
 
 /**
@@ -75,19 +110,14 @@ export const fitFontSizeInXY = (ctx, paragraphs, maxWidth, maxHeight) => {
     });
 
     textHeight = textLines.reduce((height, line) => {
-      const lineMeasures = ctx.measureText(line);
-      const lineHeight = lineMeasures.fontBoundingBoxAscent
-        + lineMeasures.fontBoundingBoxDescent;
+      const lineHeight = getLineHeight(ctx.measureText(line))
 
       return line
         ? height + lineHeight
         : height + lineHeight * EMPTY_LINE_RELATIVE_SIZE;
     }, 0);
 
-    if (textHeight > maxHeight) {
-      const [, currentFont] = ctx.font.match(/(\d+)px/);
-      ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - 1}px`);
-    }
+    if (textHeight > maxHeight) reduceTextSize(ctx);
   } while (textHeight > maxHeight);
 
   return textLines;
@@ -114,15 +144,13 @@ export const fitTextIntoBox = (ctx, paragraphs, maxHeight) => {
   let processedParagraphs;
 
   do {
-    const [, currentFont] = ctx.font.match(/(\d+)px/);
+    const currentFont = getFontSize(ctx)
 
     processedParagraphs = paragraphs.map(({ content, width }, position) => {
       const lines = wrapText(ctx, content, width);
-      const paragraphHeight = lines.reduce((totalHeight, line) => {
-        const lineMeasures = ctx.measureText(line);
-        const lineHeight = lineMeasures.fontBoundingBoxAscent + lineMeasures.fontBoundingBoxDescent;
 
-        return totalHeight + lineHeight;
+      const paragraphHeight = lines.reduce((totalHeight, line) => {
+        return totalHeight + getLineHeight(ctx.measureText(line));
       }, 0);
 
       const paragraphHeightWithMargin = position === (paragraphs.length - 1)
@@ -141,15 +169,11 @@ export const fitTextIntoBox = (ctx, paragraphs, maxHeight) => {
       return totalHeight + paragraphHeight;
     }, 0);
 
-    if (textHeight > maxHeight) {
-      ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - 1}px`);
-    }
+    if (textHeight > maxHeight) reduceTextSize(ctx);
   } while (textHeight > maxHeight);
 
-  console.log(processedParagraphs)
-
   return processedParagraphs;
-}
+};
 
 export const fillMultilineText = (ctx, lines, originX, originY) => {
   let currentBaseLine = originY;
@@ -174,7 +198,6 @@ export const fillMultilineText = (ctx, lines, originX, originY) => {
     previousFontSize = currentFontSize;
 
     renderTextWithSymbols(ctx, line, originX, currentBaseLine);
-    // ctx.fillText(convertedLine, originX, currentBaseLine);
   }
 };
 

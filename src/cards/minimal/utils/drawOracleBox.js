@@ -5,7 +5,6 @@ const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character he
 const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 
-
 export const drawOracleBox = (ctx, { cardOracleText, x, y, height, width }) => {
   ctx.font = "30px Tahoma";
   ctx.fillStyle = 'black';

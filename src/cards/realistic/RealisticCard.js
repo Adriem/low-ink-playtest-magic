@@ -1,6 +1,11 @@
 import { useEffect, useState } from 'react';
 import { midBrightnessPass } from '../../utils/canvasFilters';
-import { drawLoyaltyBox, drawRectangle, drawRoundedBox } from '../../utils/canvasShapes';
+import {
+  drawLoyaltyBox, drawLoyaltyMinus,
+  drawLoyaltyPlus, drawLoyaltyZero,
+  drawRectangle,
+  drawRoundedBox,
+} from '../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY } from '../../utils/canvasText';
 import { getColorMappings } from '../../utils/colors';
@@ -278,7 +283,7 @@ const RealisticCard = ({
     }
 
     if (cardLoyalty) {
-      drawLoyaltyBox(ctx, { cardLoyalty, cardColorIdentity, x: 439, y: 664 });
+      drawLoyaltyBox(ctx, { cardLoyalty, x: 439, y: 664 });
     }
   }, [
     canvas,

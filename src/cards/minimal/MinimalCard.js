@@ -4,6 +4,7 @@ import { getColorIdentityStyle } from '../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY, wrapText } from '../../utils/canvasText';
 import { getColorMappings } from '../../utils/colors';
 import { getSymbolImage } from '../../utils/symbols';
+import { drawOracleBox, drawPlaneswalkerOracleBox } from './utils/drawOracleBox';
 
 const drawOuterFrame = (ctx, { blackBordered }) => {
   const OUTER_BORDER_RADIUS = 0;
@@ -105,55 +106,12 @@ const drawTypeBox = (ctx, { cardType, cardColorIdentity, }) => {
   ctx.fillText(cardType.toUpperCase(), 45, 189);
 };
 
-const drawOracleBox = (ctx, {
-  cardOracleText,
-  cardPower,
-  cardToughness,
-  cardLoyalty,
-}) => {
-  ctx.font = "25px Tahoma";
-  ctx.fillStyle = 'black';
-  ctx.textAlign = 'start';
-
-  fillMultilineText(ctx, fitFontSizeInXY(
-    ctx,
-    cardOracleText.split('\n'),
-    ctx.canvas.width - 45 * 2,
-    ((cardPower != null && cardToughness != null) || cardLoyalty != null ? 625 : 640) - 45,
-  ), 45, 270);
-};
-
 const drawStatsBox = (ctx, { cardPower, cardToughness }) => {
   ctx.font = "40px Tahoma";
   ctx.fillStyle = 'black';
   ctx.textAlign = 'center';
   ctx.fillText(`${cardPower}/${cardToughness}`, 389 + 40, 654);
 };
-
-// const drawLoyaltyBox = (ctx, { cardLoyalty, cardColorIdentity }) => {
-//   ctx.fillStyle = 'black';
-//   ctx.beginPath();
-//   ctx.moveTo(439, 664);
-//   ctx.arc(378, 645, 29, 0.075 * Math.PI, 1.765 * Math.PI, true);
-//   ctx.arc(439, 612, 11, 0.90 * Math.PI, 0.1 * Math.PI, true);
-//   ctx.arc(499, 645, 29, 1.225 * Math.PI, 0.925 * Math.PI, true);
-//   ctx.closePath();
-//   ctx.fill();
-//
-//   ctx.fillStyle = 'white';
-//   ctx.beginPath();
-//   ctx.moveTo(439, 659);
-//   ctx.arc(379, 645, 32, 0.045 * Math.PI, 1.82 * Math.PI, true);
-//   ctx.arc(439, 613, 15, 0.825 * Math.PI, 0.175 * Math.PI, true);
-//   ctx.arc(498, 645, 32, 1.18 * Math.PI, 0.955 * Math.PI, true);
-//   ctx.closePath();
-//   ctx.fill();
-//
-//   ctx.font = "bold 27px Tahoma";
-//   ctx.fillStyle = 'black';
-//   ctx.textAlign = 'center';
-//   ctx.fillText(cardLoyalty, 439, 652);
-// };
 
 const CanvasCard = ({
   cardName,
@@ -189,14 +147,33 @@ const CanvasCard = ({
     drawOuterFrame(ctx, { blackBordered });
     drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
-    drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity })
 
     if (cardPower && cardToughness) {
+      drawOracleBox(ctx, {
+        cardOracleText,
+        x: 45,
+        y: 270,
+        height: 440 - 45,
+        width: ctx.canvas.width - 45 * 2,
+      })
       drawStatsBox(ctx, { cardPower, cardToughness, cardColorIdentity });
-    }
-
-    if (cardLoyalty) {
+    } else if (cardLoyalty) {
+      drawPlaneswalkerOracleBox(ctx, {
+        cardOracleText,
+        x: 45,
+        y: 270,
+        height: 430 - 45,
+        width: ctx.canvas.width - 45 * 2,
+      })
       drawLoyaltyBox(ctx, { cardLoyalty, cardColorIdentity, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
+    } else {
+      drawOracleBox(ctx, {
+        cardOracleText,
+        x: 45,
+        y: 270,
+        height: 460 - 45,
+        width: ctx.canvas.width - 45 * 2,
+      })
     }
   }, [
     canvas,

@@ -1,6 +1,8 @@
 import { getSymbolImage } from './symbols';
 
 const EMPTY_LINE_RELATIVE_SIZE = .25;
+const PARAGRAPH_SPACING_RELATIVE_SIZE = .75;
+
 /**
  * Automatically wrap a given text to fit inside an specified maximum width on
  * a canvas with a properly set font.
@@ -90,6 +92,64 @@ export const fitFontSizeInXY = (ctx, paragraphs, maxWidth, maxHeight) => {
 
   return textLines;
 };
+
+/**
+ * Automatically reduce the font size of the canvas until a given text
+ * wraps and fits within a specified max width and height.
+ *
+ * NOTE: This method updates the canvas configuration
+ *
+ * @param {CanvasRenderingContext2D} ctx - Canvas rendering context
+ * @param {{content: string, width: number}[]} paragraphs - Text to fit in the given width
+ * @param {number} maxHeight - Maximum height where the text must be placed
+ * @returns {{
+ *   originalContent: string,
+ *   lineHeight: number,
+ *   paragraphHeight: number,
+ *   lines: string[],
+ * }[]} Lines with the text wrapped ready to be displayed.
+ */
+export const fitTextIntoBox = (ctx, paragraphs, maxHeight) => {
+  let textHeight;
+  let processedParagraphs;
+
+  do {
+    const [, currentFont] = ctx.font.match(/(\d+)px/);
+
+    processedParagraphs = paragraphs.map(({ content, width }, position) => {
+      const lines = wrapText(ctx, content, width);
+      const paragraphHeight = lines.reduce((totalHeight, line) => {
+        const lineMeasures = ctx.measureText(line);
+        const lineHeight = lineMeasures.fontBoundingBoxAscent + lineMeasures.fontBoundingBoxDescent;
+
+        return totalHeight + lineHeight;
+      }, 0);
+
+      const paragraphHeightWithMargin = position === (paragraphs.length - 1)
+        ? paragraphHeight
+        : (paragraphHeight + currentFont * PARAGRAPH_SPACING_RELATIVE_SIZE)
+
+      return {
+        originalContent: content,
+        lines,
+        lineHeight: currentFont,
+        paragraphHeight: paragraphHeightWithMargin,
+      };
+    });
+
+    textHeight = processedParagraphs.reduce((totalHeight, { paragraphHeight }) => {
+      return totalHeight + paragraphHeight;
+    }, 0);
+
+    if (textHeight > maxHeight) {
+      ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - 1}px`);
+    }
+  } while (textHeight > maxHeight);
+
+  console.log(processedParagraphs)
+
+  return processedParagraphs;
+}
 
 export const fillMultilineText = (ctx, lines, originX, originY) => {
   let currentBaseLine = originY;

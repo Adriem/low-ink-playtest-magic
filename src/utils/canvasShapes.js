@@ -1,3 +1,5 @@
+import { fitFontSizeInX } from './canvasText';
+
 export const drawRectangle = (ctx, {
   x,
   y,
@@ -90,12 +92,119 @@ export const drawRoundedBox = (ctx, {
   if (strokeStyle != null) ctx.stroke();
 };
 
+export const drawLoyaltyPlus = (ctx, {
+  loyaltyCost,
+  x,
+  y,
+  scale = 1,
+  fontFamily = 'Serif',
+  fontSize = 22,
+}) => {
+  const topY = y - 18
+
+  const leftArcProps = { x: x - (47 * scale), y: topY + (21 * scale), radius: (23 * scale) };
+  const rightArcProps = { x: x + (46 * scale), y: topY + (21 * scale), radius: (23 * scale) };
+
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.moveTo(x, topY);
+  ctx.arc(rightArcProps.x, rightArcProps.y, rightArcProps.radius, 1.135 * Math.PI, 0.795 * Math.PI, true);
+  ctx.arc(leftArcProps.x, leftArcProps.y, leftArcProps.radius, 0.205 * Math.PI, 1.855 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.moveTo(x, topY + (6 * scale));
+  ctx.arc(rightArcProps.x - scale, rightArcProps.y, rightArcProps.radius + (3 * scale), 1.09 * Math.PI, 0.875 * Math.PI, true);
+  ctx.arc(leftArcProps.x + scale, leftArcProps.y, leftArcProps.radius + (3 * scale), 0.125 * Math.PI, 1.91 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = `bold ${fontSize * scale}px ${fontFamily}`;
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  fitFontSizeInX(ctx, loyaltyCost, 30 * scale)
+  ctx.fillText(loyaltyCost, x, topY + (28 * scale));
+};
+
+export const drawLoyaltyMinus = (ctx, {
+  loyaltyCost,
+  x,
+  y,
+  scale = 1,
+  fontFamily = 'Serif',
+  fontSize = 22,
+}) => {
+  const bottomY = y + 18
+
+  const leftArcProps = { x: x - (47 * scale), y: bottomY - (21 * scale), radius: (23 * scale) };
+  const rightArcProps = { x: x + (46 * scale), y: bottomY - (21 * scale), radius: (23 * scale) };
+
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.moveTo(x, bottomY);
+  ctx.arc(leftArcProps.x, leftArcProps.y, leftArcProps.radius, 0.125 * Math.PI, 1.775 * Math.PI, true);
+  ctx.arc(rightArcProps.x, rightArcProps.y, rightArcProps.radius, 1.215 * Math.PI, 0.875 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.moveTo(x, bottomY - (6 * scale));
+  ctx.arc(leftArcProps.x + scale, leftArcProps.y, leftArcProps.radius + (3 * scale), 0.085 * Math.PI, 1.87 * Math.PI, true);
+  ctx.arc(rightArcProps.x - scale, rightArcProps.y, rightArcProps.radius + (3 * scale), 1.13 * Math.PI, 0.915 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = `bold ${fontSize * scale}px ${fontFamily}`;
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  fitFontSizeInX(ctx, loyaltyCost, 30 * scale)
+  ctx.fillText(loyaltyCost, x, bottomY - (14 * scale));
+};
+
+export const drawLoyaltyZero = (ctx, {
+  loyaltyCost = 0,
+  x,
+  y,
+  scale = 1,
+  fontFamily = 'Serif',
+  fontSize = 22,
+}) => {
+  const bottomY = y + 14
+
+  const leftArcProps = { x: x - (47 * scale), y: bottomY - (15 * scale), radius: (23 * scale) };
+  const rightArcProps = { x: x + (46 * scale), y: bottomY - (15 * scale), radius: (23 * scale) };
+
+  ctx.fillStyle = 'black';
+  ctx.beginPath();
+  ctx.moveTo(x, bottomY);
+  ctx.arc(leftArcProps.x, leftArcProps.y, leftArcProps.radius, 0.225 * Math.PI, 1.775 * Math.PI, true);
+  ctx.arc(rightArcProps.x, rightArcProps.y, rightArcProps.radius, 1.215 * Math.PI, 0.775 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.fillStyle = 'white';
+  ctx.beginPath();
+  ctx.moveTo(x, bottomY - (5 * scale));
+  ctx.arc(leftArcProps.x + scale, leftArcProps.y, leftArcProps.radius + (3 * scale), 0.125 * Math.PI, 1.87 * Math.PI, true);
+  ctx.arc(rightArcProps.x - scale, rightArcProps.y, rightArcProps.radius + (3 * scale), 1.13 * Math.PI, 0.875 * Math.PI, true);
+  ctx.closePath();
+  ctx.fill();
+
+  ctx.font = `bold ${fontSize * scale}px ${fontFamily}`;
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  ctx.fillText(loyaltyCost, x, bottomY - (7 * scale));
+};
+
 export const drawLoyaltyBox = (ctx, {
   cardLoyalty,
   x,
   y,
   scale = 1,
-  fontFamily = 'Serif'
+  fontFamily = 'Serif',
 }) => {
   const leftArcProps = { x: x - (61 * scale), y: y - (19 * scale), radius: (29 * scale) };
   const topArcProps = { x, y: y - (52 * scale), radius: (11 * scale) };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import CanvasCard from './CanvasCard';
+import Realistic from './cards/realistic/RealisticCard';
 import Card from './Card';
 import useCardData from './hooks/useCardData';
 import Reference from './Reference';
@@ -30,7 +30,7 @@ const Workbench = () => {
 
                 <div style={{ marginTop: '-2px', zIndex: '0' }}>
                   {/*<Card*/}
-                  <CanvasCard
+                  <Realistic
                     cardName={cardData.name}
                     cardManaCost={cardData.mana_cost}
                     cardColors={cardColors || cardData.colors}

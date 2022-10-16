@@ -1,81 +1,56 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import useCardData from './hooks/useCardData';
-import Card from './CanvasCard';
-// import Card from './cards/Minimal';
+// import Card from './cards/realistic/RealisticCard';
+import Card from './cards/minimal/MinimalCard';
 
 import './Press.css';
+import { useCardSheet } from './hooks/useCardSheet';
 import exportToPDF from './utils/exportToPdf';
+
+const CARDS_PER_SHEET = 9
 
 const Press = () => {
   const [multipleSearch, setMultipleSearch] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [cardList, setCardList] = useState([]);
-  const [cardSheets, setSheets] = useState([]);
-
-  useEffect(() => {
-    const _cardList = [...cardList]
-    const _cardSheets = [];
-    while (_cardList.length) _cardSheets.push(_cardList.splice(0, 9));
-
-    setSheets(_cardSheets);
-  }, [cardList]);
+  const [cardNamesList, setCardNamesList] = useState([]);
+  const cardSheets = useCardSheet(cardNamesList, CARDS_PER_SHEET);
 
   const addCards = useCallback((cards) => {
-    setCardList(list => [...list, ...cards]);
-  }, [setCardList]);
+    setCardNamesList(list => [...list, ...cards]);
+  }, [setCardNamesList]);
 
-  const removeCard = useCallback((card) => {
-    setCardList(list => list.filter(e => e !== card));
-  }, [setCardList])
-
-  const fetchSingleCard = useCallback(async (cardName) => {
-    if (!cardName) return;
-
-    const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
-      headers: { Origin: window.location.origin }
+  const removeCard = useCallback((sheetNumber, cardPosition) => {
+    setCardNamesList(list => {
+      const _list = [...list]
+      _list.splice((sheetNumber * CARDS_PER_SHEET) + cardPosition, 1)
+      return _list
     });
-
-    if (!response.ok) {
-      const error = await response.json();
-      alert(`Could not fetch the card. Reason: ${error.details}`);
-      throw new Error(error.details);
-    }
-
-    const cardData = await response.json();
-
-    const cardsToBeAdded = cardData.card_faces
-      ? cardData.card_faces.map(face => ({ ...cardData, ...face }))
-      : [cardData];
-
-    addCards(cardsToBeAdded);
-  }, [addCards, setLoading]);
+  }, [setCardNamesList])
 
   const handleSubmit = useCallback(async (event) => {
     event.preventDefault();
 
-    setLoading(true);
+    const cardNames = multipleSearch
+      ? event.target.cardNamesList.value.replace(/^\d+\s/gm, '').split('\n')
+      : [event.target.cardName.value]
 
-    try {
-      if (multipleSearch) {
-        for (const cardName of
-          event.target.cardNamesList.value.replace(/^\d+\s/gm, '').split('\n')) {
-          await fetchSingleCard(cardName);
-          await new Promise(r => setTimeout(r, 100));
-        }
-      } else {
-        await fetchSingleCard(event.target.cardName.value)
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchSingleCard, multipleSearch]);
+    addCards(cardNames)
+  }, [multipleSearch]);
 
   const exportPress = useCallback(() => {
     const canvases = document.querySelectorAll('canvas.card');
 
     exportToPDF(canvases);
-  }, [setCardList])
+  }, [setCardNamesList])
+
+  const calculateCardKey = (cardsInSheet, card, position) => {
+    const cardId = card.multiverse_ids[0]
+    const cardOccurrenceInSheet = cardsInSheet
+      .slice(0, position)
+      .filter(c => c.multiverse_ids[0] === cardId)
+      .length
+
+    return `${cardId}__${cardOccurrenceInSheet}`
+  }
 
   return (
     <>
@@ -85,7 +60,6 @@ const Press = () => {
             <textarea
               className="card-name-input"
               name="cardNamesList"
-              disabled={loading}
               placeholder="e.g. Colossal Dreadmaw"
             />
             <a
@@ -98,8 +72,7 @@ const Press = () => {
             <input
               className="submit-card-search multiple"
               type="submit"
-              value={loading ? 'Loading...' : 'Add cards' }
-              disabled={loading}
+              value="Add cards"
             />
           </>
         ) : (
@@ -107,14 +80,12 @@ const Press = () => {
             <input
               className="card-name-input"
               name="cardName"
-              disabled={loading}
               placeholder="e.g. Colossal Dreadmaw"
             />
             <input
               className="submit-card-search single"
               type="submit"
-              value={loading ? 'Loading...' : 'Add card' }
-              disabled={loading}
+              value="Add card"
             />
             <a
               href="#"
@@ -126,25 +97,30 @@ const Press = () => {
           </>
         )}
         </form>
-      {cardSheets.map((sheet, i) => (
-        <div key={i} className="press-sheet">
-          {sheet.map(card => (
-            <div className="sheet-slot" key={card.multiverse_ids[0]}>
-              <button className="sheet-slot-control delete" onClick={() => removeCard(card)} >
+      {cardSheets.map((sheet, sheetNumber) => (
+        <div key={sheetNumber} className="press-sheet">
+          {sheet.map((card, cardPosition) => (
+            <div className="sheet-slot" key={card._loading ? `loading_${cardPosition}` : calculateCardKey(sheet, card, cardPosition)}>
+              <button className="sheet-slot-control delete" onClick={() => removeCard(sheetNumber, cardPosition)} >
                 <i className="fa fa-trash" />
               </button>
-              <Card
-                cardName={card.name}
-                cardManaCost={card.mana_cost}
-                cardColors={card.colors}
-                cardOracleText={card.oracle_text}
-                cardTypeLine={card.type_line}
-                cardArtUrl={card.image_uris?.art_crop}
-                cardLoyalty={card.loyalty}
-                cardPower={card.power}
-                cardToughness={card.toughness}
-                cardSet={card.set.toUpperCase()}
-              />
+              {card._loading ? (
+                <div>LOADING</div>
+              ) : (
+                <Card
+                  cardName={card.name}
+                  cardManaCost={card.mana_cost}
+                  cardColors={card.colors}
+                  cardOracleText={card.oracle_text}
+                  cardTypeLine={card.type_line}
+                  cardArtUrl={card.image_uris?.art_crop}
+                  cardLoyalty={card.loyalty}
+                  cardPower={card.power}
+                  cardToughness={card.toughness}
+                  cardSet={card.set.toUpperCase()}
+                />
+
+              )}
             </div>
           ))}
         </div>

@@ -1,10 +1,12 @@
-const symbolsMapPromise = fetch('https://api.scryfall.com/symbology')
-  .then((response) => response.json())
-  .then((response) => response.data.reduce((symbolsMap, symbolDef) => {
+import { fetchSymbology } from './scryfall';
+
+const symbolsMapPromise = fetchSymbology().then((response) => {
+  return response.data.reduce((symbolsMap, symbolDef) => {
     symbolsMap.set(symbolDef.symbol, symbolDef.svg_uri);
 
     return symbolsMap
-  }, new Map()));
+  }, new Map())
+});
 
 /**
  * Get the image of a specified symbol.

@@ -98,7 +98,6 @@ export const drawTitleBox = (ctx, {
   });
 
   const currentFont = getFontSize(ctx);
-  console.log(cardName, currentFont)
   const titleYOffset = Math.max(TITLE_ORIGIN_Y, TITLE_ORIGIN_Y - (34 - currentFont)); // Compensate bigger fonts
   fillMultilineText(ctx, titleLines, 40, titleYOffset);
 

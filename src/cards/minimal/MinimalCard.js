@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { drawLoyaltyBox, drawRectangle, drawRoundedBox } from '../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../utils/canvasStyles';
-import { fitFontSizeInX } from '../../utils/canvasText';
+import { drawLoyaltyBox, drawRectangle } from '../../utils/canvasShapes';
 import { getColorMappings } from '../../utils/colors';
 import { drawOracleBox, drawPlaneswalkerOracleBox } from './utils/drawOracleBox';
 import { drawTitleBox } from './utils/drawTitleBox';
+import { drawTypeBox } from './utils/drawTypeBox';
 
 const drawOuterFrame = (ctx, { blackBordered }) => {
   const OUTER_BORDER_RADIUS = 0;
@@ -20,36 +19,6 @@ const drawOuterFrame = (ctx, { blackBordered }) => {
     fillStyle: blackBordered ? 'black' : 'white',
     borderRadiusTop: OUTER_BORDER_RADIUS,
   });
-};
-
-const drawTypeBox = (ctx, { cardType, cardColorIdentity, }) => {
-  const typeOriginX = 45;
-  const typeEndX = ctx.canvas.width - 45;
-
-  drawRoundedBox(ctx, {
-    x: 29,
-    y: 170,
-    width: ctx.canvas.width - 29 * 2,
-    height: 50,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-
-  drawRoundedBox(ctx, {
-    x: 33,
-    y: 175,
-    width: ctx.canvas.width - 33 * 2,
-    height: 38,
-    lineWidth: 3,
-    strokeStyle: 'white',
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-
-  ctx.font = "bold 22px Tahoma";
-  ctx.fillStyle = 'white';
-  ctx.textAlign = 'start';
-  fitFontSizeInX(ctx, cardType.toUpperCase(), typeEndX - typeOriginX)
-  ctx.fillText(cardType.toUpperCase(), 45, 203);
 };
 
 const drawStatsBox = (ctx, { cardPower, cardToughness }) => {

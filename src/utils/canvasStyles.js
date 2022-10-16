@@ -1,78 +1,77 @@
 import { Colors } from './colors';
 
-export const getColorIdentityStyle = (ctx, colorIdentity, { devoid } = {}) => {
+export const getColorIdentityStyle = (ctx, colorIdentity, { devoid, palette = Colors } = {}) => {
   switch (colorIdentity) {
-  case 'white': return Colors.WHITE;
-  case 'blue': return Colors.BLUE;
-  case 'black': return Colors.BLACK;
-  case 'red': return Colors.RED;
-  case 'green': return Colors.GREEN;
+  case 'white': return palette.WHITE;
+  case 'blue': return palette.BLUE;
+  case 'black': return palette.BLACK;
+  case 'red': return palette.RED;
+  case 'green': return palette.GREEN;
 
   case 'gruul':
     const gruulGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    gruulGradient.addColorStop(.4, Colors.RED);
-    gruulGradient.addColorStop(.6, Colors.GREEN);
+    gruulGradient.addColorStop(.4, palette.RED);
+    gruulGradient.addColorStop(.6, palette.GREEN);
     return gruulGradient;
 
   case 'izzet':
     const izzetGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    izzetGradient.addColorStop(.4, Colors.BLUE);
-    izzetGradient.addColorStop(.6, Colors.RED);
+    izzetGradient.addColorStop(.4, palette.BLUE);
+    izzetGradient.addColorStop(.6, palette.RED);
     return izzetGradient;
 
   case 'rakdos':
     const rakdosGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    rakdosGradient.addColorStop(.4, Colors.BLACK);
-    rakdosGradient.addColorStop(.6, Colors.RED);
+    rakdosGradient.addColorStop(.4, palette.BLACK);
+    rakdosGradient.addColorStop(.6, palette.RED);
     return rakdosGradient;
 
   case 'orzhov':
     const orzhovGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    orzhovGradient.addColorStop(.4, Colors.WHITE);
-    orzhovGradient.addColorStop(.6, Colors.BLACK);
+    orzhovGradient.addColorStop(.4, palette.WHITE);
+    orzhovGradient.addColorStop(.6, palette.BLACK);
     return orzhovGradient;
 
   case 'golgari':
     const golgariGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    golgariGradient.addColorStop(.4, Colors.BLACK);
-    golgariGradient.addColorStop(.6, Colors.GREEN);
+    golgariGradient.addColorStop(.4, palette.BLACK);
+    golgariGradient.addColorStop(.6, palette.GREEN);
     return golgariGradient;
 
   case 'azorius':
     const azoriusGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    azoriusGradient.addColorStop(.4, Colors.WHITE);
-    azoriusGradient.addColorStop(.6, Colors.BLUE);
+    azoriusGradient.addColorStop(.4, palette.WHITE);
+    azoriusGradient.addColorStop(.6, palette.BLUE);
     return azoriusGradient;
 
   case 'simic':
     const simicGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    simicGradient.addColorStop(.4, Colors.GREEN);
-    simicGradient.addColorStop(.6, Colors.BLUE);
+    simicGradient.addColorStop(.4, palette.GREEN);
+    simicGradient.addColorStop(.6, palette.BLUE);
     return simicGradient;
 
   case 'selesnya':
     const selesnyaGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    selesnyaGradient.addColorStop(.4, Colors.GREEN);
-    selesnyaGradient.addColorStop(.6, Colors.WHITE);
+    selesnyaGradient.addColorStop(.4, palette.GREEN);
+    selesnyaGradient.addColorStop(.6, palette.WHITE);
     return selesnyaGradient;
 
   case 'dimir':
     const dimigGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    dimigGradient.addColorStop(.4, Colors.BLUE);
-    dimigGradient.addColorStop(.6, Colors.BLACK);
+    dimigGradient.addColorStop(.4, palette.BLUE);
+    dimigGradient.addColorStop(.6, palette.BLACK);
     return dimigGradient;
 
   case 'boros':
     const borosGradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-    borosGradient.addColorStop(.4, Colors.RED);
-    borosGradient.addColorStop(.6, Colors.WHITE);
+    borosGradient.addColorStop(.4, palette.RED);
+    borosGradient.addColorStop(.6, palette.WHITE);
     return borosGradient;
 
-  case 'artifact': return Colors.ARTIFACT;
-  case 'land': return Colors.LAND;
-  case 'colorless': return Colors.COLORLESS;
-  case 'multi': return Colors.MULTI;
-  default: return Colors.COLORLESS;
+  case 'artifact': return palette.ARTIFACT;
+  case 'land': return palette.LAND;
+  case 'colorless': return palette.COLORLESS;
+  case 'multi': return palette.MULTI;
+  default: return palette.COLORLESS;
   }
-};
-
+}

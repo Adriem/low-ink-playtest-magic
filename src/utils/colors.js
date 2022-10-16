@@ -13,10 +13,30 @@ export const Colors = {
   LAND: 'rgb(143, 120, 90)',
 };
 
+export const MinimalistColors = {
+  COLORLESS: 'rgb(210,210,210)',
+  WHITE: 'rgb(192,175,148)',
+  BLUE: 'rgb(41, 133, 225)',
+  BLACK: 'rgb(105, 92, 114)',
+  RED: 'rgb(211, 14, 14)',
+  GREEN: 'rgb(6, 147, 45)',
+  MULTI: 'rgb(239, 164, 0)',
+  ARTIFACT: 'rgb(160,173,185)',
+  LAND: 'rgb(143, 120, 90)',
+};
+
+export const isArtifactType = (cardTypeLine) => {
+  return /artifact/i.test(cardTypeLine)
+}
+
+export const isLandType = (cardTypeLine) => {
+  return /land/i.test(cardTypeLine)
+}
+
 export const getColorMappings = (cardColors, cardTypeLine) => {
   if (!cardColors) return '';
-  if (cardColors.length === 0 && /artifact/i.test(cardTypeLine)) return 'artifact';
-  if (cardColors.length === 0 && /land/i.test(cardTypeLine)) return 'land';
+  if (cardColors.length === 0 && isArtifactType(cardTypeLine)) return 'artifact';
+  if (cardColors.length === 0 && isLandType(cardTypeLine)) return 'land';
   if (cardColors.length === 0) return 'colorless';
 
   if (cardColors.length === 1 && cardColors.includes('W')) return 'white';

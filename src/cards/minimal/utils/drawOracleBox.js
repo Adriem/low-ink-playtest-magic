@@ -1,4 +1,9 @@
-import { drawLoyaltyMinus, drawLoyaltyPlus, drawLoyaltyZero } from '../../../utils/canvasShapes';
+import {
+  drawLoyaltyMinus,
+  drawLoyaltyPlus,
+  drawLoyaltyZero,
+  drawRectangle,
+} from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInX, fitTextIntoBox } from '../../../utils/canvasText';
 import { MinimalistColors } from '../../../utils/colors';
@@ -8,7 +13,7 @@ const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
 
-export const drawOracleBox = (ctx, { cardOracleText, x, y, height, width }) => {
+export const drawOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width }) => {
   ctx.font = "30px Verdana";
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
@@ -24,9 +29,17 @@ export const drawOracleBox = (ctx, { cardOracleText, x, y, height, width }) => {
     fillMultilineText(ctx, paragraph.lines, x, currentY)
     currentY += paragraph.paragraphHeight
   }
+
+  drawRectangle(ctx, {
+    x,
+    y: y + height,
+    width,
+    height: 5,
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity)
+  })
 };
 
-const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height, width }) => {
+const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
   ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors });
 
   const xOffsetL = x + PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * .65
@@ -48,7 +61,7 @@ export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdenti
   const loyaltyAbilityWidth = width - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
   const regularOracleWidth = width - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
 
-  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x, y: y - 50, height: height + 75, width })
+  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x, y: y - 50, height: height + 60, width })
 
   ctx.font = "30px Tahoma";
   ctx.fillStyle = 'black';

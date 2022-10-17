@@ -63,9 +63,10 @@ const CanvasCard = ({
     if (cardPower && cardToughness) {
       drawOracleBox(ctx, {
         cardOracleText,
+        cardColorIdentity,
         x: 45,
         y: 270,
-        height: 410 - 45,
+        height: 370 - 45,
         width: ctx.canvas.width - 45 * 2,
       })
       drawStatsBox(ctx, { cardPower, cardToughness, cardColorIdentity });
@@ -82,9 +83,10 @@ const CanvasCard = ({
     } else {
       drawOracleBox(ctx, {
         cardOracleText,
+        cardColorIdentity,
         x: 45,
         y: 270,
-        height: 460 - 45,
+        height: 410 - 45,
         width: ctx.canvas.width - 45 * 2,
       })
     }

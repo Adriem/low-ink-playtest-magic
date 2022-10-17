@@ -72,12 +72,13 @@ const CanvasCard = ({
     } else if (cardLoyalty) {
       drawPlaneswalkerOracleBox(ctx, {
         cardOracleText,
+        cardColorIdentity,
         x: 45,
         y: 270,
         height: 410 - 45,
         width: ctx.canvas.width - 45 * 2,
       })
-      drawLoyaltyBox(ctx, { cardLoyalty, cardColorIdentity, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
+      drawLoyaltyBox(ctx, { cardLoyalty, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
     } else {
       drawOracleBox(ctx, {
         cardOracleText,

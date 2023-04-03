@@ -32,7 +32,8 @@ export const useCardSheet = (cardNames, sheetSize = 9) => {
   useEffect(() => {
     const buildCardSheets = async () => {
       const cardsData = (await Promise.all(cardNames.map((cardName) => fetchCardData(cardName))))
-        .filter(card => card._error == null);
+        .filter(card => card._error == null)
+        .flatMap(card => card.card_faces ? card.card_faces.map(face => ({ ...card, ...face})) : [card]);
       const cardSheets = []
 
       while (cardsData.length) cardSheets.push(cardsData.splice(0, sheetSize));

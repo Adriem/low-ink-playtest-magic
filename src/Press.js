@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
 
-// import Card from './cards/realistic/RealisticCard';
-import Card from './cards/minimal/MinimalCard';
+import Card from './cards/realistic/RealisticCard';
+// import Card from './cards/minimal/MinimalCard';
+import DualCard from './cards/minimal/DualMinimalCard';
 
 import './Press.css';
 import { useCardSheet } from './hooks/useCardSheet';
 import exportToPDF from './utils/exportToPdf';
 
 const CARDS_PER_SHEET = 9
+const MERGE_DUAL_FACE_CARDS = false;
 
 const Press = () => {
   const [multipleSearch, setMultipleSearch] = useState(false);
@@ -106,6 +108,20 @@ const Press = () => {
               </button>
               {card._loading ? (
                 <div>LOADING</div>
+              ) : MERGE_DUAL_FACE_CARDS ? (
+                  <DualCard
+                      cardFaces={card.card_faces}
+                      cardName={card.name}
+                      cardManaCost={card.mana_cost}
+                      cardColors={card.colors}
+                      cardOracleText={card.oracle_text}
+                      cardTypeLine={card.type_line}
+                      cardArtUrl={card.image_uris?.art_crop}
+                      cardLoyalty={card.loyalty}
+                      cardPower={card.power}
+                      cardToughness={card.toughness}
+                      cardSet={card.set.toUpperCase()}
+                  />
               ) : (
                 <Card
                   cardName={card.name}
@@ -119,7 +135,6 @@ const Press = () => {
                   cardToughness={card.toughness}
                   cardSet={card.set.toUpperCase()}
                 />
-
               )}
             </div>
           ))}

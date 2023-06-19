@@ -23,11 +23,7 @@ export const drawTypeBox = (ctx, { cardType, cardColorIdentity }) => {
     height: 38,
     lineWidth: 3,
     strokeStyle: 'white',
-    fillStyle: getColorIdentityStyle(
-      ctx,
-      isArtifactType(cardType) ? 'artifact' : cardColorIdentity,
-      { palette: MinimalistColors },
-    ),
+    fillStyle: "white"
   });
 
   ctx.font = "bold 22px Verdana";
@@ -39,7 +35,7 @@ export const drawTypeBox = (ctx, { cardType, cardColorIdentity }) => {
   ctx.fillText(cardType.toUpperCase(), 46, 204);
 
   // Actual text
-  ctx.fillStyle = cardColorIdentity === 'colorless' ? 'dimgray' : 'white';
+  ctx.fillStyle = cardColorIdentity === 'colorless' ? 'gray' : 'black';
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType.toUpperCase(), typeEndX - typeOriginX)
   ctx.fillText(cardType.toUpperCase(), 45, 203);

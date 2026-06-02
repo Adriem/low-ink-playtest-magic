@@ -209,8 +209,8 @@ const drawArtBox = (ctx, {
   });
 
   const artImage = new Image();
-  artImage.src = `https://api.allorigins.win/raw?url=${cardArtUrl}`;
   artImage.crossOrigin = 'Anonymous';
+  artImage.src = cardArtUrl;
   artImage.onload = () => {
     ctx.drawImage(artImage, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
     midBrightnessPass(ctx, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);

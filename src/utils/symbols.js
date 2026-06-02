@@ -21,8 +21,8 @@ export const getSymbolImage = async (symbol) => {
   if (typeof symbolContent === 'string') {
     const actualContentPromise = new Promise((resolve, reject) => {
       const symbolImage = new Image();
-      symbolImage.src = `https://api.allorigins.win/raw?url=${symbolContent}`;
       symbolImage.crossOrigin = 'Anonymous';
+      symbolImage.src = symbolContent;
       symbolImage.onload = () => resolve(symbolImage);
       symbolImage.onerror = reject;
     });

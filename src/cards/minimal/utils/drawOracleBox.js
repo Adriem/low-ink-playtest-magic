@@ -12,31 +12,66 @@ const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character he
 const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
+const TYPE_BOX_BOTTOM_Y = 220;
+const DIVIDER_THICKNESS = 5;
 
-export const drawOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width }) => {
+const resolveSubCardLayout = (ctx, { x, y, height, width, subCardPosition }) => {
+  if (!subCardPosition) return { x, width };
+
+  const halfWidth = (width - DIVIDER_THICKNESS) / 2;
+  const contentX = subCardPosition === 'left' ? x + halfWidth + DIVIDER_THICKNESS : x;
+
+  return { x: contentX, width: halfWidth };
+};
+
+const drawSubCardDivider = (ctx, { cardColorIdentity, x, y, height, width }) => {
+  const dividerX = x + (width - DIVIDER_THICKNESS) / 2;
+  drawRectangle(ctx, {
+    x: dividerX,
+    y: TYPE_BOX_BOTTOM_Y,
+    width: DIVIDER_THICKNESS,
+    height: y + height - TYPE_BOX_BOTTOM_Y,
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
+  });
+};
+
+const applyFlatSide = (ctx, { x, width, flatSide }) => {
+  if (flatSide === 'left') return { x: 0, width: x + width };
+  if (flatSide === 'right') return { x, width: ctx.canvas.width - x };
+  return { x, width };
+};
+
+export const drawOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width, subCardPosition, flatSide }) => {
+  const { x: flatX, width: flatWidth } = applyFlatSide(ctx, { x, width, flatSide });
+  const { x: contentX, width: contentWidth } = resolveSubCardLayout(ctx, { x: flatX, y, height, width: flatWidth, subCardPosition });
+
   ctx.font = "30px Verdana";
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    (cardOracleText ?? '').split('\n').map(content => ({ content, width })),
+    (cardOracleText ?? '').split('\n').map(content => ({ content, width: contentWidth })),
     height,
   );
 
   let currentY = y
   for (const paragraph of paragraphs) {
-    fillMultilineText(ctx, paragraph.lines, x, currentY)
+    fillMultilineText(ctx, paragraph.lines, contentX, currentY)
     currentY += paragraph.paragraphHeight
   }
 
   drawRectangle(ctx, {
-    x,
+    x: flatX,
     y: y + height,
-    width,
+    width: flatWidth,
     height: 5,
     fillStyle: getColorIdentityStyle(ctx, cardColorIdentity)
   })
+
+  if (subCardPosition) {
+    drawSubCardDivider(ctx, { cardColorIdentity, x: flatX, y, height, width: flatWidth });
+  }
 };
 
 const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
@@ -56,12 +91,18 @@ const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) 
   ctx.fill();
 }
 
-export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width }) => {
-  const paddedX = x + PLANESWALKER_ORACLE_EXTRA_PADDING;
-  const loyaltyAbilityWidth = width - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
-  const regularOracleWidth = width - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
+export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width, subCardPosition, flatSide }) => {
+  const { x: flatX, width: flatWidth } = applyFlatSide(ctx, { x, width, flatSide });
+  const { x: contentX, width: contentWidth } = resolveSubCardLayout(ctx, { x: flatX, y, height, width: flatWidth, subCardPosition });
+  const paddedX = contentX + PLANESWALKER_ORACLE_EXTRA_PADDING;
+  const loyaltyAbilityWidth = contentWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
+  const regularOracleWidth = contentWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
 
-  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x, y: y - 50, height: height + 60, width })
+  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x: contentX, y: y - 50, height: height + 60, width: contentWidth })
+
+  if (subCardPosition) {
+    drawSubCardDivider(ctx, { cardColorIdentity, x: flatX, y, height, width: flatWidth });
+  }
 
   ctx.font = "30px Tahoma";
   ctx.fillStyle = 'black';

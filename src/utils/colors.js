@@ -25,6 +25,18 @@ export const MinimalistColors = {
   LAND: 'rgb(143, 120, 90)',
 };
 
+const COLOR_SYMBOLS = ['W', 'U', 'B', 'R', 'G'];
+
+export const colorsFromManaCost = (manaCost = '') => {
+  const found = new Set();
+  for (const match of manaCost.matchAll(/\{([^}]+)\}/g)) {
+    for (const part of match[1].split('/')) {
+      if (COLOR_SYMBOLS.includes(part)) found.add(part);
+    }
+  }
+  return [...found];
+};
+
 export const isArtifactType = (cardTypeLine) => {
   return /artifact/i.test(cardTypeLine)
 }

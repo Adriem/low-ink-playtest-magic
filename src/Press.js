@@ -147,11 +147,11 @@ const Press = () => {
               {card._loading ? (
                 <div>LOADING</div>
               ) : card.card_faces ? (
-                  <DualCard
-                      Card={Card}
-                      cardFaces={card.card_faces}
-                      cardSet={card.set.toUpperCase()}
-                  />
+                <DualCard
+                  Card={Card}
+                  cardFaces={card.card_faces}
+                  cardSet={card.set.toUpperCase()}
+                />
               ) : (
                 <Card
                   cardName={card.name}
@@ -164,6 +164,8 @@ const Press = () => {
                   cardPower={card.power}
                   cardToughness={card.toughness}
                   cardSet={card.set.toUpperCase()}
+                  subCardPosition={card._subFace ? (card.layout === 'prepare' ? 'right' : 'left') : null}
+                  subCard={card._subFace}
                 />
               )}
             </div>

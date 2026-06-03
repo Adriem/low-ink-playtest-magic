@@ -3,6 +3,7 @@ import { useFetchCard } from './useFetchCard';
 
 const SPLIT_LAYOUTS = ['split'];
 const DUAL_FACE_LAYOUTS = ['flip', 'transform', 'modal_dfc', 'meld', 'reversible_card', 'double_faced_token'];
+const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
 
 /**
  * @typedef {object} Card
@@ -38,6 +39,11 @@ export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 's
         .filter(card => card._error == null)
         .flatMap(card => {
           if (!card.card_faces) return [card];
+
+          if (SUBCARD_LAYOUTS.includes(card.layout)) {
+            const { card_faces, ...cardWithoutFaces } = card;
+            return [{ ...cardWithoutFaces, ...card_faces[0], _subFace: card_faces[1] }];
+          }
 
           const treatment = SPLIT_LAYOUTS.includes(card.layout)
             ? splitCardTreatment

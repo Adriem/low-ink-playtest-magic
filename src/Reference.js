@@ -1,9 +1,9 @@
-const Reference = ({ multiverseId }) => (
+const Reference = ({ imageUrl }) => imageUrl ? (
   <img
     alt="Reference card"
-    src={`https://gatherer.wizards.com/Handlers/Image.ashx?multiverseid=${multiverseId}&type=card`}
+    src={imageUrl}
     style={{ width: '100%', height: 'auto' }}
   />
-);
+) : null;
 
-export default Reference
+export default Reference;

@@ -1,20 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { colorsFromManaCost } from '../utils/colors';
 
 const WIDTH = 500;
 const HEIGHT = 700;
 const HALF_HEIGHT = HEIGHT / 2;
-
-const COLOR_SYMBOLS = ['W', 'U', 'B', 'R', 'G'];
-
-const colorsFromManaCost = (manaCost = '') => {
-  const found = new Set();
-  for (const match of manaCost.matchAll(/\{([^}]+)\}/g)) {
-    for (const part of match[1].split('/')) {
-      if (COLOR_SYMBOLS.includes(part)) found.add(part);
-    }
-  }
-  return [...found];
-};
 
 const drawRotatedCW = (ctx, src, dx, dy, dw, dh) => {
   ctx.save();

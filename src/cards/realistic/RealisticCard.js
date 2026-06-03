@@ -254,6 +254,8 @@ const RealisticCard = ({
   cardSet = 'PXY',
   devoid,
   blackBordered,
+  canvasClassName = 'card',
+  canvasRef,
 }) => {
   const WIDTH = 500;
   const HEIGHT = 700;
@@ -303,8 +305,11 @@ const RealisticCard = ({
 
   return (
     <canvas
-      className="card"
-      ref={(canvas) => setCanvas(canvas)}
+      className={canvasClassName}
+      ref={(canvas) => {
+        setCanvas(canvas);
+        if (canvasRef) canvasRef.current = canvas;
+      }}
       height={HEIGHT}
       width={WIDTH}
       style={{ background: 'white' }}

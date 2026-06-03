@@ -20,7 +20,7 @@ export const drawOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, he
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    cardOracleText.split('\n').map(content => ({ content, width })),
+    (cardOracleText ?? '').split('\n').map(content => ({ content, width })),
     height,
   );
 
@@ -67,7 +67,7 @@ export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdenti
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
 
-  const originalParagraphs = cardOracleText.split('\n');
+  const originalParagraphs = (cardOracleText ?? '').split('\n');
 
   const paragraphs = fitTextIntoBox(
     ctx,

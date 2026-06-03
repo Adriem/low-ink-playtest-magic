@@ -30,6 +30,7 @@ const drawTitleBox = (ctx, {
   cardName,
   cardColorIdentity,
   cardManaCost,
+  drawState,
 }) => {
   const [...manaSymbols] = cardManaCost.match(/({.*?})/g) || [];
 
@@ -76,6 +77,8 @@ const drawTitleBox = (ctx, {
     const originX = xEnd - radius - (manaSymbolWidth + manaSymbolMargin) * (manaSymbols.length - i - 1);
     const originY = 65 + yOffset - radius;
 
+    if (drawState?.cancelled) return;
+
     // Shadow
     ctx.beginPath();
     ctx.fillStyle = '#424242';
@@ -88,8 +91,10 @@ const drawTitleBox = (ctx, {
     ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
+    const symbolImage = await getSymbolImage(symbol);
+    if (drawState?.cancelled) return;
     ctx.drawImage(
-      await getSymbolImage(symbol),
+      symbolImage,
       originX - radius,
       originY - radius,
       2 * radius,
@@ -192,6 +197,7 @@ const drawOracleBox = (ctx, {
 const drawArtBox = (ctx, {
   cardColorIdentity,
   cardArtUrl,
+  drawState,
 }) => {
   drawRectangle(ctx, {
     x: 33,
@@ -215,6 +221,7 @@ const drawArtBox = (ctx, {
   artImage.crossOrigin = 'Anonymous';
   artImage.src = cardArtUrl;
   artImage.onload = () => {
+    if (drawState?.cancelled) return;
     ctx.drawImage(artImage, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
     midBrightnessPass(ctx, 39, 82, ctx.canvas.width - 37 * 2 - 4, 308);
   };
@@ -260,6 +267,7 @@ const drawSubCardTitleBox = (ctx, {
   cardManaCost,
   cardColorIdentity,
   position,
+  drawState,
 }) => {
   const half = ctx.canvas.width / 2;
   const x = position === 'left' ? 25 : half;
@@ -324,6 +332,8 @@ const drawSubCardTitleBox = (ctx, {
     const originX = manaAnchorRight - radius - (manaSymbolWidth + manaSymbolMargin) * (manaSymbols.length - i - 1);
     const originY = innerCenterY;
 
+    if (drawState?.cancelled) return;
+
     ctx.beginPath();
     ctx.fillStyle = '#424242';
     ctx.arc(originX, originY + 2, radius, 0, 2 * Math.PI);
@@ -334,8 +344,10 @@ const drawSubCardTitleBox = (ctx, {
     ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
+    const symbolImage = await getSymbolImage(symbol);
+    if (drawState?.cancelled) return;
     ctx.drawImage(
-      await getSymbolImage(symbol),
+      symbolImage,
       originX - radius,
       originY - radius,
       2 * radius,
@@ -452,7 +464,7 @@ const drawSubCardOracleBox = (ctx, {
   ), textX, textTopY);
 };
 
-const drawSubCard = (ctx, { subCard, subCardPosition }) => {
+const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
   const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
   const subColorIdentity = getColorMappings(subColors, subCard.type_line);
 
@@ -461,6 +473,7 @@ const drawSubCard = (ctx, { subCard, subCardPosition }) => {
     cardManaCost: subCard.mana_cost,
     cardColorIdentity: subColorIdentity,
     position: subCardPosition,
+    drawState,
   });
   drawSubCardTypeBox(ctx, {
     cardType: subCard.type_line,
@@ -500,19 +513,20 @@ const RealisticCard = ({
   useEffect(() => {
     if (canvas == null) return;
 
+    const drawState = { cancelled: false };
     const cardColorIdentity = getColorMappings(cardColors, cardTypeLine);
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawOuterFrame(ctx, { blackBordered });
-    drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity });
-    drawArtBox(ctx, { cardArtUrl, cardColorIdentity });
+    drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity, drawState });
+    drawArtBox(ctx, { cardArtUrl, cardColorIdentity, drawState });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
     drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity, subCardPosition });
 
     if (subCard && subCardPosition) {
-      drawSubCard(ctx, { subCard, subCardPosition });
+      drawSubCard(ctx, { subCard, subCardPosition, drawState });
     }
 
     if (cardPower && cardToughness) {
@@ -522,6 +536,10 @@ const RealisticCard = ({
     if (cardLoyalty) {
       drawLoyaltyBox(ctx, { cardLoyalty, x: 439, y: 664 });
     }
+
+    return () => {
+      drawState.cancelled = true;
+    };
   }, [
     canvas,
     cardName,

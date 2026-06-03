@@ -6,12 +6,13 @@ import { SettingsContextProvider } from './settings';
 
 import './App.css';
 
+const SHOW_WORKBENCH = process.env.REACT_APP_WORKBENCH === 'true';
+
 function App() {
   return (
     <SettingsContextProvider>
       <div className="App">
-        {/*<Workbench />*/}
-        <Press />
+        {SHOW_WORKBENCH ? <Workbench /> : <Press />}
       </div>
     </SettingsContextProvider>
   );

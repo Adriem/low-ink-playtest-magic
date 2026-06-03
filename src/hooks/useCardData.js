@@ -1,5 +1,7 @@
 const { useState, useEffect } = require('react');
 
+const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
+
 const useCardData = (cardName) => {
   const [cardData, setCardData] = useState({});
   const [loading, setLoading] = useState(false);
@@ -18,7 +20,12 @@ const useCardData = (cardName) => {
         setLoading(false);
         setError(null);
         setCardData(data.card_faces
-          ? { ...data, ...data.card_faces[0], reverse_name: data.card_faces[1].card_name }
+          ? {
+              ...data,
+              ...data.card_faces[0],
+              reverse_name: data.card_faces[1].name,
+              ...(SUBCARD_LAYOUTS.includes(data.layout) ? { _subFace: data.card_faces[1] } : {})
+            }
           : data);
       })
       .catch(error => {

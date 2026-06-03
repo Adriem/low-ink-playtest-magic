@@ -25,7 +25,7 @@ const Workbench = () => {
                   zIndex: '10',
                   opacity,
                 }}>
-                  <Reference multiverseId={cardData.multiverse_ids[0]}/>
+                  <Reference imageUrl={cardData.image_uris?.normal} />
                 </div>
 
                 <div style={{ marginTop: '-2px', zIndex: '0' }}>
@@ -42,6 +42,8 @@ const Workbench = () => {
                     cardToughness={cardData.toughness}
                     cardSet={cardData.set.toUpperCase()}
                     blackBordered={blackBordered}
+                    subCardPosition={cardData._subFace ? (cardData.layout === 'prepare' ? 'right' : 'left') : null}
+                    subCard={cardData._subFace}
                   />
                 </div>
               </div>
@@ -76,9 +78,16 @@ const Workbench = () => {
           <option value={["B","U"]}>dimir</option>
           <option value={["W","R"]}>boros</option>
         </select>
-        <button onClick={() => setOpacity(1)}>Opaque</button>
-        <button onClick={() => setOpacity(0.5)}>Transparent</button>
-        <button onClick={() => setOpacity(0)}>Invisible</button>
+        <label htmlFor="referenceOpacity" style={{ marginLeft: '1em' }}>Reference</label>
+        <input
+          id="referenceOpacity"
+          type="range"
+          min={0}
+          max={1}
+          step={0.01}
+          value={opacity}
+          onChange={(e) => setOpacity(parseFloat(e.target.value))}
+        />
       </div>
     </div>
   );

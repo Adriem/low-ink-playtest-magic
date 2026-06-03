@@ -60,32 +60,53 @@ export const drawRoundedBox = (ctx, {
   lineWidth = 0,
   strokeStyle = null,
   fillStyle = null,
+  flatSide = null,
 }) => {
-  ctx.moveTo(x, y);
-
   ctx.lineWidth = lineWidth;
   ctx.strokeStyle = strokeStyle;
   ctx.fillStyle = fillStyle;
 
+  const x0 = x + lineWidth / 2;
+  const x1 = x + width - lineWidth / 2;
+
+  const y0 = y + lineWidth / 2;
+  const y1 = y + height + lineWidth / 2;
+
+  const rx = height / 4;
+  const ry = height / 2;
+
   ctx.beginPath();
-  ctx.ellipse(
-    x + lineWidth / 2 + height / 4,
-    y + lineWidth / 2 + height / 2,
-    height / 4,
-    height / 2,
-    0,
-    0.5 * Math.PI,
-    1.5 * Math.PI,
-  );
-  ctx.ellipse(
-    x + width - lineWidth / 2 - height / 4,
-    y + lineWidth / 2 + height / 2,
-    height / 4,
-    height / 2,
-    0,
-    1.5 * Math.PI,
-    0.5 * Math.PI,
-  );
+
+  if (flatSide === 'left') {
+    ctx.moveTo(x0, y1);
+    ctx.lineTo(x0, y0);
+  } else {
+    ctx.ellipse(
+      x0 + rx,
+      y0 + ry,
+      rx,
+      ry,
+      0,
+      0.5 * Math.PI,
+      1.5 * Math.PI,
+    );
+  }
+
+  if (flatSide === 'right') {
+    ctx.lineTo(x1, y0);
+    ctx.lineTo(x1, y1);
+  } else {  
+    ctx.ellipse(
+      x1 - rx,
+      y0 + ry,
+      rx,
+      ry,
+      0,
+      1.5 * Math.PI,
+      0.5 * Math.PI,
+    );
+  }
+
   ctx.closePath();
 
   if (fillStyle != null) ctx.fill();

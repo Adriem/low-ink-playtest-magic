@@ -84,7 +84,7 @@ export const drawTitleBox = (ctx, {
   cardManaCost,
   maxHeight = 110,
 }) => {
-  const [...manaSymbols] = cardManaCost.match(/({.*?})/g) || [];
+  const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
 
   // ctx.font = "bold 34px Tahoma";
   ctx.font = "bold 70px Tahoma";

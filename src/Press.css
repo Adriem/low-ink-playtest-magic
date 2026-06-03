@@ -35,6 +35,38 @@
 }
 
 
+.press-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    width: 750px;
+    margin: 0 auto 1rem;
+}
+
+.press-actions .clear {
+    margin-right: auto;
+    font-weight: bold;
+    color: #A03;
+}
+
+.press-actions .export {
+    font-weight: bold;
+    padding: 0.5em 1em;
+}
+
+dialog:not([open]) {
+    display: none;
+}
+
+.dual-card-sources {
+    position: absolute;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
 .press-sheet {
     overflow: auto;
     margin: 0 auto 5rem;

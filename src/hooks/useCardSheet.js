@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useFetchCard } from './useFetchCard';
 
+const SPLIT_LAYOUTS = ['split'];
+const DUAL_FACE_LAYOUTS = ['flip', 'transform', 'modal_dfc', 'meld', 'reversible_card', 'double_faced_token'];
+
 /**
  * @typedef {object} Card
  * @prop {boolean} _loading
@@ -25,7 +28,7 @@ import { useFetchCard } from './useFetchCard';
  * @param {number} sheetSize - Amount of cards to be included in the sheet
  * @returns {Card[][]}
  */
-export const useCardSheet = (cardNames, sheetSize = 9) => {
+export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 'separate', doubleFacedCardTreatment = 'separate' } = {}) => {
   const fetchCardData = useFetchCard();
   const [cardSheets, setSheets] = useState([[]]);
 
@@ -33,7 +36,20 @@ export const useCardSheet = (cardNames, sheetSize = 9) => {
     const buildCardSheets = async () => {
       const cardsData = (await Promise.all(cardNames.map((cardName) => fetchCardData(cardName))))
         .filter(card => card._error == null)
-        .flatMap(card => card.card_faces ? card.card_faces.map(face => ({ ...card, ...face})) : [card]);
+        .flatMap(card => {
+          if (!card.card_faces) return [card];
+
+          const treatment = SPLIT_LAYOUTS.includes(card.layout)
+            ? splitCardTreatment
+            : DUAL_FACE_LAYOUTS.includes(card.layout)
+              ? doubleFacedCardTreatment
+              : 'separate';
+
+          if (treatment === 'unified') return [card];
+
+          const { card_faces, ...cardWithoutFaces } = card;
+          return card_faces.map(face => ({ ...cardWithoutFaces, ...face }));
+        });
       const cardSheets = []
 
       while (cardsData.length) cardSheets.push(cardsData.splice(0, sheetSize));
@@ -42,7 +58,7 @@ export const useCardSheet = (cardNames, sheetSize = 9) => {
     };
 
     buildCardSheets()
-  }, [cardNames, fetchCardData]);
+  }, [cardNames, fetchCardData, splitCardTreatment, doubleFacedCardTreatment]);
 
   return cardSheets;
 };

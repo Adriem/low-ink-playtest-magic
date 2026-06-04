@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
-import { drawLoyaltyBox, drawRectangle } from '../../utils/canvasShapes';
-import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY } from '../../utils/canvasText';
-import { colorsFromManaCost, getColorMappings } from '../../utils/colors';
+import { drawLoyaltyBox, drawRectangle, drawRoundedBox } from '../../utils/canvasShapes';
+import { getColorIdentityStyle } from '../../utils/canvasStyles';
+import { fillMultilineText, fitFontSizeInX, fitFontSizeInXY, reduceTextSize } from '../../utils/canvasText';
+import { colorsFromManaCost, getColorMappings, MinimalistColors } from '../../utils/colors';
 import { getSymbolImage } from '../../utils/symbols';
 import { drawOracleBox, drawPlaneswalkerOracleBox } from './utils/drawOracleBox';
 import { drawTitleBox } from './utils/drawTitleBox';
@@ -30,14 +31,58 @@ const drawStatsBox = (ctx, { cardPower, cardToughness }) => {
   ctx.fillText(`${cardPower}/${cardToughness}`, 389 + 40, 654);
 };
 
-const SUB_TITLE_TEXT_Y = 290;
-const SUB_TITLE_HEIGHT = 55;
-const SUB_TYPE_Y = SUB_TITLE_TEXT_Y + 30;
+const MAIN_TYPE_BOX_BOTTOM = 220;
+const DIVIDER_THICKNESS = 5;
+const DIVIDER_TEXT_PADDING = 8;
+const DIVIDER_CENTER_OFFSET = DIVIDER_THICKNESS / 2 + DIVIDER_TEXT_PADDING;
+const TEXT_LEFT_X = 45;
+const TEXT_RIGHT_X = 455;
+const SUB_TITLE_PADDING = 6;
+const SUB_TITLE_BOTTOM_PADDING = 20;
+const SUB_ORACLE_TOP_PADDING = 26;
+const SUB_TITLE_TEXT_Y = MAIN_TYPE_BOX_BOTTOM + 28 + SUB_TITLE_PADDING;
+const SUB_TITLE_LINE_HEIGHT = 34;
+const SUB_TYPE_Y = SUB_TITLE_TEXT_Y + SUB_TITLE_LINE_HEIGHT + SUB_TITLE_BOTTOM_PADDING;
 const SUB_TYPE_HEIGHT = 38;
-const SUB_ORACLE_TEXT_Y = SUB_TYPE_Y + SUB_TYPE_HEIGHT + 18;
+const SUB_ORACLE_TEXT_Y = SUB_TYPE_Y + SUB_TYPE_HEIGHT + SUB_ORACLE_TOP_PADDING;
 const SUB_ORACLE_TEXT_BOTTOM = 590;
 
-const drawSubCardTitleText = (ctx, { cardName, cardManaCost, x, right }) => {
+const wrapSubCardTitleInTwoLines = (ctx, { cardName, line1MaxWidth, line2MaxWidth }) => {
+  let line1 = '';
+  let line2 = '';
+
+  while (true) {
+    line1 = '';
+    line2 = '';
+    const pendingWords = cardName.split(/\s+/);
+
+    while (pendingWords.length) {
+      const word = pendingWords.shift();
+      const candidate = line1 ? `${line1} ${word}` : word;
+      if (ctx.measureText(candidate).width <= line1MaxWidth) {
+        line1 = candidate;
+      } else {
+        line2 = [word, ...pendingWords.splice(0, pendingWords.length)].join(' ');
+      }
+    }
+
+    if (ctx.measureText(line2).width <= line2MaxWidth) break;
+    reduceTextSize(ctx);
+  }
+
+  return line2 ? [line1, line2] : [line1];
+};
+
+const drawSubCardTitleBox = (ctx, {
+  cardName,
+  cardManaCost,
+  position,
+  drawState,
+}) => {
+  const half = ctx.canvas.width / 2;
+  const x = (position === 'left' ? TEXT_LEFT_X : half + DIVIDER_CENTER_OFFSET) + SUB_TITLE_PADDING;
+  const right = (position === 'left' ? half - DIVIDER_CENTER_OFFSET : TEXT_RIGHT_X) - SUB_TITLE_PADDING;
+
   const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
   const manaSymbolWidth = 22;
   const manaSymbolMargin = 2;
@@ -45,19 +90,22 @@ const drawSubCardTitleText = (ctx, { cardName, cardManaCost, x, right }) => {
   const manaTotalWidth = manaSymbols.length * manaSymbolWidth
     + Math.max(manaSymbols.length - 1, 0) * manaSymbolMargin;
 
-  const nameOriginX = x;
-  const nameMaxWidth = (right - manaTotalWidth - 6) - nameOriginX;
+  const line1MaxWidth = (right - manaTotalWidth - 6) - x;
+  const line2MaxWidth = right - x;
 
   ctx.font = "bold 32px Tahoma";
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
-  fitFontSizeInX(ctx, cardName, nameMaxWidth);
-  ctx.fillText(cardName, nameOriginX, SUB_TITLE_TEXT_Y);
+
+  const titleLines = wrapSubCardTitleInTwoLines(ctx, { cardName, line1MaxWidth, line2MaxWidth });
+  fillMultilineText(ctx, titleLines, x, SUB_TITLE_TEXT_Y);
 
   manaSymbols.forEach(async (symbol, i) => {
     const radius = manaSymbolWidth / 2;
     const originX = right - radius - (manaSymbolWidth + manaSymbolMargin) * (manaSymbols.length - i - 1);
     const originY = SUB_TITLE_TEXT_Y - 12;
+
+    if (drawState?.cancelled) return;
 
     ctx.beginPath();
     ctx.fillStyle = '#424242';
@@ -69,8 +117,10 @@ const drawSubCardTitleText = (ctx, { cardName, cardManaCost, x, right }) => {
     ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
+    const symbolImage = await getSymbolImage(symbol);
+    if (drawState?.cancelled) return;
     ctx.drawImage(
-      await getSymbolImage(symbol),
+      symbolImage,
       originX - radius,
       originY - radius,
       2 * radius,
@@ -79,36 +129,69 @@ const drawSubCardTitleText = (ctx, { cardName, cardManaCost, x, right }) => {
   });
 };
 
-const drawSubCard = (ctx, { subCard, subCardPosition }) => {
-  const flatSide = subCardPosition === 'left' ? 'right' : 'left';
-  const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
-  const subColorIdentity = getColorMappings(subColors, subCard.type_line);
-
+const drawSubCardTypeBox = (ctx, {
+  cardType,
+  cardColorIdentity,
+  position,
+}) => {
   const half = ctx.canvas.width / 2;
-  const boxX = subCardPosition === 'left' ? 29 : half;
-  const boxWidth = half - 29;
-  const titleX = subCardPosition === 'left' ? 30 : half + 8;
-  const titleRight = subCardPosition === 'left' ? half - 8 : ctx.canvas.width - 30;
+  const x = position === 'left' ? 29 : half;
+  const width = half - 29;
+  const right = x + width;
+  const flatSide = position === 'left' ? 'right' : 'left';
 
-  drawSubCardTitleText(ctx, {
-    cardName: subCard.name,
-    cardManaCost: subCard.mana_cost,
-    x: titleX,
-    right: titleRight,
+  const y = SUB_TYPE_Y;
+  const height = SUB_TYPE_HEIGHT;
+
+  const innerLeftPad = flatSide === 'left' ? 0 : 4;
+  const innerRightPad = flatSide === 'right' ? 0 : 4;
+  const innerX = x + innerLeftPad;
+  const innerRight = right - innerRightPad;
+  const textX = flatSide === 'left' ? x + 8 : x + 16;
+  const textRight = flatSide === 'right' ? right - 8 : right - 16;
+
+  drawRoundedBox(ctx, {
+    x,
+    y,
+    width,
+    height,
+    lineWidth: 0,
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors }),
+    flatSide,
   });
-
-  drawTypeBox(ctx, {
-    cardType: subCard.type_line,
-    cardColorIdentity: subColorIdentity,
-    x: boxX,
-    width: boxWidth,
-    y: SUB_TYPE_Y,
-    height: SUB_TYPE_HEIGHT,
+  drawRoundedBox(ctx, {
+    x: innerX,
+    y: y + 5,
+    width: innerRight - innerX,
+    height: height - 12,
+    lineWidth: 3,
+    strokeStyle: 'white',
+    fillStyle: 'white',
     flatSide,
   });
 
-  const textX = subCardPosition === 'left' ? 30 : half + 8;
-  const textRight = subCardPosition === 'left' ? half - 8 : ctx.canvas.width - 30;
+  ctx.font = "bold 18px Verdana";
+
+  // Shadow
+  ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+  ctx.textAlign = 'start';
+  fitFontSizeInX(ctx, cardType.toUpperCase(), textRight - textX);
+  ctx.fillText(cardType.toUpperCase(), textX + 1, y + 27);
+
+  // Actual text
+  ctx.fillStyle = cardColorIdentity === 'colorless' ? 'gray' : 'black';
+  ctx.textAlign = 'start';
+  fitFontSizeInX(ctx, cardType.toUpperCase(), textRight - textX);
+  ctx.fillText(cardType.toUpperCase(), textX, y + 26);
+};
+
+const drawSubCardOracleBox = (ctx, {
+  cardOracleText,
+  position,
+}) => {
+  const half = ctx.canvas.width / 2;
+  const textX = position === 'left' ? TEXT_LEFT_X : half + DIVIDER_CENTER_OFFSET;
+  const textRight = position === 'left' ? half - DIVIDER_CENTER_OFFSET : TEXT_RIGHT_X;
 
   ctx.font = "22px Verdana";
   ctx.fillStyle = 'black';
@@ -116,10 +199,31 @@ const drawSubCard = (ctx, { subCard, subCardPosition }) => {
 
   fillMultilineText(ctx, fitFontSizeInXY(
     ctx,
-    (subCard.oracle_text ?? '').split('\n'),
+    (cardOracleText ?? '').split('\n'),
     textRight - textX,
     SUB_ORACLE_TEXT_BOTTOM - SUB_ORACLE_TEXT_Y,
   ), textX, SUB_ORACLE_TEXT_Y);
+};
+
+const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
+  const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
+  const subColorIdentity = getColorMappings(subColors, subCard.type_line);
+
+  drawSubCardTitleBox(ctx, {
+    cardName: subCard.name,
+    cardManaCost: subCard.mana_cost,
+    position: subCardPosition,
+    drawState,
+  });
+  drawSubCardTypeBox(ctx, {
+    cardType: subCard.type_line,
+    cardColorIdentity: subColorIdentity,
+    position: subCardPosition,
+  });
+  drawSubCardOracleBox(ctx, {
+    cardOracleText: subCard.oracle_text,
+    position: subCardPosition,
+  });
 };
 
 const CanvasCard = ({
@@ -148,14 +252,18 @@ const CanvasCard = ({
   useEffect(() => {
     if (canvas == null) return;
 
+    const drawState = { cancelled: false };
     const cardColorIdentity = getColorMappings(cardColors, cardTypeLine);
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawOuterFrame(ctx, { blackBordered });
-    drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110 });
-    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
+    drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110, drawState });
+
+    if (subCard && subCardPosition) {
+      drawSubCard(ctx, { subCard, subCardPosition, drawState });
+    }
 
     if (cardPower && cardToughness) {
       drawOracleBox(ctx, {
@@ -189,9 +297,7 @@ const CanvasCard = ({
       });
     }
 
-    if (subCard && subCardPosition) {
-      drawSubCard(ctx, { subCard, subCardPosition });
-    }
+    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
 
     if (cardPower && cardToughness) {
       drawStatsBox(ctx, { cardPower, cardToughness, cardColorIdentity });
@@ -200,6 +306,10 @@ const CanvasCard = ({
     if (cardLoyalty) {
       drawLoyaltyBox(ctx, { cardLoyalty, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
     }
+
+    return () => {
+      drawState.cancelled = true;
+    };
   }, [
     canvas,
     cardName,

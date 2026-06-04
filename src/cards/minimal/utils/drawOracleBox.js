@@ -12,25 +12,29 @@ const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character he
 const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
-const TYPE_BOX_BOTTOM_Y = 220;
+const TYPE_BOX_TOP_Y = 170;
 const DIVIDER_THICKNESS = 5;
+const SUBCARD_TEXT_DIVIDER_PADDING = 8;
 
 const resolveSubCardLayout = (ctx, { x, y, height, width, subCardPosition }) => {
   if (!subCardPosition) return { x, width };
 
   const halfWidth = (width - DIVIDER_THICKNESS) / 2;
-  const contentX = subCardPosition === 'left' ? x + halfWidth + DIVIDER_THICKNESS : x;
+  const visibleWidth = halfWidth - SUBCARD_TEXT_DIVIDER_PADDING;
+  const contentX = subCardPosition === 'left'
+    ? x + halfWidth + DIVIDER_THICKNESS + SUBCARD_TEXT_DIVIDER_PADDING
+    : x;
 
-  return { x: contentX, width: halfWidth };
+  return { x: contentX, width: visibleWidth };
 };
 
 const drawSubCardDivider = (ctx, { cardColorIdentity, x, y, height, width }) => {
   const dividerX = x + (width - DIVIDER_THICKNESS) / 2;
   drawRectangle(ctx, {
     x: dividerX,
-    y: TYPE_BOX_BOTTOM_Y,
+    y: TYPE_BOX_TOP_Y,
     width: DIVIDER_THICKNESS,
-    height: y + height - TYPE_BOX_BOTTOM_Y,
+    height: y + height - TYPE_BOX_TOP_Y,
     fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
   });
 };

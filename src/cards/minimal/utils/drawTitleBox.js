@@ -83,6 +83,7 @@ export const drawTitleBox = (ctx, {
   cardName,
   cardManaCost,
   maxHeight = 110,
+  drawState,
 }) => {
   const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
 
@@ -110,6 +111,8 @@ export const drawTitleBox = (ctx, {
     const originX = xEnd - radius - (MANA_SYMBOL_WIDTH + MANA_SYMBOL_MARGIN) * (manaSymbols.length - i - 1);
     const originY = 65 + yOffset - radius;
 
+    if (drawState?.cancelled) return;
+
     // Shadow
     ctx.beginPath();
     ctx.fillStyle = '#424242';
@@ -122,8 +125,10 @@ export const drawTitleBox = (ctx, {
     ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
     ctx.fill();
 
+    const symbolImage = await getSymbolImage(symbol);
+    if (drawState?.cancelled) return;
     ctx.drawImage(
-      await getSymbolImage(symbol),
+      symbolImage,
       originX - radius,
       originY - radius,
       2 * radius,

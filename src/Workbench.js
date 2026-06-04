@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react';
 import Realistic from './cards/realistic/RealisticCard';
-import Card from './Card';
+import Minimal from './cards/minimal/MinimalCard';
 import useCardData from './hooks/useCardData';
 import Reference from './Reference';
+import { useSetting } from './settings';
 
 const Workbench = () => {
   const [opacity, setOpacity] = useState(0);
   const [blackBordered, setBlackBordered] = useState(false);
   const [cardColors, setCardColors] = useState(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
+  const [cardVariant, setCardVariant] = useSetting('cardVariant');
 
   const { cardData, loading, error } = useCardData(cardName);
+  const Card = cardVariant === 'minimalist' ? Minimal : Realistic;
 
   return (
     <div className="workbench">
@@ -29,8 +32,7 @@ const Workbench = () => {
                 </div>
 
                 <div style={{ marginTop: '-2px', zIndex: '0' }}>
-                  {/*<Card*/}
-                  <Realistic
+                  <Card
                     cardName={cardData.name}
                     cardManaCost={cardData.mana_cost}
                     cardColors={cardColors || cardData.colors}
@@ -58,6 +60,15 @@ const Workbench = () => {
           <input id="blackBordered" type="checkbox" onChange={(e) => setBlackBordered(e.target.checked)} />
           <label htmlFor="blackBordered">Black border</label>
         </div>
+        <select
+          name="cardVariant"
+          value={cardVariant}
+          onChange={(e) => setCardVariant(e.target.value)}
+          style={{ marginRight: '0.5em' }}
+        >
+          <option value="original">Original</option>
+          <option value="minimalist">Minimalist</option>
+        </select>
         <select name="borderColor" defaultValue="" onChange={(e) => setCardColors(e.target.value)}>
           <option value="">default</option>
           <option value={[]}>none</option>

@@ -27,6 +27,7 @@ const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
   });
   drawSubCardOracleBox(ctx, {
     cardOracleText: subCard.oracle_text,
+    cardColorIdentity: subColorIdentity,
     position: subCardPosition,
   });
 };
@@ -70,35 +71,22 @@ const CanvasCard = ({
       drawSubCard(ctx, { subCard, subCardPosition, drawState });
     }
 
-    if (cardPower && cardToughness) {
-      drawOracleBox(ctx, {
-        cardOracleText,
-        cardColorIdentity,
-        x: 45,
-        y: 270,
-        height: 370 - 45,
-        width: ctx.canvas.width - 45 * 2,
-        subCardPosition,
-      });
-    } else if (cardLoyalty) {
+    const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
+
+    if (cardLoyalty) {
       drawPlaneswalkerOracleBox(ctx, {
         cardOracleText,
         cardColorIdentity,
-        x: 45,
-        y: 270,
-        height: 410 - 45,
-        width: ctx.canvas.width - 45 * 2,
-        subCardPosition,
+        layout: oracleLayout,
       });
     } else {
       drawOracleBox(ctx, {
         cardOracleText,
         cardColorIdentity,
-        x: 45,
-        y: 270,
-        height: 410 - 45,
-        width: ctx.canvas.width - 45 * 2,
-        subCardPosition,
+        cardPower,
+        cardToughness,
+        cardLoyalty,
+        layout: oracleLayout,
       });
     }
 

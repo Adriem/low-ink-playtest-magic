@@ -5,84 +5,100 @@ import {
   drawRectangle,
 } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
-import { fillMultilineText, fitFontSizeInX, fitTextIntoBox } from '../../../utils/canvasText';
+import { fillMultilineText, fitTextIntoBox } from '../../../utils/canvasText';
 import { MinimalistColors } from '../../../utils/colors';
+import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y, PINLINE_THICKNESS } from '../config';
 
 const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character here! D:
 const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
-const TYPE_BOX_TOP_Y = 170;
-const DIVIDER_THICKNESS = 5;
-const SUBCARD_TEXT_DIVIDER_PADDING = 8;
+const ORACLE_EXTENDED_EXTRA = 40;
+const DIVIDER_TEXT_PADDING = 8;
 
-const resolveSubCardLayout = (ctx, { x, y, height, width, subCardPosition }) => {
-  if (!subCardPosition) return { x, width };
-
-  const halfWidth = (width - DIVIDER_THICKNESS) / 2;
-  const visibleWidth = halfWidth - SUBCARD_TEXT_DIVIDER_PADDING;
-  const contentX = subCardPosition === 'left'
-    ? x + halfWidth + DIVIDER_THICKNESS + SUBCARD_TEXT_DIVIDER_PADDING
-    : x;
-
-  return { x: contentX, width: visibleWidth };
-};
-
-const drawSubCardDivider = (ctx, { cardColorIdentity, x, y, height, width }) => {
-  const dividerX = x + (width - DIVIDER_THICKNESS) / 2;
+const drawSubCardDivider = (ctx, { cardColorIdentity, height }) => {
   drawRectangle(ctx, {
-    x: dividerX,
-    y: TYPE_BOX_TOP_Y,
-    width: DIVIDER_THICKNESS,
-    height: y + height - TYPE_BOX_TOP_Y,
+    x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
+    y: ORACLE_Y,
+    width: PINLINE_THICKNESS,
+    height: height,
     fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
   });
 };
 
-const applyFlatSide = (ctx, { x, width, flatSide }) => {
-  if (flatSide === 'left') return { x: 0, width: x + width };
-  if (flatSide === 'right') return { x, width: ctx.canvas.width - x };
-  return { x, width };
+const drawOracleBorder = (ctx, { cardColorIdentity, layout, y }) => {
+  const x = layout === 'right-half'
+    ? ctx.canvas.width / 2 - PINLINE_THICKNESS / 2
+    : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const width = layout === 'full-width'
+    ? CONTENT_WIDTH
+    : CONTENT_WIDTH / 2 + PINLINE_THICKNESS / 2;
+
+  drawRectangle(ctx, {
+    x,
+    y,
+    width,
+    height: PINLINE_THICKNESS,
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
+  });
 };
 
-export const drawOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width, subCardPosition, flatSide }) => {
-  const { x: flatX, width: flatWidth } = applyFlatSide(ctx, { x, width, flatSide });
-  const { x: contentX, width: contentWidth } = resolveSubCardLayout(ctx, { x: flatX, y, height, width: flatWidth, subCardPosition });
+export const drawOracleBox = (ctx, {
+  cardOracleText,
+  cardColorIdentity,
+  cardPower,
+  cardToughness,
+  cardLoyalty,
+  layout,
+}) => {
+  const hasStats = (cardPower != null && cardToughness != null) || cardLoyalty != null;
 
-  ctx.font = "30px Verdana";
+  const x = layout === 'right-half'
+    ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2
+    : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const y = ORACLE_Y;
+  const width = layout === 'full-width'
+    ? CONTENT_WIDTH
+    : (CONTENT_WIDTH - PINLINE_THICKNESS) / 2;
+  const height = hasStats ? ORACLE_HEIGHT : ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
+
+  if (layout !== 'full-width') {
+    drawSubCardDivider(ctx, { cardColorIdentity, y, height });
+  }
+  drawOracleBorder(ctx, { cardColorIdentity, layout, y: y + height });
+
+  const textPaddingX = layout === 'full-width' ? 0 : DIVIDER_TEXT_PADDING;
+  const textX = layout === 'right-half' ? x + textPaddingX : x;
+  const textWidth = width - textPaddingX;
+
+  const textPaddingTop = 50;
+  const textPaddingBottom = 0;
+  const textY = y + textPaddingTop;
+  const textHeight = height - textPaddingTop - textPaddingBottom;
+
+  ctx.font = `${ORACLE_FONT_SIZE}px Verdana`;
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    (cardOracleText ?? '').split('\n').map(content => ({ content, width: contentWidth })),
-    height,
+    (cardOracleText ?? '').split('\n').map(content => ({ content, width: textWidth })),
+    textHeight,
   );
 
-  let currentY = y
+  let currentY = textY;
   for (const paragraph of paragraphs) {
-    fillMultilineText(ctx, paragraph.lines, contentX, currentY)
-    currentY += paragraph.paragraphHeight
+    fillMultilineText(ctx, paragraph.lines, textX, currentY);
+    currentY += paragraph.paragraphHeight;
   }
 
-  drawRectangle(ctx, {
-    x: flatX,
-    y: y + height,
-    width: flatWidth,
-    height: 5,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity)
-  })
-
-  if (subCardPosition) {
-    drawSubCardDivider(ctx, { cardColorIdentity, x: flatX, y, height, width: flatWidth });
-  }
 };
 
 const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
   ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors });
 
-  const xOffsetL = x + PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * .65
-  const xOffsetR = x + PLANESWALKER_ORACLE_EXTRA_PADDING + PLANESWALKER_ORACLE_BORDER_WIDTH * .35
+  const xOffsetL = x + PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * .65;
+  const xOffsetR = x + PLANESWALKER_ORACLE_EXTRA_PADDING + PLANESWALKER_ORACLE_BORDER_WIDTH * .35;
 
   ctx.beginPath();
   ctx.moveTo(xOffsetL - 15, y);
@@ -93,22 +109,39 @@ const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) 
   ctx.closePath();
 
   ctx.fill();
-}
+};
 
-export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdentity, x, y, height, width, subCardPosition, flatSide }) => {
-  const { x: flatX, width: flatWidth } = applyFlatSide(ctx, { x, width, flatSide });
-  const { x: contentX, width: contentWidth } = resolveSubCardLayout(ctx, { x: flatX, y, height, width: flatWidth, subCardPosition });
-  const paddedX = contentX + PLANESWALKER_ORACLE_EXTRA_PADDING;
-  const loyaltyAbilityWidth = contentWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
-  const regularOracleWidth = contentWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
+export const drawPlaneswalkerOracleBox = (ctx, {
+  cardOracleText,
+  cardColorIdentity,
+  layout,
+}) => {
+  const x = layout === 'right-half'
+    ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2
+    : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const y = ORACLE_Y;
+  const width = layout === 'full-width'
+    ? CONTENT_WIDTH
+    : (CONTENT_WIDTH - PINLINE_THICKNESS) / 2;
+  const height = ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
 
-  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x: contentX, y: y - 50, height: height + 60, width: contentWidth })
+  const textPaddingX = layout === 'full-width' ? 0 : DIVIDER_TEXT_PADDING;
+  const textX = layout === 'right-half' ? x + textPaddingX : x;
+  const textWidth = width - textPaddingX;
+  const textY = y;
+  const textHeight = height;
 
-  if (subCardPosition) {
-    drawSubCardDivider(ctx, { cardColorIdentity, x: flatX, y, height, width: flatWidth });
+  const paddedX = textX + PLANESWALKER_ORACLE_EXTRA_PADDING;
+  const loyaltyAbilityWidth = textWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
+  const regularOracleWidth = textWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
+
+  drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x: textX, y: textY - 50, height: textHeight + 60, width: textWidth });
+
+  if (layout !== 'full-width') {
+    drawSubCardDivider(ctx, { cardColorIdentity, y, height });
   }
 
-  ctx.font = "30px Tahoma";
+  ctx.font = `${ORACLE_FONT_SIZE}px Tahoma`;
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
 
@@ -117,56 +150,54 @@ export const drawPlaneswalkerOracleBox = (ctx, { cardOracleText, cardColorIdenti
   const paragraphs = fitTextIntoBox(
     ctx,
     originalParagraphs.map(content => {
-      const isLoyaltyAbility = LOYALTY_COST_REGEX.test(content)
+      const isLoyaltyAbility = LOYALTY_COST_REGEX.test(content);
 
       return {
         content: isLoyaltyAbility ? content.replace(LOYALTY_COST_REGEX, '').trim() : content,
         width: isLoyaltyAbility ? loyaltyAbilityWidth : regularOracleWidth,
-      }
+      };
     }),
-    height,
+    textHeight,
   );
 
-  let currentY = y
+  let currentY = textY;
   for (const [index, paragraph] of paragraphs.entries()) {
-    const originalParagraph = originalParagraphs[index]
-    const isLoyaltyAbility = LOYALTY_COST_REGEX.test(originalParagraph)
+    const originalParagraph = originalParagraphs[index];
+    const isLoyaltyAbility = LOYALTY_COST_REGEX.test(originalParagraph);
 
     if (isLoyaltyAbility) {
-      fillMultilineText(ctx, paragraph.lines, paddedX + LOYALTY_ABILITY_OFFSET, currentY)
+      fillMultilineText(ctx, paragraph.lines, paddedX + LOYALTY_ABILITY_OFFSET, currentY);
     } else {
-      fillMultilineText(ctx, paragraph.lines, paddedX + PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5, currentY)
+      fillMultilineText(ctx, paragraph.lines, paddedX + PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5, currentY);
     }
 
-    currentY += paragraph.paragraphHeight
+    currentY += paragraph.paragraphHeight;
   }
 
-  // Drawing the loyalty symbols will mess up the configuration for writing the
-  // oracle text in the canvas, so it must be done after all the text is rendered
-  currentY = y
+  currentY = textY;
   for (const [index, paragraph] of paragraphs.entries()) {
-    const originalParagraph = originalParagraphs[index]
-    const isLoyaltyAbility = LOYALTY_COST_REGEX.test(originalParagraph)
+    const originalParagraph = originalParagraphs[index];
+    const isLoyaltyAbility = LOYALTY_COST_REGEX.test(originalParagraph);
 
     if (isLoyaltyAbility) {
-      const [abilityCost] = originalParagraph.match(LOYALTY_COST_REGEX)
+      const [abilityCost] = originalParagraph.match(LOYALTY_COST_REGEX);
       const parsedAbilityCost = abilityCost.replace(':', '');
 
       const drawLoyaltyCost = parsedAbilityCost.startsWith('+')
         ? drawLoyaltyPlus
         : parsedAbilityCost === '0'
           ? drawLoyaltyZero
-          : drawLoyaltyMinus
+          : drawLoyaltyMinus;
 
-        drawLoyaltyCost(ctx, {
-          loyaltyCost: parsedAbilityCost,
-          x: paddedX,
-          y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1) / 2),
-          scale: 1.1,
-          fontFamily: 'Tahoma',
-        })
+      drawLoyaltyCost(ctx, {
+        loyaltyCost: parsedAbilityCost,
+        x: paddedX,
+        y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1) / 2),
+        scale: 1.1,
+        fontFamily: 'Tahoma',
+      });
     }
 
-    currentY += paragraph.paragraphHeight
+    currentY += paragraph.paragraphHeight;
   }
 };

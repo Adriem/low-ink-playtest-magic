@@ -70,7 +70,8 @@ const RealisticCard = ({
     drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity, drawState });
     drawArtBox(ctx, { cardArtUrl, cardColorIdentity, drawState });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
-    drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity, subCardPosition });
+    const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
+    drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity, layout: oracleLayout });
 
     if (subCard && subCardPosition) {
       drawSubCard(ctx, { subCard, subCardPosition, drawState });

@@ -17,7 +17,6 @@ export const drawTitleBox = (ctx, {
   cardName,
   cardManaCost,
   maxHeight = 110,
-  drawState,
 }) => {
   const cardWidth = ctx.canvas.width;
   const titleBoxMarginX = (cardWidth - TITLE_WIDTH) / 2;
@@ -57,7 +56,6 @@ export const drawTitleBox = (ctx, {
       y: TITLE_Y,
       symbolDiameter: MANA_SYMBOL_DIAMETER,
       symbolSpacing: MANA_SYMBOLS_SPACING,
-      drawState,
     });
   }
 };

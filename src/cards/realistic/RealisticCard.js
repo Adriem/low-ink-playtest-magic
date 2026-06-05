@@ -11,7 +11,7 @@ import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
 
-const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
+const drawSubCard = (ctx, { subCard, subCardPosition }) => {
   const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
   const subColorIdentity = getColorMappings(subColors, subCard.type_line);
 
@@ -20,7 +20,6 @@ const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
     cardManaCost: subCard.mana_cost,
     cardColorIdentity: subColorIdentity,
     position: subCardPosition,
-    drawState,
   });
   drawSubCardTypeBox(ctx, {
     cardType: subCard.type_line,
@@ -60,21 +59,20 @@ const RealisticCard = ({
   useEffect(() => {
     if (canvas == null) return;
 
-    const drawState = { cancelled: false };
     const cardColorIdentity = getColorMappings(cardColors, cardTypeLine);
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawOuterFrame(ctx, { blackBordered });
-    drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity, drawState });
-    drawArtBox(ctx, { cardArtUrl, cardColorIdentity, drawState });
+    drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity });
+    drawArtBox(ctx, { cardArtUrl, cardColorIdentity });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
     const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
     drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity, layout: oracleLayout });
 
     if (subCard && subCardPosition) {
-      drawSubCard(ctx, { subCard, subCardPosition, drawState });
+      drawSubCard(ctx, { subCard, subCardPosition });
     }
 
     if (cardPower && cardToughness) {
@@ -84,10 +82,6 @@ const RealisticCard = ({
     if (cardLoyalty) {
       drawLoyaltyBox(ctx, { cardLoyalty, x: 439, y: 664 });
     }
-
-    return () => {
-      drawState.cancelled = true;
-    };
   }, [
     canvas,
     cardName,

@@ -10,7 +10,7 @@ import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
 
-const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
+const drawSubCard = (ctx, { subCard, subCardPosition }) => {
   const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
   const subColorIdentity = getColorMappings(subColors, subCard.type_line);
 
@@ -18,7 +18,6 @@ const drawSubCard = (ctx, { subCard, subCardPosition, drawState }) => {
     cardName: subCard.name,
     cardManaCost: subCard.mana_cost,
     position: subCardPosition,
-    drawState,
   });
   drawSubCardTypeBox(ctx, {
     cardType: subCard.type_line,
@@ -58,17 +57,16 @@ const CanvasCard = ({
   useEffect(() => {
     if (canvas == null) return;
 
-    const drawState = { cancelled: false };
     const cardColorIdentity = getColorMappings(cardColors, cardTypeLine);
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     drawOuterFrame(ctx, { blackBordered });
-    drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110, drawState });
+    drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110 });
 
     if (subCard && subCardPosition) {
-      drawSubCard(ctx, { subCard, subCardPosition, drawState });
+      drawSubCard(ctx, { subCard, subCardPosition });
     }
 
     const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
@@ -99,10 +97,6 @@ const CanvasCard = ({
     if (cardLoyalty) {
       drawLoyaltyBox(ctx, { cardLoyalty, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
     }
-
-    return () => {
-      drawState.cancelled = true;
-    };
   }, [
     canvas,
     cardName,

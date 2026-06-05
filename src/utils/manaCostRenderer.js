@@ -6,10 +6,8 @@ export const calculateManaCostWidth = ({ manaSymbols, symbolDiameter, symbolSpac
   return symbolDiameter * manaSymbols.length + symbolSpacing * (manaSymbols.length - 1);
 }
 
-export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolSpacing, addShadow = true, drawState }) => {
+export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolSpacing, addShadow = true }) => {
   manaSymbols.forEach(async (symbol, i) => {
-    if (drawState?.cancelled) return;
-
     const symbolRadius = symbolDiameter / 2;
 
     const symbolX = x + (symbolDiameter + symbolSpacing) * i;
@@ -33,7 +31,6 @@ export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolS
 
     // Symbol image
     const symbolImage = await getSymbolImage(symbol);
-    if (drawState?.cancelled) return;
     ctx.drawImage(
       symbolImage,
       symbolX,

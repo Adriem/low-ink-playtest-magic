@@ -12,7 +12,6 @@ export const drawTitleBox = (ctx, {
   cardName,
   cardColorIdentity,
   cardManaCost,
-  drawState,
 }) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const y = TITLE_Y;
@@ -59,8 +58,6 @@ export const drawTitleBox = (ctx, {
     const originX = manaAnchorRight - radius - (MANA_SYMBOL_DIAMETER + MANA_SYMBOL_SPACING) * (manaSymbols.length - i - 1);
     const originY = innerCenterY;
 
-    if (drawState?.cancelled) return;
-
     ctx.beginPath();
     ctx.fillStyle = '#424242';
     ctx.arc(originX - 1, originY + 2, radius, 0, 2 * Math.PI);
@@ -72,7 +69,6 @@ export const drawTitleBox = (ctx, {
     ctx.fill();
 
     const symbolImage = await getSymbolImage(symbol);
-    if (drawState?.cancelled) return;
     ctx.drawImage(
       symbolImage,
       originX - radius,

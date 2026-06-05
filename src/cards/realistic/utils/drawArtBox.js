@@ -6,7 +6,6 @@ import { ARTWORK_HEIGHT, ARTWORK_Y, CONTENT_WIDTH, PINLINE_THICKNESS } from '../
 export const drawArtBox = (ctx, {
   cardColorIdentity,
   cardArtUrl,
-  drawState,
 }) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;
@@ -40,7 +39,6 @@ export const drawArtBox = (ctx, {
   artImage.crossOrigin = 'Anonymous';
   artImage.src = cardArtUrl;
   artImage.onload = () => {
-    if (drawState?.cancelled) return;
     ctx.drawImage(artImage, imageX, imageY, imageWidth, imageHeight);
     midBrightnessPass(ctx, imageX, imageY, imageWidth, imageHeight);
   };

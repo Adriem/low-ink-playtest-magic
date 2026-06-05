@@ -9,7 +9,6 @@ export const drawSubCardTitleBox = (ctx, {
   cardManaCost,
   cardColorIdentity,
   position,
-  drawState,
 }) => {
   const x = position === 'left' ? (ctx.canvas.width - TITLE_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_TITLE_Y;
@@ -73,8 +72,6 @@ export const drawSubCardTitleBox = (ctx, {
     const originX = manaAnchorRight - radius - (manaSymbolWidth + manaSymbolMargin) * (manaSymbols.length - i - 1);
     const originY = innerCenterY;
 
-    if (drawState?.cancelled) return;
-
     ctx.beginPath();
     ctx.fillStyle = '#424242';
     ctx.arc(originX, originY + 2, radius, 0, 2 * Math.PI);
@@ -86,7 +83,6 @@ export const drawSubCardTitleBox = (ctx, {
     ctx.fill();
 
     const symbolImage = await getSymbolImage(symbol);
-    if (drawState?.cancelled) return;
     ctx.drawImage(
       symbolImage,
       originX - radius,

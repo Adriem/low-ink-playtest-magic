@@ -14,7 +14,6 @@ export const drawSubCardTitleBox = (ctx, {
   cardManaCost,
   position,
   maxHeight = SUBCARD_TITLE_HEIGHT,
-  drawState,
 }) => {
   const cardWidth = ctx.canvas.width;
   const subCardWidth = cardWidth / 2;
@@ -61,7 +60,6 @@ export const drawSubCardTitleBox = (ctx, {
       y: SUBCARD_TITLE_Y,
       symbolDiameter: MANA_SYMBOL_DIAMETER,
       symbolSpacing: MANA_SYMBOLS_SPACING,
-      drawState,
     });
   }
 };

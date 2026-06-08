@@ -1,8 +1,18 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { getSymbolImage } from '../../../utils/symbols';
-import { PINLINE_THICKNESS, SUB_TITLE_FONT_SIZE, SUBCARD_TITLE_HEIGHT, SUBCARD_TITLE_Y, TITLE_WIDTH } from '../config';
+import { calculateManaCostWidth, renderManaCost } from '../../../utils/manaCostRenderer';
+import {
+  CAPSULE_INNER_STROKE,
+  PINLINE_THICKNESS,
+  SUBCARD_MANA_SYMBOL_DIAMETER,
+  SUBCARD_MANA_SYMBOL_EDGE_PADDING,
+  SUBCARD_MANA_SYMBOL_SPACING,
+  SUBCARD_TITLE_FONT_SIZE,
+  SUBCARD_TITLE_HEIGHT,
+  SUBCARD_TITLE_Y,
+  TITLE_WIDTH,
+} from '../config';
 
 export const drawSubCardTitleBox = (ctx, {
   cardName,
@@ -16,12 +26,12 @@ export const drawSubCardTitleBox = (ctx, {
   const height = SUBCARD_TITLE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
-  const manaSymbolWidth = 21;
-  const manaSymbolMargin = 2.5;
-  const manaSymbolEdgePadding = 10;
-  const fontSize = SUB_TITLE_FONT_SIZE;
-
   const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
+  const manaCostWidth = calculateManaCostWidth({
+    manaSymbols,
+    symbolDiameter: SUBCARD_MANA_SYMBOL_DIAMETER,
+    symbolSpacing: SUBCARD_MANA_SYMBOL_SPACING,
+  });
 
   const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
   const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
@@ -44,7 +54,7 @@ export const drawSubCardTitleBox = (ctx, {
     y: innerY,
     width: innerWidth,
     height: innerHeight,
-    lineWidth: PINLINE_THICKNESS / 2,
+    lineWidth: CAPSULE_INNER_STROKE,
     strokeStyle: 'black',
     fillStyle: 'white',
     flatSide,
@@ -55,40 +65,23 @@ export const drawSubCardTitleBox = (ctx, {
   const innerCenterY = y + height / 2;
 
   const manaAnchorRight = innerX + innerWidth - PINLINE_THICKNESS - 4;
-  const manaTotalWidth = manaSymbols.length * manaSymbolWidth
-    + Math.max(manaSymbols.length - 1, 0) * manaSymbolMargin;
   const titleEndX = manaSymbols.length
-    ? manaAnchorRight - manaTotalWidth - manaSymbolEdgePadding
+    ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING
     : textRight;
 
-  ctx.font = `bold ${fontSize}px Serif`;
+  ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px Serif`;
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardName, titleEndX - textX);
-  ctx.fillText(cardName, textX, innerCenterY + fontSize / 3);
+  ctx.fillText(cardName, textX, innerCenterY + SUBCARD_TITLE_FONT_SIZE / 3);
 
-  manaSymbols.forEach(async (symbol, i) => {
-    const radius = manaSymbolWidth / 2;
-    const originX = manaAnchorRight - radius - (manaSymbolWidth + manaSymbolMargin) * (manaSymbols.length - i - 1);
-    const originY = innerCenterY;
-
-    ctx.beginPath();
-    ctx.fillStyle = '#424242';
-    ctx.arc(originX, originY + 2, radius, 0, 2 * Math.PI);
-    ctx.fill();
-
-    ctx.beginPath();
-    ctx.fillStyle = 'lightgray';
-    ctx.arc(originX, originY, radius, 0, 2 * Math.PI);
-    ctx.fill();
-
-    const symbolImage = await getSymbolImage(symbol);
-    ctx.drawImage(
-      symbolImage,
-      originX - radius,
-      originY - radius,
-      2 * radius,
-      2 * radius,
-    );
-  });
+  if (manaSymbols.length > 0) {
+    renderManaCost(ctx, {
+      manaSymbols,
+      x: manaAnchorRight - manaCostWidth,
+      y: innerCenterY - SUBCARD_MANA_SYMBOL_DIAMETER / 2,
+      symbolDiameter: SUBCARD_MANA_SYMBOL_DIAMETER,
+      symbolSpacing: SUBCARD_MANA_SYMBOL_SPACING,
+    });
+  }
 };

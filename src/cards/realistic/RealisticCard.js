@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { drawLoyaltyBox } from '../../utils/canvasShapes';
 import { colorsFromManaCost, getColorMappings } from '../../utils/colors';
 import { drawArtBox } from './utils/drawArtBox';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawOuterFrame } from './utils/drawOuterFrame';
+import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
 import { drawStatsBox } from './utils/drawStatsBox';
 import { drawSubCardOracleBox } from './utils/drawSubCardOracleBox';
 import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
@@ -69,7 +69,11 @@ const RealisticCard = ({
     drawArtBox(ctx, { cardArtUrl, cardColorIdentity });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
     const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
-    drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardLoyalty, cardColorIdentity, layout: oracleLayout });
+    if (cardLoyalty) {
+      drawPlaneswalkerOracleBox(ctx, { cardOracleText, cardLoyalty, cardColorIdentity, layout: oracleLayout });
+    } else {
+      drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardColorIdentity, layout: oracleLayout });
+    }
 
     if (subCard && subCardPosition) {
       drawSubCard(ctx, { subCard, subCardPosition });
@@ -77,10 +81,6 @@ const RealisticCard = ({
 
     if (cardPower && cardToughness) {
       drawStatsBox(ctx, { cardPower, cardToughness, cardColorIdentity });
-    }
-
-    if (cardLoyalty) {
-      drawLoyaltyBox(ctx, { cardLoyalty, x: 439, y: 664 });
     }
   }, [
     canvas,

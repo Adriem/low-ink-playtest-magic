@@ -1,14 +1,11 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
-import { PINLINE_THICKNESS, STATSLINE_FONT_SIZE, STATSLINE_HEIGHT, STATSLINE_Y } from '../config';
-
-const STATS_X = 385;
-const STATS_WIDTH = 88;
+import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, STATSLINE_FONT_SIZE, STATSLINE_HEIGHT, STATSLINE_WIDTH, STATSLINE_Y, TITLE_WIDTH } from '../config';
 
 export const drawStatsBox = (ctx, { cardPower, cardToughness, cardColorIdentity }) => {
-  const x = STATS_X;
+  const x = (ctx.canvas.width - TITLE_WIDTH) / 2 + TITLE_WIDTH - STATSLINE_WIDTH;
   const y = STATSLINE_Y;
-  const width = STATS_WIDTH;
+  const width = STATSLINE_WIDTH;
   const height = STATSLINE_HEIGHT;
 
   drawRoundedBox(ctx, {
@@ -24,7 +21,7 @@ export const drawStatsBox = (ctx, { cardPower, cardToughness, cardColorIdentity 
     y: y + PINLINE_THICKNESS,
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2 - 2,
-    lineWidth: 2,
+    lineWidth: CAPSULE_INNER_STROKE,
     strokeStyle: 'black',
     fillStyle: 'white',
   });

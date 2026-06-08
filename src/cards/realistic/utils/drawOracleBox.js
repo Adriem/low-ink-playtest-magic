@@ -7,7 +7,6 @@ export const drawOracleBox = (ctx, {
   cardOracleText,
   cardPower,
   cardToughness,
-  cardLoyalty,
   cardColorIdentity,
   layout,
 }) => {
@@ -40,7 +39,7 @@ export const drawOracleBox = (ctx, {
   const textWidth = width - PINLINE_THICKNESS * 2 - textPaddingX * 2;
 
   const textPaddingTop = ORACLE_FONT_SIZE + 11;
-  const textPaddingBottom = ((cardPower != null && cardToughness != null) || cardLoyalty != null) && layout !== 'left-half' ? 26 : 11;
+  const textPaddingBottom = (cardPower != null && cardToughness != null) && layout !== 'left-half' ? 26 : 11;
   const textY = y + PINLINE_THICKNESS + textPaddingTop;
   const textHeight = height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom;
 

@@ -1,7 +1,7 @@
 import { drawRectangle } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInXY } from '../../../utils/canvasText';
-import { CONTENT_WIDTH, PINLINE_THICKNESS, SUB_ORACLE_FONT_SIZE, SUB_ORACLE_HEIGHT, SUBCARD_ORACLE_Y } from '../config';
+import { CONTENT_WIDTH, PINLINE_THICKNESS, SUBCARD_ORACLE_FONT_SIZE, SUBCARD_ORACLE_HEIGHT, SUBCARD_ORACLE_Y } from '../config';
 
 export const drawSubCardOracleBox = (ctx, {
   cardOracleText,
@@ -11,7 +11,7 @@ export const drawSubCardOracleBox = (ctx, {
   const x = position === 'left' ? (ctx.canvas.width - CONTENT_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_ORACLE_Y;
   const width = CONTENT_WIDTH / 2;
-  const height = SUB_ORACLE_HEIGHT;
+  const height = SUBCARD_ORACLE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
   const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
@@ -45,7 +45,7 @@ export const drawSubCardOracleBox = (ctx, {
   const textTopY = innerY + 22;
   const textBottomY = innerY + innerHeight - 6;
 
-  ctx.font = `${SUB_ORACLE_FONT_SIZE}px Serif`;
+  ctx.font = `${SUBCARD_ORACLE_FONT_SIZE}px Serif`;
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
 

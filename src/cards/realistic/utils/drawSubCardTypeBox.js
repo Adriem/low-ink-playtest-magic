@@ -1,7 +1,7 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { PINLINE_THICKNESS, SUBCARD_TYPELINE_HEIGHT, SUBCARD_TYPELINE_Y, SUBCARD_TYPELINE_FONT_SIZE, TITLE_WIDTH } from '../config';
+import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, SUBCARD_TYPELINE_FONT_SIZE, SUBCARD_TYPELINE_HEIGHT, SUBCARD_TYPELINE_Y, TITLE_WIDTH } from '../config';
 
 export const drawSubCardTypeBox = (ctx, {
   cardType,
@@ -13,8 +13,6 @@ export const drawSubCardTypeBox = (ctx, {
   const width = TITLE_WIDTH / 2;
   const height = SUBCARD_TYPELINE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
-
-  const fontSize = SUBCARD_TYPELINE_FONT_SIZE;
 
   const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
   const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
@@ -37,7 +35,7 @@ export const drawSubCardTypeBox = (ctx, {
     y: innerY,
     width: innerWidth,
     height: innerHeight,
-    lineWidth: PINLINE_THICKNESS / 2,
+    lineWidth: CAPSULE_INNER_STROKE,
     strokeStyle: 'black',
     fillStyle: 'white',
     flatSide,
@@ -47,9 +45,9 @@ export const drawSubCardTypeBox = (ctx, {
   const textRight = flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - 7;
   const innerCenterY = y + height / 2;
 
-  ctx.font = `bold ${fontSize}px Serif`;
+  ctx.font = `bold ${SUBCARD_TYPELINE_FONT_SIZE}px Serif`;
   ctx.fillStyle = 'black';
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType, textRight - textX);
-  ctx.fillText(cardType, textX, innerCenterY + fontSize / 3);
+  ctx.fillText(cardType, textX, innerCenterY + SUBCARD_TYPELINE_FONT_SIZE / 3);
 };

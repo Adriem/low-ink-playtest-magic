@@ -1,7 +1,7 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { PINLINE_THICKNESS, TITLE_WIDTH, TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_Y } from '../config';
+import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, TITLE_WIDTH, TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_Y } from '../config';
 
 export const drawTypeBox = (ctx, {
   cardType,
@@ -26,7 +26,7 @@ export const drawTypeBox = (ctx, {
     y: y + PINLINE_THICKNESS,
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2 - 2,
-    lineWidth: 2,
+    lineWidth: CAPSULE_INNER_STROKE,
     strokeStyle: 'black',
     fillStyle: 'white',
   });

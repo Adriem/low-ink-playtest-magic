@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { drawLoyaltyBox } from '../../utils/canvasShapes';
 import { colorsFromManaCost, getColorMappings } from '../../utils/colors';
-import { drawOracleBox, drawPlaneswalkerOracleBox } from './utils/drawOracleBox';
+import { drawOracleBox } from './utils/drawOracleBox';
+import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
 import { drawOuterFrame } from './utils/drawOuterFrame';
 import { drawStatsBox } from './utils/drawStatsBox';
 import { drawSubCardOracleBox } from './utils/drawSubCardOracleBox';

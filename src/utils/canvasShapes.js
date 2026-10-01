@@ -257,3 +257,51 @@ export const drawLoyaltyBox = (ctx, {
   ctx.fillText(cardLoyalty, x, y - (12 * scale));
 };
 
+const traceHexagonPath = (ctx, { x, y, radius }) => {
+  const horizontalHalf = radius * Math.sqrt(3) / 2;
+  const verticalHalf = radius / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(x, y - radius);
+  ctx.lineTo(x + horizontalHalf, y - verticalHalf);
+  ctx.lineTo(x + horizontalHalf, y + verticalHalf);
+  ctx.lineTo(x, y + radius);
+  ctx.lineTo(x - horizontalHalf, y + verticalHalf);
+  ctx.lineTo(x - horizontalHalf, y - verticalHalf);
+  ctx.closePath();
+};
+
+export const drawSagaChapter = (ctx, {
+  romanNumeral,
+  x,
+  y,
+  scale = 1,
+  fontFamily = 'Tahoma',
+  fontSize = 17.5,
+}) => {
+  const outerRadius = 22.5 * scale;
+  const innerRadius = outerRadius - 3.75 * scale;
+
+  ctx.fillStyle = 'black';
+  traceHexagonPath(ctx, { x, y, radius: outerRadius });
+  ctx.fill();
+
+  ctx.fillStyle = 'white';
+  traceHexagonPath(ctx, { x, y, radius: innerRadius });
+  ctx.fill();
+
+  const previousTextAlign = ctx.textAlign;
+  const previousTextBaseline = ctx.textBaseline;
+  const previousFont = ctx.font;
+
+  ctx.font = `bold ${fontSize * scale}px ${fontFamily}`;
+  ctx.fillStyle = 'black';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(romanNumeral, x, y + 1.25 * scale);
+
+  ctx.textAlign = previousTextAlign;
+  ctx.textBaseline = previousTextBaseline;
+  ctx.font = previousFont;
+};
+

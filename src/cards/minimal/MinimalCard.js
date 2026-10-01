@@ -3,6 +3,7 @@ import { drawLoyaltyBox } from '../../utils/canvasShapes';
 import { colorsFromManaCost, getColorMappings } from '../../utils/colors';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
+import { drawSagaOracleBox } from './utils/drawSagaOracleBox';
 import { drawOuterFrame } from './utils/drawOuterFrame';
 import { drawStatsBox } from './utils/drawStatsBox';
 import { drawSubCardOracleBox } from './utils/drawSubCardOracleBox';
@@ -71,12 +72,19 @@ const CanvasCard = ({
     }
 
     const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
+    const isSaga = /\bSaga\b/i.test(cardTypeLine ?? '');
 
-    if (cardLoyalty) {
+    if (isSaga) {
+      drawSagaOracleBox(ctx, {
+        cardOracleText,
+        cardColorIdentity,
+        cardPower,
+        cardToughness,
+      });
+    } else if (cardLoyalty) {
       drawPlaneswalkerOracleBox(ctx, {
         cardOracleText,
         cardColorIdentity,
-        layout: oracleLayout,
       });
     } else {
       drawOracleBox(ctx, {

@@ -2,29 +2,17 @@ import {
   drawLoyaltyMinus,
   drawLoyaltyPlus,
   drawLoyaltyZero,
-  drawRectangle,
 } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitTextIntoBox } from '../../../utils/canvasText';
 import { MinimalistColors } from '../../../utils/colors';
-import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y, PINLINE_THICKNESS } from '../config';
+import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y } from '../config';
 
 const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character here! D:
 const LOYALTY_ABILITY_OFFSET = 45;
 const PLANESWALKER_ORACLE_EXTRA_PADDING = 20;
 const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
 const ORACLE_EXTENDED_EXTRA = 40;
-const DIVIDER_TEXT_PADDING = 8;
-
-const drawSubCardDivider = (ctx, { cardColorIdentity, height }) => {
-  drawRectangle(ctx, {
-    x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
-    y: ORACLE_Y,
-    width: PINLINE_THICKNESS,
-    height: height,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-};
 
 const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
   ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors });
@@ -46,32 +34,22 @@ const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) 
 export const drawPlaneswalkerOracleBox = (ctx, {
   cardOracleText,
   cardColorIdentity,
-  layout,
 }) => {
-  const x = layout === 'right-half'
-    ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2
-    : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
-  const width = layout === 'full-width'
-    ? CONTENT_WIDTH
-    : (CONTENT_WIDTH - PINLINE_THICKNESS) / 2;
   const height = ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
 
-  const textPaddingX = layout === 'full-width' ? 0 : DIVIDER_TEXT_PADDING;
-  const textX = layout === 'right-half' ? x + textPaddingX : x;
-  const textWidth = width - textPaddingX;
-  const textY = y;
-  const textHeight = height;
+  const textPaddingTop = 50;
+  const textX = x;
+  const textWidth = CONTENT_WIDTH;
+  const textY = y + textPaddingTop;
+  const textHeight = height - textPaddingTop;
 
   const paddedX = textX + PLANESWALKER_ORACLE_EXTRA_PADDING;
   const loyaltyAbilityWidth = textWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - LOYALTY_ABILITY_OFFSET;
   const regularOracleWidth = textWidth - PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * 1.5;
 
   drawPlaneswalkerOracleBorder(ctx, { cardColorIdentity, x: textX, y: textY - 50, height: textHeight + 60, width: textWidth });
-
-  if (layout !== 'full-width') {
-    drawSubCardDivider(ctx, { cardColorIdentity, y, height });
-  }
 
   ctx.font = `${ORACLE_FONT_SIZE}px Tahoma`;
   ctx.fillStyle = 'black';

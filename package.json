@@ -2,6 +2,7 @@
   "name": "low-ink-mtg-press",
   "version": "0.1.0",
   "private": true,
+  "homepage": ".",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@testing-library/jest-dom": "^5.15.1",

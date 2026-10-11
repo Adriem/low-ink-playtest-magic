@@ -13,7 +13,7 @@ const SAGA_CHAPTER_DIVIDER_HEIGHT = 1;
 const ORACLE_EXTENDED_EXTRA = 30;
 
 const drawSagaOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
-  ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors });
+  ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palette: MinimalistColors });
 
   const xOffsetL = x + SAGA_ORACLE_EXTRA_PADDING - SAGA_ORACLE_BORDER_WIDTH * .65;
   const xOffsetR = x + SAGA_ORACLE_EXTRA_PADDING + SAGA_ORACLE_BORDER_WIDTH * .35;

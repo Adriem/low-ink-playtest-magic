@@ -15,7 +15,7 @@ const PLANESWALKER_ORACLE_BORDER_WIDTH = 16;
 const ORACLE_EXTENDED_EXTRA = 40;
 
 const drawPlaneswalkerOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
-  ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors });
+  ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palette: MinimalistColors });
 
   const xOffsetL = x + PLANESWALKER_ORACLE_EXTRA_PADDING - PLANESWALKER_ORACLE_BORDER_WIDTH * .65;
   const xOffsetR = x + PLANESWALKER_ORACLE_EXTRA_PADDING + PLANESWALKER_ORACLE_BORDER_WIDTH * .35;

@@ -19,7 +19,7 @@ export const drawSubCardTypeBox = (ctx, { cardType, cardColorIdentity, position 
     width: subcardTypelineWidth,
     height: SUBCARD_TYPELINE_HEIGHT,
     lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors }),
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity, { palette: MinimalistColors }),
     flatSide,
   });
 

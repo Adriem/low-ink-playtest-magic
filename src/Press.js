@@ -50,10 +50,10 @@ const Press = () => {
     setCardNamesList(list => [...list, ...cards]);
   }, [setCardNamesList]);
 
-  const removeCard = useCallback((sheetNumber, cardPosition) => {
+  const removeCard = useCallback((sourceIndex) => {
     setCardNamesList(list => {
       const _list = [...list]
-      _list.splice((sheetNumber * CARDS_PER_SHEET) + cardPosition, 1)
+      _list.splice(sourceIndex, 1)
       return _list
     });
   }, [setCardNamesList])
@@ -141,7 +141,7 @@ const Press = () => {
         <div key={sheetNumber} className="press-sheet">
           {sheet.map((card, cardPosition) => (
             <div className="sheet-slot" key={card._loading ? `loading_${cardPosition}` : calculateCardKey(sheet, card, cardPosition)}>
-              <button className="sheet-slot-control delete" onClick={() => removeCard(sheetNumber, cardPosition)} >
+              <button className="sheet-slot-control delete" onClick={() => removeCard(card._sourceIndex)} >
                 <i className="fa fa-trash" />
               </button>
               {card._loading ? (

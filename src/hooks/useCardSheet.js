@@ -9,6 +9,7 @@ const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
  * @typedef {object} Card
  * @prop {boolean} _loading
  * @prop {Error|null} _error
+ * @prop {number} _sourceIndex - Index of the card name this card was built from
  * @prop {string} mana_cost
  * @prop {string} colors
  * @prop {string} oracle_text
@@ -36,6 +37,7 @@ export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 's
   useEffect(() => {
     const buildCardSheets = async () => {
       const cardsData = (await Promise.all(cardNames.map((cardName) => fetchCardData(cardName))))
+        .map((card, sourceIndex) => ({ ...card, _sourceIndex: sourceIndex }))
         .filter(card => card._error == null)
         .flatMap(card => {
           if (!card.card_faces) return [card];

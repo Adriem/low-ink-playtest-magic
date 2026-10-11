@@ -1,5 +1,6 @@
 import { getSymbolImage } from './symbols';
 
+const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 const EMPTY_LINE_RELATIVE_SIZE = .25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = .75;
 
@@ -39,8 +40,8 @@ export const wrapText = (ctx, text, maxWidth) => {
  * @returns {number} Font size
  */
 export const getFontSize = (ctx) => {
-  const [, currentFont] = ctx.font.match(/(\d+)px/);
-  return currentFont;
+  const [, currentFont] = ctx.font.match(FONT_SIZE_REGEX);
+  return Number(currentFont);
 }
 
 /**
@@ -54,7 +55,7 @@ export const getFontSize = (ctx) => {
  */
 export const reduceTextSize = (ctx, reduceAmount = 1) => {
   const currentFont = getFontSize(ctx)
-  ctx.font = ctx.font.replace(/(\d+)px/, `${currentFont - reduceAmount}px`);
+  ctx.font = ctx.font.replace(FONT_SIZE_REGEX, `${currentFont - reduceAmount}px`);
 }
 
 /**

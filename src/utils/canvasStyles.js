@@ -1,9 +1,5 @@
 import { Colors } from './colors';
 
-// TODO: 4 call sites pass `palettte` (typo) instead of `palette`, so `MinimalistColors`
-// is silently ignored and this falls back to the default `Colors`. Fix the call sites in
-// drawTypeBox, drawSubCardTypeBox, drawPlaneswalkerOracleBox, and drawSagaOracleBox
-// (minimal). Do first thing after the realistic saga textbox lands.
 export const getColorIdentityStyle = (ctx, colorIdentity, { devoid, palette = Colors } = {}) => {
   switch (colorIdentity) {
   case 'white': return palette.WHITE;

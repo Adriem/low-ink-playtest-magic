@@ -18,7 +18,7 @@ export const drawTypeBox = (ctx, { cardType, cardColorIdentity }) => {
     width: TYPELINE_WIDTH,
     height: TYPELINE_HEIGHT,
     lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity, { palettte: MinimalistColors }),
+    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity, { palette: MinimalistColors }),
   });
 
   const innerLineWidth = 3;

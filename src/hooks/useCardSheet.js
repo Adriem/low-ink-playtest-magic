@@ -11,6 +11,7 @@ const LOADING_CARD = { _loading: true, _error: null };
  * @prop {boolean} _loading
  * @prop {Error|null} _error
  * @prop {number} _sourceIndex - Index of the card name this card was built from
+ * @prop {string} _requestedName - Card name this card was built from
  * @prop {string} mana_cost
  * @prop {string} colors
  * @prop {string} oracle_text
@@ -40,10 +41,13 @@ export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 's
 
   return useMemo(() => {
     const cardsData = cardNames
-      .map((cardName, sourceIndex) => ({ ...(cards[cardName] ?? LOADING_CARD), _sourceIndex: sourceIndex }))
-      .filter(card => card._error == null)
+      .map((cardName, sourceIndex) => ({
+        ...(cards[cardName] ?? LOADING_CARD),
+        _requestedName: cardName,
+        _sourceIndex: sourceIndex,
+      }))
       .flatMap(card => {
-        if (!card.card_faces) return [card];
+        if (card._error != null || !card.card_faces) return [card];
 
         if (SUBCARD_LAYOUTS.includes(card.layout)) {
           const { card_faces, ...cardWithoutFaces } = card;

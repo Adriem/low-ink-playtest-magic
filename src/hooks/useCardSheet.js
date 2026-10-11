@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useFetchCard } from './useFetchCard';
 
 const SPLIT_LAYOUTS = ['split'];
 const DUAL_FACE_LAYOUTS = ['flip', 'transform', 'modal_dfc', 'meld', 'reversible_card', 'double_faced_token'];
 const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
+const LOADING_CARD = { _loading: true, _error: null };
 
 /**
  * @typedef {object} Card
@@ -31,42 +32,39 @@ const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
  * @returns {Card[][]}
  */
 export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 'separate', doubleFacedCardTreatment = 'separate' } = {}) => {
-  const fetchCardData = useFetchCard();
-  const [cardSheets, setSheets] = useState([[]]);
+  const { cards, requestCard } = useFetchCard();
 
   useEffect(() => {
-    const buildCardSheets = async () => {
-      const cardsData = (await Promise.all(cardNames.map((cardName) => fetchCardData(cardName))))
-        .map((card, sourceIndex) => ({ ...card, _sourceIndex: sourceIndex }))
-        .filter(card => card._error == null)
-        .flatMap(card => {
-          if (!card.card_faces) return [card];
+    cardNames.forEach(requestCard);
+  }, [cardNames, requestCard]);
 
-          if (SUBCARD_LAYOUTS.includes(card.layout)) {
-            const { card_faces, ...cardWithoutFaces } = card;
-            return [{ ...cardWithoutFaces, ...card_faces[0], _subFace: card_faces[1] }];
-          }
+  return useMemo(() => {
+    const cardsData = cardNames
+      .map((cardName, sourceIndex) => ({ ...(cards[cardName] ?? LOADING_CARD), _sourceIndex: sourceIndex }))
+      .filter(card => card._error == null)
+      .flatMap(card => {
+        if (!card.card_faces) return [card];
 
-          const treatment = SPLIT_LAYOUTS.includes(card.layout)
-            ? splitCardTreatment
-            : DUAL_FACE_LAYOUTS.includes(card.layout)
-              ? doubleFacedCardTreatment
-              : 'separate';
-
-          if (treatment === 'unified') return [card];
-
+        if (SUBCARD_LAYOUTS.includes(card.layout)) {
           const { card_faces, ...cardWithoutFaces } = card;
-          return card_faces.map(face => ({ ...cardWithoutFaces, ...face }));
-        });
-      const cardSheets = []
+          return [{ ...cardWithoutFaces, ...card_faces[0], _subFace: card_faces[1] }];
+        }
 
-      while (cardsData.length) cardSheets.push(cardsData.splice(0, sheetSize));
+        const treatment = SPLIT_LAYOUTS.includes(card.layout)
+          ? splitCardTreatment
+          : DUAL_FACE_LAYOUTS.includes(card.layout)
+            ? doubleFacedCardTreatment
+            : 'separate';
 
-      setSheets(cardSheets);
-    };
+        if (treatment === 'unified') return [card];
 
-    buildCardSheets()
-  }, [cardNames, fetchCardData, splitCardTreatment, doubleFacedCardTreatment]);
+        const { card_faces, ...cardWithoutFaces } = card;
+        return card_faces.map(face => ({ ...cardWithoutFaces, ...face }));
+      });
+    const cardSheets = []
 
-  return cardSheets;
+    while (cardsData.length) cardSheets.push(cardsData.splice(0, sheetSize));
+
+    return cardSheets;
+  }, [cardNames, cards, sheetSize, splitCardTreatment, doubleFacedCardTreatment]);
 };

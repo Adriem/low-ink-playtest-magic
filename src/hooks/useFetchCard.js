@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useReducer, useRef } from 'react';
+import { useCallback, useReducer, useRef } from 'react';
 import { fetchCardData } from '../utils/scryfall';
 
 /**
@@ -15,7 +15,11 @@ import { fetchCardData } from '../utils/scryfall';
  */
 
 /**
- * @returns {function(cardName: string): Promise<Card>}
+ * @returns {{
+ *   cards: Object<string, Card>,
+ *   requestCard: function(cardName: string): void,
+ * }} Cards fetched so far, keyed by name, and a stable function to request a
+ *    card (requests for already fetched or pending cards are ignored)
  */
 export const useFetchCard = () => {
   const pendingCardsRef = useRef([])
@@ -23,7 +27,6 @@ export const useFetchCard = () => {
   const [state, dispatch] = useReducer((prevState, { type, cardName, payload }) => {
     switch (type) {
     case 'CARD_LOADED':
-      console.log('CARD_LOADED', type, cardName, payload)
       return {
         ...prevState,
         [cardName]: {
@@ -46,18 +49,15 @@ export const useFetchCard = () => {
     }
   }, {});
 
-  return useMemo(() => console.log('Re-rendering memo') || (async (cardName) => {
-    // TODO: OPTIMISE CACHING TO AVOID UNNECESSARY RE-RENDERS
-    if (state[cardName] != null) return state[cardName]
+  const requestCard = useCallback((cardName) => {
+    if (pendingCardsRef.current.includes(cardName)) return
 
-    if (!pendingCardsRef.current.includes(cardName)) {
-      pendingCardsRef.current.push(cardName)
+    pendingCardsRef.current.push(cardName)
 
-      fetchCardData(cardName)
-        .then(cardData => dispatch({ type: 'CARD_LOADED', cardName, payload: cardData }))
-        .catch(error => dispatch({ type: 'CARD_ERROR', cardName, payload: error }))
-    }
+    fetchCardData(cardName)
+      .then(cardData => dispatch({ type: 'CARD_LOADED', cardName, payload: cardData }))
+      .catch(error => dispatch({ type: 'CARD_ERROR', cardName, payload: error }))
+  }, [])
 
-    return { _loading: true, _error: null }
-  }), [state])
+  return { cards: state, requestCard }
 }

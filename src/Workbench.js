@@ -69,25 +69,32 @@ const Workbench = () => {
           <option value="original">Original</option>
           <option value="minimalist">Minimalist</option>
         </select>
-        <select name="borderColor" defaultValue="" onChange={(e) => setCardColors(e.target.value)}>
+        <select
+          name="borderColor"
+          defaultValue=""
+          onChange={(e) => {
+            const { value } = e.target;
+            setCardColors(value === '' ? null : value === 'none' ? [] : value.split(','));
+          }}
+        >
           <option value="">default</option>
-          <option value={[]}>none</option>
-          <option value={["W"]}>white</option>
-          <option value={["U"]}>blue</option>
-          <option value={["B"]}>black</option>
-          <option value={["R"]}>red</option>
-          <option value={["G"]}>green</option>
-          <option value={["W","U","B","R","G"]}>multi</option>
-          <option value={["R","G"]}>gruul</option>
-          <option value={["U","R"]}>izzet</option>
-          <option value={["W","B"]}>orzhov</option>
-          <option value={["G","U"]}>simic</option>
-          <option value={["G","B"]}>golgari</option>
-          <option value={["W","U"]}>azorius</option>
-          <option value={["W","G"]}>selesnya</option>
-          <option value={["B","R"]}>rakdos</option>
-          <option value={["B","U"]}>dimir</option>
-          <option value={["W","R"]}>boros</option>
+          <option value="none">none</option>
+          <option value="W">white</option>
+          <option value="U">blue</option>
+          <option value="B">black</option>
+          <option value="R">red</option>
+          <option value="G">green</option>
+          <option value="W,U,B,R,G">multi</option>
+          <option value="R,G">gruul</option>
+          <option value="U,R">izzet</option>
+          <option value="W,B">orzhov</option>
+          <option value="G,U">simic</option>
+          <option value="G,B">golgari</option>
+          <option value="W,U">azorius</option>
+          <option value="W,G">selesnya</option>
+          <option value="B,R">rakdos</option>
+          <option value="B,U">dimir</option>
+          <option value="W,R">boros</option>
         </select>
         <label htmlFor="referenceOpacity" style={{ marginLeft: '1em' }}>Reference</label>
         <input

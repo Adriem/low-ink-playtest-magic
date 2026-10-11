@@ -1,8 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+jest.mock('jspdf', () => ({ jsPDF: jest.fn() }));
+jest.mock('./utils/scryfall', () => ({
+  fetchCardData: jest.fn(),
+  fetchSymbology: jest.fn(() => Promise.resolve({ data: [] })),
+}));
+
+test('renders the card search form', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByPlaceholderText(/colossal dreadmaw/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
 });

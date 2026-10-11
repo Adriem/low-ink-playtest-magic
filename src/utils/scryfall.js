@@ -25,7 +25,7 @@ const awaitIfNecessary = async () => {
 export const fetchCardData = async (cardName) => {
   await awaitIfNecessary()
 
-  const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}&lang:es`, {
+  const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
     headers: { Origin: window.location.origin }
   });
 

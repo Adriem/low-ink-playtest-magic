@@ -86,6 +86,11 @@ dialog:not([open]) {
     float: left;
 }
 
+.sheet-slot-error {
+    padding: 1rem;
+    color: darkred;
+}
+
 .sheet-slot .card {
     transform: scale(0.5);
     transform-origin: top left;

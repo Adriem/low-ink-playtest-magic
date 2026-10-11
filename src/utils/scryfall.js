@@ -31,7 +31,6 @@ export const fetchCardData = async (cardName) => {
 
   if (!response.ok) {
     const error = await response.json();
-    alert(`Could not fetch the card. Reason: ${error.details}`);
     throw new Error(error.details);
   }
 
@@ -50,7 +49,6 @@ export const fetchSymbology = async () => {
 
   if (!response.ok) {
     const error = await response.json();
-    alert(`Could not fetch symbology. Reason: ${error.details}`);
     throw new Error(error.details);
   }
 

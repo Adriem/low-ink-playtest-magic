@@ -140,12 +140,23 @@ const Press = () => {
       {cardSheets.map((sheet, sheetNumber) => (
         <div key={sheetNumber} className="press-sheet">
           {sheet.map((card, cardPosition) => (
-            <div className="sheet-slot" key={card._loading ? `loading_${cardPosition}` : calculateCardKey(sheet, card, cardPosition)}>
+            <div
+              className="sheet-slot"
+              key={card._loading
+                ? `loading_${cardPosition}`
+                : card._error
+                  ? `error_${card._sourceIndex}`
+                  : calculateCardKey(sheet, card, cardPosition)}
+            >
               <button className="sheet-slot-control delete" onClick={() => removeCard(card._sourceIndex)} >
                 <i className="fa fa-trash" />
               </button>
               {card._loading ? (
                 <div>LOADING</div>
+              ) : card._error ? (
+                <div className="sheet-slot-error">
+                  Could not load "{card._requestedName}": {card._error.message}
+                </div>
               ) : card.card_faces ? (
                 <DualCard
                   Card={Card}

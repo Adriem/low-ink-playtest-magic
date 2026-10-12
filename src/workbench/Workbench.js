@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
-import Realistic from './cards/realistic/RealisticCard';
-import Minimal from './cards/minimal/MinimalCard';
-import useCardData from './hooks/useCardData';
+import { useState } from 'react';
+import Realistic from '../cards/realistic/RealisticCard';
+import Minimal from '../cards/minimal/MinimalCard';
+import useCardData from './useCardData';
 import Reference from './Reference';
-import { useSetting } from './settings';
+import { useSetting } from '../settings';
+
+import './Workbench.css';
 
 const Workbench = () => {
   const [opacity, setOpacity] = useState(0);

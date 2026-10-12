@@ -11,7 +11,6 @@ const LOADING_CARD = { _loading: true, _error: null };
  * @prop {boolean} _loading
  * @prop {Error|null} _error
  * @prop {number} _sourceIndex - Index of the card name this card was built from
- * @prop {string} _requestedName - Card name this card was built from
  * @prop {string} mana_cost
  * @prop {string} colors
  * @prop {string} oracle_text
@@ -30,24 +29,23 @@ const LOADING_CARD = { _loading: true, _error: null };
  *
  * @param {string[]} cardNames - List of the cards to be included in the sheet
  * @param {number} sheetSize - Amount of cards to be included in the sheet
- * @returns {Card[][]}
+ * @returns {{
+ *   cardSheets: Card[][],
+ *   errors: import('./useFetchCard').CardError[],
+ * }} Card sheets, and the cards that could not be fetched
  */
 export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 'separate', doubleFacedCardTreatment = 'separate' } = {}) => {
-  const { cards, requestCard } = useFetchCard();
+  const { cards, errors, requestCard } = useFetchCard();
 
   useEffect(() => {
     cardNames.forEach(requestCard);
   }, [cardNames, requestCard]);
 
-  return useMemo(() => {
+  const cardSheets = useMemo(() => {
     const cardsData = cardNames
-      .map((cardName, sourceIndex) => ({
-        ...(cards[cardName] ?? LOADING_CARD),
-        _requestedName: cardName,
-        _sourceIndex: sourceIndex,
-      }))
+      .map((cardName, sourceIndex) => ({ ...(cards[cardName] ?? LOADING_CARD), _sourceIndex: sourceIndex }))
       .flatMap(card => {
-        if (card._error != null || !card.card_faces) return [card];
+        if (!card.card_faces) return [card];
 
         if (SUBCARD_LAYOUTS.includes(card.layout)) {
           const { card_faces, ...cardWithoutFaces } = card;
@@ -71,4 +69,6 @@ export const useCardSheet = (cardNames, sheetSize = 9, { splitCardTreatment = 's
 
     return cardSheets;
   }, [cardNames, cards, sheetSize, splitCardTreatment, doubleFacedCardTreatment]);
+
+  return { cardSheets, errors };
 };

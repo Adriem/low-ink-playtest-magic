@@ -4,8 +4,6 @@ import Press from './Press';
 
 import { SettingsContextProvider } from './settings';
 
-import './App.css';
-
 const WORKBENCH_PATH = '/workbench';
 
 // The workbench is a development-only page. In production builds NODE_ENV is

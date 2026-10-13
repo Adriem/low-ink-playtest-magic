@@ -2,18 +2,48 @@ import { useCallback, useState } from 'react';
 
 import './CardSearchForm.css';
 
+const MAX_QUANTITY = 100;
+// e.g. "4 Lightning Bolt", "2x Counterspell", "1X Colossal Dreadmaw"
+const QUANTITY_PREFIX_REGEX = /^(\d+)\s*[xX]?\s+(.+)$/;
+
 /**
- * Turn the content of the card list textarea into card names: one card per
- * line, ignoring empty lines and leading quantities (e.g. "4 Lightning Bolt").
+ * @typedef {object} CardListEntry
+ * @prop {string} line - Line of the card list it was parsed from
+ * @prop {string} cardName
+ * @prop {number} quantity
+ */
+
+/**
+ * Parse a line of the card list: an optional quantity followed by the card
+ * name. Numbers too big to be a quantity are part of the name (e.g. "1996
+ * World Champion"), so such cards need an explicit quantity ("1 1996 World
+ * Champion").
+ *
+ * @param {string} line
+ * @returns {CardListEntry}
+ */
+const parseCardListLine = (line) => {
+  const match = line.match(QUANTITY_PREFIX_REGEX);
+  const quantity = match ? Number(match[1]) : 1;
+
+  if (!match || quantity > MAX_QUANTITY) return { line, cardName: line, quantity: 1 };
+  return { line, cardName: match[2].trim(), quantity };
+};
+
+/**
+ * Turn the content of the card list textarea into entries: one card per line,
+ * ignoring empty lines.
  *
  * @param {string} cardList
- * @returns {string[]}
+ * @returns {CardListEntry[]}
  */
 const parseCardList = (cardList) => cardList
-  .replace(/^\d+\s/gm, '')
   .split('\n')
-  .map(cardName => cardName.trim())
-  .filter(Boolean);
+  .map(line => line.trim())
+  .filter(Boolean)
+  .map(parseCardListLine);
+
+const repeatCardName = (cardName, quantity) => Array.from({ length: quantity }, () => cardName);
 
 /**
  * Search form to add cards by name, either one at a time or as a list.
@@ -28,16 +58,36 @@ const CardSearchForm = ({ onAddCards }) => {
   const handleSubmit = useCallback((event) => {
     event.preventDefault();
 
-    const formData = new FormData(event.target);
-    const cardNames = multipleSearch
-      ? parseCardList(formData.get('cardNamesList'))
-      : [formData.get('cardName').trim()].filter(Boolean);
+    const form = event.target;
+    const formData = new FormData(form);
+    let cardNames;
+
+    if (multipleSearch) {
+      const cardList = form.elements.namedItem('cardNamesList');
+      const entries = parseCardList(formData.get('cardNamesList'));
+      const invalidEntry = entries.find(({ quantity }) => quantity < 1);
+
+      if (invalidEntry) {
+        cardList.setCustomValidity(`"${invalidEntry.line}": the quantity must be between 1 and ${MAX_QUANTITY}`);
+        cardList.reportValidity();
+        return;
+      }
+
+      cardNames = entries.flatMap(({ cardName, quantity }) => repeatCardName(cardName, quantity));
+    } else {
+      cardNames = [formData.get('cardName').trim()].filter(Boolean);
+    }
 
     if (cardNames.length > 0) onAddCards(cardNames);
 
-    // The card list starts over after adding it, so it's ready for the next one
-    if (multipleSearch) event.target.elements.namedItem('cardNamesList').value = '';
+    // The input starts over after adding the cards, so it's ready for the next ones
+    form.elements.namedItem(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
   }, [multipleSearch, onAddCards]);
+
+  // Editing the card list clears the error about an invalid quantity
+  const handleCardListInput = useCallback((event) => {
+    event.currentTarget.setCustomValidity('');
+  }, []);
 
   // Enter adds a new line in the card list, so Cmd/Ctrl+Enter submits it.
   // Intentionally undocumented in the UI: a shortcut for power users.
@@ -88,6 +138,7 @@ const CardSearchForm = ({ onAddCards }) => {
             name="cardNamesList"
             placeholder="e.g. Colossal Dreadmaw"
             onKeyDown={handleCardListKeyDown}
+            onInput={handleCardListInput}
           />
           {/* Invisible copy of the submit button that keeps the toggle centered */}
           <input

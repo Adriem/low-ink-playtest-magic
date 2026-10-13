@@ -1,6 +1,5 @@
 export const Colors = {
   COLORLESS: 'rgb(210,210,210)',
-  // COLORLESS: 'rgb(145, 145, 145)',
   WHITE: 'rgb(213, 194, 167)',
   BLUE: 'rgb(41, 133, 225)',
   BLACK: 'rgb(105, 92, 114)',
@@ -8,8 +7,6 @@ export const Colors = {
   GREEN: 'rgb(6, 147, 45)',
   MULTI: 'rgb(239, 164, 0)',
   ARTIFACT: 'rgb(156,168,182)',
-  // ARTIFACT: 'rgb(138,145,162)',
-  // ARTIFACT: 'rgb(176, 184, 203)',
   LAND: 'rgb(143, 120, 90)',
 };
 

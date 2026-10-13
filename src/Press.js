@@ -74,13 +74,13 @@ const Press = () => {
       : [event.target.cardName.value]
 
     addCards(cardNames)
-  }, [multipleSearch]);
+  }, [multipleSearch, addCards]);
 
   const exportPress = useCallback(() => {
     const canvases = document.querySelectorAll('canvas.card');
 
     exportToPDF(canvases);
-  }, [setCardNamesList])
+  }, [])
 
   const calculateCardKey = (cardsInSheet, card, position) => {
     const cardId = card.multiverse_ids[0]
@@ -92,6 +92,36 @@ const Press = () => {
     return `${cardId}__${cardOccurrenceInSheet}`
   }
 
+  const searchModeToggle = (
+    <div
+      className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
+      role="radiogroup"
+      aria-labelledby="search-mode-label"
+    >
+      <span id="search-mode-label">Search mode:</span>
+      <label>
+        <input
+          type="radio"
+          name="searchMode"
+          value="single"
+          checked={!multipleSearch}
+          onChange={() => setMultipleSearch(false)}
+        />
+        single card
+      </label>
+      <label>
+        <input
+          type="radio"
+          name="searchMode"
+          value="list"
+          checked={multipleSearch}
+          onChange={() => setMultipleSearch(true)}
+        />
+        card list
+      </label>
+    </div>
+  );
+
   return (
     <>
       <form className="press-controls" action="#" onSubmit={handleSubmit}>
@@ -102,13 +132,15 @@ const Press = () => {
               name="cardNamesList"
               placeholder="e.g. Colossal Dreadmaw"
             />
-            <a
-              href="#"
-              className="toggle-multiple-card-search off"
-              onClick={() => setMultipleSearch(false)}
-            >
-              Change to single card search...
-            </a>
+            {/* Invisible copy of the submit button that keeps the toggle centered */}
+            <input
+              className="submit-card-search multiple ghost"
+              type="button"
+              value="Add cards"
+              tabIndex={-1}
+              aria-hidden="true"
+            />
+            {searchModeToggle}
             <input
               className="submit-card-search multiple"
               type="submit"
@@ -127,13 +159,7 @@ const Press = () => {
               type="submit"
               value="Add card"
             />
-            <a
-              href="#"
-              className="toggle-multiple-card-search on"
-              onClick={() => setMultipleSearch(true)}
-            >
-              Change to multiple cards search...
-            </a>
+            {searchModeToggle}
           </>
         )}
         </form>

@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import RealisticCard from './cards/realistic/RealisticCard';
 import MinimalCard from './cards/minimal/MinimalCard';
 import DualCard from './cards/DualCard';
+import CardSearchForm from './CardSearchForm';
 import { SettingsPanel, useSetting } from './settings';
 
 import './Press.css';
@@ -25,18 +26,17 @@ const loadPersistedCards = () => {
 };
 
 // TODO: Replace alert with a toast notification
-const alertCardLoadError = (cardName, error) => {
+const handleCardLoadError = (cardName, error) => {
   window.alert(`Could not load "${cardName}": ${error.message}`);
 };
 
 const Press = () => {
-  const [multipleSearch, setMultipleSearch] = useState(false);
   const [cardVariant] = useSetting('cardVariant');
   const [splitCardTreatment] = useSetting('splitCardTreatment');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const { cardCollection, addCardByName, removeCardAt, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
-    onCardLoadError: alertCardLoadError,
+    onCardLoadError: handleCardLoadError,
   });
   const cardSheets = useCardSheet(cardCollection, {
     sheetSize: CARDS_PER_SHEET,
@@ -56,18 +56,9 @@ const Press = () => {
     settingsDialogRef.current?.showModal();
   }, []);
 
-  const handleSubmit = useCallback((event) => {
-    event.preventDefault();
-
-    const cardNames = multipleSearch
-      ? event.target.cardNamesList.value.replace(/^\d+\s/gm, '').split('\n')
-      : [event.target.cardName.value]
-
-    cardNames
-      .map(cardName => cardName.trim())
-      .filter(Boolean)
-      .forEach(addCardByName)
-  }, [multipleSearch, addCardByName]);
+  const handleAddCards = useCallback((cardNames) => {
+    cardNames.forEach(cardName => addCardByName(cardName));
+  }, [addCardByName]);
 
   const exportPress = useCallback(() => {
     const canvases = document.querySelectorAll('canvas.card');
@@ -85,77 +76,9 @@ const Press = () => {
     return `${cardId}__${cardOccurrenceInSheet}`
   }
 
-  const searchModeToggle = (
-    <div
-      className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
-      role="radiogroup"
-      aria-labelledby="search-mode-label"
-    >
-      <span id="search-mode-label">Search mode:</span>
-      <label>
-        <input
-          type="radio"
-          name="searchMode"
-          value="single"
-          checked={!multipleSearch}
-          onChange={() => setMultipleSearch(false)}
-        />
-        single card
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="searchMode"
-          value="list"
-          checked={multipleSearch}
-          onChange={() => setMultipleSearch(true)}
-        />
-        card list
-      </label>
-    </div>
-  );
-
   return (
     <>
-      <form className="press-controls" action="#" onSubmit={handleSubmit}>
-        {multipleSearch ? (
-          <>
-            <textarea
-              className="card-name-input"
-              name="cardNamesList"
-              placeholder="e.g. Colossal Dreadmaw"
-            />
-            {/* Invisible copy of the submit button that keeps the toggle centered */}
-            <input
-              className="submit-card-search multiple ghost"
-              type="button"
-              value="Add cards"
-              tabIndex={-1}
-              aria-hidden="true"
-            />
-            {searchModeToggle}
-            <input
-              className="submit-card-search multiple"
-              type="submit"
-              value="Add cards"
-            />
-          </>
-        ) : (
-          <>
-            <input
-              className="card-name-input"
-              name="cardName"
-              placeholder="e.g. Colossal Dreadmaw"
-            />
-            <input
-              className="submit-card-search single"
-              type="submit"
-              value="Add card"
-            />
-            {searchModeToggle}
-          </>
-        )}
-        </form>
+      <CardSearchForm onAddCards={handleAddCards} />
       {cardSheets.length > 0 && (
         <div className="press-actions">
           <button type="button" className="clear" onClick={clearCollection}>Clear</button>

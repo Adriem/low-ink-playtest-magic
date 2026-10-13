@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { beginRender, finishRender } from '../../utils/canvasRendering';
 import { drawLoyaltyBox } from '../../utils/canvasShapes';
 import { colorsFromManaCost, getColorMappings } from '../../utils/colors';
 import { drawOracleBox } from './utils/drawOracleBox';
@@ -50,11 +51,15 @@ const CanvasCard = ({
   subCard,
   canvasClassName = 'card',
   canvasRef,
+  onRendered,
 }) => {
   const WIDTH = 500;
   const HEIGHT = 700;
 
   const [canvas, setCanvas] = useState(null);
+  // Read through a ref so a new callback doesn't redraw the card
+  const onRenderedRef = useRef(onRendered);
+  onRenderedRef.current = onRendered;
 
   useEffect(() => {
     if (canvas == null) return;
@@ -63,6 +68,7 @@ const CanvasCard = ({
 
     const ctx = canvas.getContext('2d');
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    beginRender(canvas);
 
     drawOuterFrame(ctx, { blackBordered });
     drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110 });
@@ -106,6 +112,15 @@ const CanvasCard = ({
     if (cardLoyalty) {
       drawLoyaltyBox(ctx, { cardLoyalty, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
     }
+
+    let isCancelled = false;
+    finishRender(canvas).then((isCurrentRender) => {
+      if (isCurrentRender && !isCancelled) onRenderedRef.current?.(canvas);
+    });
+
+    return () => {
+      isCancelled = true;
+    };
   }, [
     canvas,
     cardName,

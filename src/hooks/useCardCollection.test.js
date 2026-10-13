@@ -127,6 +127,27 @@ test('drops a card that loads after its placeholder was removed', async () => {
   expect(cardNames(collection.cardCollection)).toEqual(['B']);
 });
 
+test('moves cards to another position', () => {
+  renderCollection({ initialCards: [{ name: 'A' }, { name: 'B' }, { name: 'C' }] });
+
+  act(() => collection.moveCard(0, 1));
+  expect(cardNames(collection.cardCollection)).toEqual(['B', 'A', 'C']);
+
+  act(() => collection.moveCard(2, 0));
+  expect(cardNames(collection.cardCollection)).toEqual(['C', 'B', 'A']);
+});
+
+test('ignores moves outside the collection', () => {
+  renderCollection({ initialCards: [{ name: 'A' }, { name: 'B' }] });
+  const initialCollection = collection.cardCollection;
+
+  act(() => collection.moveCard(0, -1));
+  act(() => collection.moveCard(1, 2));
+  act(() => collection.moveCard(5, 0));
+
+  expect(collection.cardCollection).toBe(initialCollection);
+});
+
 test('removes cards by index and clears the collection', () => {
   renderCollection({ initialCards: () => [{ name: 'A' }, { name: 'B' }, { name: 'C' }] });
 

@@ -46,12 +46,14 @@ test('splits double-faced cards into one card per face when separate', () => {
   const sheets = groupCardsIntoSheets([doubleFacedCard], { doubleFacedCardTreatment: 'separate' });
 
   expect(names(sheets)).toEqual([['Front', 'Back']]);
+  expect(sheets[0].map(card => card._faceIndex)).toEqual([0, 1]);
 });
 
 test('keeps double-faced cards whole when unified', () => {
   const sheets = groupCardsIntoSheets([doubleFacedCard], { doubleFacedCardTreatment: 'unified' });
 
   expect(names(sheets)).toEqual([['Front // Back']]);
+  expect(sheets[0][0]._faceIndex).toBeUndefined();
 });
 
 test('applies the split card treatment to split cards', () => {

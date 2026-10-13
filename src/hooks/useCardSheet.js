@@ -7,9 +7,11 @@ const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
 /**
  * @typedef {import('./useCardCollection').CollectionCard & {
  *   _collectionIndex: number,
+ *   _faceIndex?: number,
  *   _subFace?: object,
  * }} SheetCard - A collection card (or one of its faces) placed in a sheet.
- *   `_collectionIndex` is the index of the collection card it comes from.
+ *   `_collectionIndex` is the index of the collection card it comes from, and
+ *   `_faceIndex` the index of the face when the card is split into faces.
  */
 
 /**
@@ -51,7 +53,7 @@ export const groupCardsIntoSheets = (cards, {
       }
 
       const { card_faces, ...cardWithoutFaces } = card;
-      return card_faces.map(face => ({ ...cardWithoutFaces, ...face }));
+      return card_faces.map((face, faceIndex) => ({ ...cardWithoutFaces, ...face, _faceIndex: faceIndex }));
     });
   const cardSheets = []
 

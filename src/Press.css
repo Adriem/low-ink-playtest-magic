@@ -49,32 +49,26 @@ dialog:not([open]) {
     float: left;
 }
 
-.sheet-slot .card {
-    transform: scale(0.5);
-    transform-origin: top left;
-}
-
-.sheet-slot-control {
+.sheet-slot-card-button {
     position: absolute;
     top: 0;
     bottom: 0;
     left: 0;
     right: 0;
-    opacity: 0;
-    display: block;
-    width: 100%;
-    background: rgba(255, 255, 255, 0.5);
-    transition: opacity 0.5s;
-    z-index: 99;
+    z-index: 1;
+    padding: 0;
     border: none;
     border-radius: 11px;
+    background: transparent;
+    cursor: pointer;
 }
-.sheet-slot-control:hover {
-    opacity: 1;
-    transition: opacity 0.5s;
+.sheet-slot-card-button:focus-visible {
+    outline: 3px solid rgb(30, 100, 220);
+    outline-offset: -3px;
 }
-.sheet-slot-control.delete {
-    color: rgba(128, 0, 0, 0.8);
-    background: rgba(255, 0, 0, 0.5);
-    font-size: 4rem;
+
+.sheet-slot .card {
+    transform: scale(0.5);
+    transform-origin: top left;
 }
+

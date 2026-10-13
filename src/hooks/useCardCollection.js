@@ -28,6 +28,7 @@ export const LOADING_CARD = { _loading: true };
  *   cardCollection: CollectionCard[],
  *   addCardByName: function(cardName: string): void,
  *   removeCardAt: function(index: number): void,
+ *   moveCard: function(fromIndex: number, toIndex: number): void,
  *   clearCollection: function(): void,
  * }}
  */
@@ -58,9 +59,25 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError } = {}) =
     setCardCollection(collection => collection.filter((_card, i) => i !== index));
   }, []);
 
+  /**
+   * Move the card at `fromIndex` so it ends up at `toIndex`. Moves outside the
+   * collection are ignored.
+   */
+  const moveCard = useCallback((fromIndex, toIndex) => {
+    setCardCollection((collection) => {
+      const isInCollection = (index) => index >= 0 && index < collection.length;
+      if (fromIndex === toIndex || !isInCollection(fromIndex) || !isInCollection(toIndex)) return collection;
+
+      const reordered = [...collection];
+      const [card] = reordered.splice(fromIndex, 1);
+      reordered.splice(toIndex, 0, card);
+      return reordered;
+    });
+  }, []);
+
   const clearCollection = useCallback(() => {
     setCardCollection([]);
   }, []);
 
-  return { cardCollection, addCardByName, removeCardAt, clearCollection };
+  return { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection };
 };

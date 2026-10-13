@@ -1,0 +1,44 @@
+.card-search-form {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 40rem;
+    margin: 8rem auto 5rem;
+}
+
+.card-search-form input.card-name-input {
+    flex: 1;
+    min-width: 20rem;
+}
+
+.card-search-form textarea.card-name-input {
+    width: 100%;
+}
+
+.card-search-form .submit-card-search.multiple {
+    margin: 0.5rem 0;
+}
+
+.card-search-form .submit-card-search.ghost {
+    visibility: hidden;
+}
+
+.card-search-form .search-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem;
+}
+.card-search-form .search-mode.single {
+    width: 100%;
+}
+.card-search-form .search-mode.list {
+    flex: 1;
+}
+
+.card-search-form .search-mode label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+}

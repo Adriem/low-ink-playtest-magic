@@ -1,3 +1,4 @@
+import { drawWhenLoaded } from './canvasRendering';
 import { getSymbolImage } from './symbols';
 
 export const calculateManaCostWidth = ({ manaSymbols, symbolDiameter, symbolSpacing }) => {
@@ -7,7 +8,7 @@ export const calculateManaCostWidth = ({ manaSymbols, symbolDiameter, symbolSpac
 }
 
 export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolSpacing, addShadow = true }) => {
-  manaSymbols.forEach(async (symbol, i) => {
+  manaSymbols.forEach((symbol, i) => {
     const symbolRadius = symbolDiameter / 2;
 
     const symbolX = x + (symbolDiameter + symbolSpacing) * i;
@@ -30,13 +31,14 @@ export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolS
     ctx.fill();
 
     // Symbol image
-    const symbolImage = await getSymbolImage(symbol);
-    ctx.drawImage(
-      symbolImage,
-      symbolX,
-      symbolY,
-      symbolDiameter,
-      symbolDiameter,
-    );
+    drawWhenLoaded(ctx, getSymbolImage(symbol), (symbolImage) => {
+      ctx.drawImage(
+        symbolImage,
+        symbolX,
+        symbolY,
+        symbolDiameter,
+        symbolDiameter,
+      );
+    });
   });
 }

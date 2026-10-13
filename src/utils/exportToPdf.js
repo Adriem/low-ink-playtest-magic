@@ -1,9 +1,12 @@
 import { jsPDF } from 'jspdf';
 import { chunk } from './array';
+import { whenRendered } from './canvasRendering';
 import { millimetersToInches } from './unitConverter';
 
 const CARD_WIDTH_INCHES = 2.5;
 const CARD_HEIGHT_INCHES = 3.5;
+// Maximum time to wait for cards to finish rendering (e.g. slow images)
+const RENDER_TIMEOUT_MS = 10000;
 
 const pageDimensionInches = {
   'letter': { width: 8.5, height: 11 },
@@ -24,7 +27,12 @@ const pageDimensionInches = {
  *                          Canvas-Element needs to be specified (default for Canvas is JPEG),
  *                          e.g. 'JPEG', 'PNG', 'WEBP'
  */
-const exportToPDF = (cardImages, format = 'JPG') => {
+const exportToPDF = async (cardImages, format = 'JPG') => {
+  // Export cards once they're completely drawn, so images still loading aren't missing
+  const canvases = [...cardImages].filter(cardImage => cardImage instanceof HTMLCanvasElement);
+  const rendered = await Promise.all(canvases.map(canvas => whenRendered(canvas, RENDER_TIMEOUT_MS)));
+  if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
+
   const colsPerPage = Math.floor(pageDimensionInches['a4'].width / CARD_WIDTH_INCHES);
   const rowsPerPage = Math.floor(pageDimensionInches['a4'].height / CARD_HEIGHT_INCHES);
 

@@ -1,3 +1,4 @@
+import { drawWhenLoaded } from './canvasRendering';
 import { getSymbolImage } from './symbols';
 
 const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
@@ -227,9 +228,9 @@ export const renderTextWithSymbols = (ctx, text, x, y) => {
       const symbolX = currentX;
       const symbolY = y - symbolSize + (fontBoundingBoxAscent + fontBoundingBoxDescent - symbolSize) / 2;
 
-      // Do not await
-      getSymbolImage(symbol)
-        .then(img => ctx.drawImage(img, symbolX, symbolY, symbolSize, symbolSize));
+      drawWhenLoaded(ctx, getSymbolImage(symbol), (img) => {
+        ctx.drawImage(img, symbolX, symbolY, symbolSize, symbolSize);
+      });
 
       currentX += symbolSize + symbolPadding;
     }

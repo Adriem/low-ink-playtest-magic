@@ -1,4 +1,5 @@
-const { useState, useEffect } = require('react');
+import { useState, useEffect } from 'react';
+import { fetchCardData } from '../utils/scryfall';
 
 const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
 
@@ -12,10 +13,7 @@ const useCardData = (cardName) => {
 
     setLoading(true);
 
-    fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
-      headers: { Origin: window.location.origin }
-    })
-      .then(async r => r.ok ? await r.json() : Promise.reject(await r.json()))
+    fetchCardData(cardName)
       .then(data => {
         setLoading(false);
         setError(null);

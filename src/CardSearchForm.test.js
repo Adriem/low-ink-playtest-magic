@@ -37,6 +37,17 @@ test('adds a list of cards in order, ignoring quantities and empty lines', () =>
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt', 'Counterspell', 'Island']);
 });
 
+test('clears the card list after adding it', () => {
+  setupForm();
+
+  userEvent.click(screen.getByLabelText('card list'));
+  const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
+  fireEvent.change(textarea, { target: { value: 'Lightning Bolt\nCounterspell' } });
+  userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+
+  expect(textarea).toHaveValue('');
+});
+
 test('switches between single card and card list modes', () => {
   setupForm();
 
@@ -49,4 +60,41 @@ test('switches between single card and card list modes', () => {
 
   userEvent.click(screen.getByLabelText('single card'));
   expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
+});
+
+describe('card list shortcut', () => {
+  const fillCardList = (cardList) => {
+    userEvent.click(screen.getByLabelText('card list'));
+    const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
+    fireEvent.change(textarea, { target: { value: cardList } });
+    return textarea;
+  };
+
+  test('submits the list with Ctrl+Enter', () => {
+    const onAddCards = setupForm();
+    const textarea = fillCardList('Lightning Bolt\nCounterspell');
+
+    fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
+
+    expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt', 'Counterspell']);
+    expect(textarea).toHaveValue('');
+  });
+
+  test('submits the list with Cmd+Enter', () => {
+    const onAddCards = setupForm();
+    const textarea = fillCardList('Lightning Bolt');
+
+    fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
+
+    expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
+  });
+
+  test('does not submit the list with Enter alone', () => {
+    const onAddCards = setupForm();
+    const textarea = fillCardList('Lightning Bolt');
+
+    fireEvent.keyDown(textarea, { key: 'Enter' });
+
+    expect(onAddCards).not.toHaveBeenCalled();
+  });
 });

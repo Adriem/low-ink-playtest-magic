@@ -34,7 +34,20 @@ const CardSearchForm = ({ onAddCards }) => {
       : [formData.get('cardName').trim()].filter(Boolean);
 
     if (cardNames.length > 0) onAddCards(cardNames);
+
+    // The card list starts over after adding it, so it's ready for the next one
+    if (multipleSearch) event.target.elements.namedItem('cardNamesList').value = '';
   }, [multipleSearch, onAddCards]);
+
+  // Enter adds a new line in the card list, so Cmd/Ctrl+Enter submits it.
+  // Intentionally undocumented in the UI: a shortcut for power users.
+  const handleCardListKeyDown = useCallback((event) => {
+    const isSubmitShortcut = event.key === 'Enter' && (event.metaKey || event.ctrlKey);
+    if (!isSubmitShortcut || event.nativeEvent.isComposing) return;
+
+    event.preventDefault();
+    event.currentTarget.form.requestSubmit();
+  }, []);
 
   const searchModeToggle = (
     <div
@@ -74,6 +87,7 @@ const CardSearchForm = ({ onAddCards }) => {
             className="card-name-input"
             name="cardNamesList"
             placeholder="e.g. Colossal Dreadmaw"
+            onKeyDown={handleCardListKeyDown}
           />
           {/* Invisible copy of the submit button that keeps the toggle centered */}
           <input

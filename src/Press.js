@@ -6,15 +6,16 @@ import DualCard from './cards/DualCard';
 import { SettingsPanel, useSetting } from './settings';
 
 import './Press.css';
+import { useCardCollection } from './hooks/useCardCollection';
 import { useCardSheet } from './hooks/useCardSheet';
 import exportToPDF from './utils/exportToPdf';
 
 const CARDS_PER_SHEET = 9
-const CARD_NAMES_STORAGE_KEY = 'press:cardNamesList';
+const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 
-const loadPersistedCardNames = () => {
+const loadPersistedCards = () => {
   try {
-    const raw = sessionStorage.getItem(CARD_NAMES_STORAGE_KEY);
+    const raw = sessionStorage.getItem(CARD_COLLECTION_STORAGE_KEY);
     if (raw == null) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];
@@ -23,58 +24,50 @@ const loadPersistedCardNames = () => {
   }
 };
 
+// TODO: Replace alert with a toast notification
+const alertCardLoadError = (cardName, error) => {
+  window.alert(`Could not load "${cardName}": ${error.message}`);
+};
+
 const Press = () => {
   const [multipleSearch, setMultipleSearch] = useState(false);
   const [cardVariant] = useSetting('cardVariant');
   const [splitCardTreatment] = useSetting('splitCardTreatment');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
-  const [cardNamesList, setCardNamesList] = useState(loadPersistedCardNames);
-  const { cardSheets, errors } = useCardSheet(cardNamesList, CARDS_PER_SHEET, { splitCardTreatment, doubleFacedCardTreatment });
+  const { cardCollection, addCardByName, removeCardAt, clearCollection } = useCardCollection({
+    initialCards: loadPersistedCards,
+    onCardLoadError: alertCardLoadError,
+  });
+  const cardSheets = useCardSheet(cardCollection, {
+    sheetSize: CARDS_PER_SHEET,
+    splitCardTreatment,
+    doubleFacedCardTreatment,
+  });
   const settingsDialogRef = useRef(null);
 
   const Card = cardVariant === 'minimalist' ? MinimalCard : RealisticCard;
 
   useEffect(() => {
-    sessionStorage.setItem(CARD_NAMES_STORAGE_KEY, JSON.stringify(cardNamesList));
-  }, [cardNamesList]);
-
-  useEffect(() => {
-    const failedCardNames = errors.map(({ cardName }) => cardName);
-
-    setCardNamesList(list => list.some(name => failedCardNames.includes(name))
-      ? list.filter(name => !failedCardNames.includes(name))
-      : list);
-  }, [errors]);
+    const loadedCards = cardCollection.filter(card => !card._loading);
+    sessionStorage.setItem(CARD_COLLECTION_STORAGE_KEY, JSON.stringify(loadedCards));
+  }, [cardCollection]);
 
   const openSettings = useCallback(() => {
     settingsDialogRef.current?.showModal();
   }, []);
 
-  const clearCards = useCallback(() => {
-    setCardNamesList([]);
-  }, [setCardNamesList]);
-
-  const addCards = useCallback((cards) => {
-    setCardNamesList(list => [...list, ...cards]);
-  }, [setCardNamesList]);
-
-  const removeCard = useCallback((sourceIndex) => {
-    setCardNamesList(list => {
-      const _list = [...list]
-      _list.splice(sourceIndex, 1)
-      return _list
-    });
-  }, [setCardNamesList])
-
-  const handleSubmit = useCallback(async (event) => {
+  const handleSubmit = useCallback((event) => {
     event.preventDefault();
 
     const cardNames = multipleSearch
       ? event.target.cardNamesList.value.replace(/^\d+\s/gm, '').split('\n')
       : [event.target.cardName.value]
 
-    addCards(cardNames)
-  }, [multipleSearch, addCards]);
+    cardNames
+      .map(cardName => cardName.trim())
+      .filter(Boolean)
+      .forEach(addCardByName)
+  }, [multipleSearch, addCardByName]);
 
   const exportPress = useCallback(() => {
     const canvases = document.querySelectorAll('canvas.card');
@@ -165,7 +158,7 @@ const Press = () => {
         </form>
       {cardSheets.length > 0 && (
         <div className="press-actions">
-          <button type="button" className="clear" onClick={clearCards}>Clear</button>
+          <button type="button" className="clear" onClick={clearCollection}>Clear</button>
           <button type="button" onClick={openSettings}>Settings</button>
           <button type="button" className="export" onClick={exportPress}>EXPORT</button>
         </div>
@@ -174,8 +167,8 @@ const Press = () => {
       {cardSheets.map((sheet, sheetNumber) => (
         <div key={sheetNumber} className="press-sheet">
           {sheet.map((card, cardPosition) => (
-            <div className="sheet-slot" key={card._loading ? `loading_${cardPosition}` : calculateCardKey(sheet, card, cardPosition)}>
-              <button className="sheet-slot-control delete" onClick={() => removeCard(card._sourceIndex)} >
+            <div className="sheet-slot" key={card._loading ? `loading_${card._loadingCardId}` : calculateCardKey(sheet, card, cardPosition)}>
+              <button className="sheet-slot-control delete" onClick={() => removeCardAt(card._collectionIndex)} >
                 <i className="fa fa-trash" />
               </button>
               {card._loading ? (

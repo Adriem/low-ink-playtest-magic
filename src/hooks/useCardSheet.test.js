@@ -77,3 +77,22 @@ test('tags each sheet card with the index of the collection card it comes from',
     ['B', 2],
   ]);
 });
+
+test('gives unified faces without their own art the art of the card', () => {
+  const splitCardWithArt = { ...splitCard, image_uris: { art_crop: 'fire-ice.jpg' } };
+
+  const [[card]] = groupCardsIntoSheets([splitCardWithArt], { splitCardTreatment: 'unified' });
+
+  expect(card.card_faces.map(face => face.image_uris?.art_crop)).toEqual(['fire-ice.jpg', 'fire-ice.jpg']);
+});
+
+test('keeps the art of unified faces that have their own', () => {
+  const faces = [
+    { name: 'Front', image_uris: { art_crop: 'front.jpg' } },
+    { name: 'Back', image_uris: { art_crop: 'back.jpg' } },
+  ];
+
+  const [[card]] = groupCardsIntoSheets([{ ...doubleFacedCard, card_faces: faces }], { doubleFacedCardTreatment: 'unified' });
+
+  expect(card.card_faces.map(face => face.image_uris.art_crop)).toEqual(['front.jpg', 'back.jpg']);
+});

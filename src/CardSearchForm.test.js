@@ -17,6 +17,16 @@ test('adds a single card by name', () => {
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
 });
 
+test('clears the card name after adding it', () => {
+  setupForm();
+  const input = screen.getByPlaceholderText(/colossal dreadmaw/i);
+
+  userEvent.type(input, 'Lightning Bolt');
+  userEvent.click(screen.getByRole('button', { name: 'Add card' }));
+
+  expect(input).toHaveValue('');
+});
+
 test('does not add anything for an empty name', () => {
   const onAddCards = setupForm();
 
@@ -25,12 +35,12 @@ test('does not add anything for an empty name', () => {
   expect(onAddCards).not.toHaveBeenCalled();
 });
 
-test('adds a list of cards in order, ignoring quantities and empty lines', () => {
+test('adds a list of cards in order, ignoring empty lines', () => {
   const onAddCards = setupForm();
 
   userEvent.click(screen.getByLabelText('card list'));
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
-    target: { value: '4 Lightning Bolt\n\nCounterspell\n  Island  \n' },
+    target: { value: 'Lightning Bolt\n\nCounterspell\n  Island  \n' },
   });
   userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
 
@@ -96,5 +106,58 @@ describe('card list shortcut', () => {
     fireEvent.keyDown(textarea, { key: 'Enter' });
 
     expect(onAddCards).not.toHaveBeenCalled();
+  });
+});
+
+describe('quantities', () => {
+  const submitCardList = (cardList) => {
+    userEvent.click(screen.getByLabelText('card list'));
+    const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
+    fireEvent.change(textarea, { target: { value: cardList } });
+    userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+    return textarea;
+  };
+
+  test('adds as many copies as the quantity of each line in the list', () => {
+    const onAddCards = setupForm();
+
+    submitCardList('2 Lightning Bolt\n3x Counterspell\n1X Colossal Dreadmaw\nIsland');
+
+    expect(onAddCards).toHaveBeenCalledWith([
+      'Lightning Bolt', 'Lightning Bolt',
+      'Counterspell', 'Counterspell', 'Counterspell',
+      'Colossal Dreadmaw',
+      'Island',
+    ]);
+  });
+
+  test('treats numbers too big to be a quantity as part of the card name', () => {
+    const onAddCards = setupForm();
+
+    submitCardList('1996 World Champion\n2 1996 World Champion');
+
+    expect(onAddCards).toHaveBeenCalledWith([
+      '1996 World Champion',
+      '1996 World Champion', '1996 World Champion',
+    ]);
+  });
+
+  test('rejects a list with a quantity of 0 without adding or clearing it', () => {
+    const onAddCards = setupForm();
+
+    const textarea = submitCardList('Island\n0 Lightning Bolt');
+
+    expect(onAddCards).not.toHaveBeenCalled();
+    expect(textarea).toHaveValue('Island\n0 Lightning Bolt');
+    expect(textarea.validationMessage).toBe('"0 Lightning Bolt": the quantity must be between 1 and 100');
+  });
+
+  test('editing the list clears the quantity error', () => {
+    setupForm();
+    const textarea = submitCardList('0 Lightning Bolt');
+
+    fireEvent.input(textarea, { target: { value: '1 Lightning Bolt' } });
+
+    expect(textarea.validationMessage).toBe('');
   });
 });

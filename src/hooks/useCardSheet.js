@@ -45,7 +45,10 @@ export const groupCardsIntoSheets = (cards, {
           ? doubleFacedCardTreatment
           : 'separate';
 
-      if (treatment === 'unified') return [card];
+      // Split and flip cards have their art on the card rather than on each face
+      if (treatment === 'unified') {
+        return [{ ...card, card_faces: card.card_faces.map(face => ({ image_uris: card.image_uris, ...face })) }];
+      }
 
       const { card_faces, ...cardWithoutFaces } = card;
       return card_faces.map(face => ({ ...cardWithoutFaces, ...face }));

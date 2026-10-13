@@ -19,21 +19,30 @@
     margin: 0.5rem 0;
 }
 
-.press-controls .toggle-multiple-card-search {
-    margin: 0.5rem;
-    display: block;
+.press-controls .submit-card-search.ghost {
+    visibility: hidden;
 }
-.press-controls .toggle-multiple-card-search.on {
+
+.press-controls .search-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin: 0.5rem;
+}
+.press-controls .search-mode.single {
     width: 100%;
-    margin: 0.5rem;
-    text-align: center;
 }
-.press-controls .toggle-multiple-card-search.off {
-    display: block;
-    text-align: center;
+.press-controls .search-mode.list {
     flex: 1;
 }
 
+.press-controls .search-mode label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    cursor: pointer;
+}
 
 .press-actions {
     display: flex;

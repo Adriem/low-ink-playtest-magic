@@ -93,46 +93,51 @@ const Press = () => {
       <SettingsPanel ref={settingsDialogRef} />
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
         {cardSheets.map((sheet, sheetNumber) => (
-          <div key={sheetNumber} className="press-sheet">
-            {sheet.map((card, cardPosition) => {
-              const { _collectionIndex: collectionIndex } = card;
-              const face = card._faceIndex == null ? 'single' : card._faceIndex === 0 ? 'main' : 'secondary';
+          <section key={sheetNumber} className="press-page">
+            <div className="press-sheet">
+              {sheet.map((card, cardPosition) => {
+                const { _collectionIndex: collectionIndex } = card;
+                const face = card._faceIndex == null ? 'single' : card._faceIndex === 0 ? 'main' : 'secondary';
 
-              return (
-                <SheetSlot
-                  key={card._loading ? `loading_${card._loadingCardId}` : calculateCardKey(sheet, card, cardPosition)}
-                  collectionIndex={collectionIndex}
-                  face={face}
-                  cardName={card._loading ? 'loading card' : card.name}
-                >
-                  {card._loading ? (
-                    <div>LOADING</div>
-                  ) : card.card_faces ? (
-                    <DualCard
-                      Card={Card}
-                      cardFaces={card.card_faces}
-                      cardSet={card.set.toUpperCase()}
-                    />
-                  ) : (
-                    <Card
-                      cardName={card.name}
-                      cardManaCost={card.mana_cost}
-                      cardColors={card.colors}
-                      cardOracleText={card.oracle_text}
-                      cardTypeLine={card.type_line}
-                      cardArtUrl={card.image_uris?.art_crop}
-                      cardLoyalty={card.loyalty}
-                      cardPower={card.power}
-                      cardToughness={card.toughness}
-                      cardSet={card.set.toUpperCase()}
-                      subCardPosition={card._subFace ? (card.layout === 'prepare' ? 'right' : 'left') : null}
-                      subCard={card._subFace}
-                    />
-                  )}
-                </SheetSlot>
-              );
-            })}
-          </div>
+                return (
+                  <SheetSlot
+                    key={card._loading ? `loading_${card._loadingCardId}` : calculateCardKey(sheet, card, cardPosition)}
+                    collectionIndex={collectionIndex}
+                    face={face}
+                    cardName={card._loading ? 'loading card' : card.name}
+                  >
+                    {card._loading ? (
+                      <div>LOADING</div>
+                    ) : card.card_faces ? (
+                      <DualCard
+                        Card={Card}
+                        cardFaces={card.card_faces}
+                        cardSet={card.set.toUpperCase()}
+                      />
+                    ) : (
+                      <Card
+                        cardName={card.name}
+                        cardManaCost={card.mana_cost}
+                        cardColors={card.colors}
+                        cardOracleText={card.oracle_text}
+                        cardTypeLine={card.type_line}
+                        cardArtUrl={card.image_uris?.art_crop}
+                        cardLoyalty={card.loyalty}
+                        cardPower={card.power}
+                        cardToughness={card.toughness}
+                        cardSet={card.set.toUpperCase()}
+                        subCardPosition={card._subFace ? (card.layout === 'prepare' ? 'right' : 'left') : null}
+                        subCard={card._subFace}
+                      />
+                    )}
+                  </SheetSlot>
+                );
+              })}
+            </div>
+            <footer className="press-page-footer">
+              Page {sheetNumber + 1} of {cardSheets.length}
+            </footer>
+          </section>
         ))}
       </CardOverlayProvider>
     </>

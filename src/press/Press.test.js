@@ -76,6 +76,16 @@ afterEach(() => {
   sessionStorage.clear();
 });
 
+test('numbers the pages below each sheet', () => {
+  // 9 cards fit in a sheet, so 10 cards need two
+  const cards = Array.from({ length: 10 }, (_, i) => ({ name: `Card ${i}`, set: 'abc', multiverse_ids: [i] }));
+  sessionStorage.setItem('press:cardCollection', JSON.stringify(cards));
+  render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+
+  expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
+  expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+});
+
 describe('hovering with a mouse', () => {
   test('hovering any face opens the overlay of all the faces of that card', () => {
     const { slots, openOverlays } = renderPress();

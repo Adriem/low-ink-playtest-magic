@@ -1,8 +1,7 @@
-import { drawRectangle } from '../../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInXY } from '../../../utils/canvasText';
 import { CONTENT_WIDTH, FONT_FAMILY, PINLINE_THICKNESS, SUBCARD_ORACLE_FONT_SIZE, SUBCARD_ORACLE_HEIGHT, SUBCARD_ORACLE_Y } from '../config';
 import { InkColors } from '../../../utils/colors';
+import { drawFramedBox } from './drawFramedBox';
 
 export const drawSubCardOracleBox = (ctx, {
   cardOracleText,
@@ -15,29 +14,14 @@ export const drawSubCardOracleBox = (ctx, {
   const height = SUBCARD_ORACLE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
-  const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
-  const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
-  const innerX = x + innerLeftPad;
-  const innerWidth = width - innerLeftPad - innerRightPad;
-  const innerY = y + PINLINE_THICKNESS;
-  const innerHeight = height - PINLINE_THICKNESS * 2;
-
-  drawRectangle(ctx, {
+  const { x: innerX, y: innerY, width: innerWidth, height: innerHeight } = drawFramedBox(ctx, {
     x,
     y,
     width,
     height,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-  drawRectangle(ctx, {
-    x: innerX,
-    y: innerY,
-    width: innerWidth,
-    height: innerHeight,
-    lineWidth: PINLINE_THICKNESS,
-    strokeStyle: InkColors.LINE,
-    fillStyle: InkColors.PAPER,
+    cardColorIdentity,
+    shape: 'rectangle',
+    flatSide,
   });
 
   const textPadding = PINLINE_THICKNESS + 4;

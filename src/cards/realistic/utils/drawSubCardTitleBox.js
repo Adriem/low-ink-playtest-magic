@@ -1,9 +1,6 @@
-import { drawRoundedBox } from '../../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
 import { calculateManaCostWidth, parseManaSymbols, renderManaCost } from '../../../utils/manaCostRenderer';
 import {
-  CAPSULE_INNER_STROKE,
   CAPSULE_TEXT_INSET,
   FONT_FAMILY,
   PINLINE_THICKNESS,
@@ -16,6 +13,7 @@ import {
   TITLE_WIDTH,
 } from '../config';
 import { InkColors } from '../../../utils/colors';
+import { drawFramedBox } from './drawFramedBox';
 
 export const drawSubCardTitleBox = (ctx, {
   cardName,
@@ -36,30 +34,13 @@ export const drawSubCardTitleBox = (ctx, {
     symbolSpacing: SUBCARD_MANA_SYMBOL_SPACING,
   });
 
-  const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
-  const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
-  const innerX = x + innerLeftPad;
-  const innerWidth = width - innerLeftPad - innerRightPad;
-  const innerY = y + PINLINE_THICKNESS;
-  const innerHeight = height - PINLINE_THICKNESS * 2;
-
-  drawRoundedBox(ctx, {
+  const inner = drawFramedBox(ctx, {
     x,
     y,
     width,
     height,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-    flatSide,
-  });
-  drawRoundedBox(ctx, {
-    x: innerX,
-    y: innerY,
-    width: innerWidth,
-    height: innerHeight,
-    lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: InkColors.LINE,
-    fillStyle: InkColors.PAPER,
+    cardColorIdentity,
+    shape: 'capsule',
     flatSide,
   });
 
@@ -67,7 +48,7 @@ export const drawSubCardTitleBox = (ctx, {
   const textRight = flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
   const innerCenterY = y + height / 2;
 
-  const manaAnchorRight = innerX + innerWidth - PINLINE_THICKNESS - 4;
+  const manaAnchorRight = inner.x + inner.width - PINLINE_THICKNESS - 4;
   const titleEndX = manaSymbols.length
     ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING
     : textRight;

@@ -1,8 +1,7 @@
-import { drawRoundedBox } from '../../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { CAPSULE_INNER_STROKE, CAPSULE_TEXT_INSET, FONT_FAMILY, PINLINE_THICKNESS, SUBCARD_TYPELINE_FONT_SIZE, SUBCARD_TYPELINE_HEIGHT, SUBCARD_TYPELINE_Y, TITLE_WIDTH } from '../config';
+import { CAPSULE_TEXT_INSET, FONT_FAMILY, PINLINE_THICKNESS, SUBCARD_TYPELINE_FONT_SIZE, SUBCARD_TYPELINE_HEIGHT, SUBCARD_TYPELINE_Y, TITLE_WIDTH } from '../config';
 import { InkColors } from '../../../utils/colors';
+import { drawFramedBox } from './drawFramedBox';
 
 export const drawSubCardTypeBox = (ctx, {
   cardType,
@@ -15,30 +14,13 @@ export const drawSubCardTypeBox = (ctx, {
   const height = SUBCARD_TYPELINE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
-  const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
-  const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
-  const innerX = x + innerLeftPad;
-  const innerWidth = width - innerLeftPad - innerRightPad;
-  const innerY = y + PINLINE_THICKNESS;
-  const innerHeight = height - PINLINE_THICKNESS * 2;
-
-  drawRoundedBox(ctx, {
+  drawFramedBox(ctx, {
     x,
     y,
     width,
     height,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-    flatSide,
-  });
-  drawRoundedBox(ctx, {
-    x: innerX,
-    y: innerY,
-    width: innerWidth,
-    height: innerHeight,
-    lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: InkColors.LINE,
-    fillStyle: InkColors.PAPER,
+    cardColorIdentity,
+    shape: 'capsule',
     flatSide,
   });
 

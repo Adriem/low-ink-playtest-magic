@@ -1,9 +1,6 @@
-import { drawRoundedBox } from '../../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
 import { calculateManaCostWidth, parseManaSymbols, renderManaCost } from '../../../utils/manaCostRenderer';
 import {
-  CAPSULE_INNER_STROKE,
   CAPSULE_TEXT_INSET,
   FONT_FAMILY,
   MANA_SYMBOL_DIAMETER,
@@ -17,6 +14,7 @@ import {
   TITLE_Y,
 } from '../config';
 import { InkColors } from '../../../utils/colors';
+import { drawFramedBox } from './drawFramedBox';
 
 export const drawTitleBox = (ctx, {
   cardName,
@@ -35,23 +33,14 @@ export const drawTitleBox = (ctx, {
     symbolSpacing: MANA_SYMBOL_SPACING,
   });
 
-  drawRoundedBox(ctx, {
+  drawFramedBox(ctx, {
     x,
     y,
     width,
     height,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-
-  drawRoundedBox(ctx, {
-    x: x + PINLINE_THICKNESS,
-    y: y + PINLINE_THICKNESS,
-    width: width - PINLINE_THICKNESS * 2,
-    height: height - PINLINE_THICKNESS * 2 - 2,
-    lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: InkColors.LINE,
-    fillStyle: InkColors.PAPER,
+    cardColorIdentity,
+    shape: 'capsule',
+    innerHeightAdjustment: -2,
   });
 
   const textX = x + PINLINE_THICKNESS * 2 + CAPSULE_TEXT_INSET;

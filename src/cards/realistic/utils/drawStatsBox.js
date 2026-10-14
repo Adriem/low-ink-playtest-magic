@@ -1,7 +1,6 @@
-import { drawRoundedBox } from '../../../utils/canvasShapes';
-import { getColorIdentityStyle } from '../../../utils/canvasStyles';
-import { CAPSULE_INNER_STROKE, FONT_FAMILY, PINLINE_THICKNESS, STATSLINE_FONT_SIZE, STATSLINE_HEIGHT, STATSLINE_WIDTH, STATSLINE_Y, TITLE_WIDTH } from '../config';
+import { FONT_FAMILY, STATSLINE_FONT_SIZE, STATSLINE_HEIGHT, STATSLINE_WIDTH, STATSLINE_Y, TITLE_WIDTH } from '../config';
 import { InkColors } from '../../../utils/colors';
+import { drawFramedBox } from './drawFramedBox';
 
 export const drawStatsBox = (ctx, { cardPower, cardToughness, cardColorIdentity }) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2 + TITLE_WIDTH - STATSLINE_WIDTH;
@@ -9,22 +8,14 @@ export const drawStatsBox = (ctx, { cardPower, cardToughness, cardColorIdentity 
   const width = STATSLINE_WIDTH;
   const height = STATSLINE_HEIGHT;
 
-  drawRoundedBox(ctx, {
+  drawFramedBox(ctx, {
     x,
     y,
     width,
     height,
-    lineWidth: 0,
-    fillStyle: getColorIdentityStyle(ctx, cardColorIdentity),
-  });
-  drawRoundedBox(ctx, {
-    x: x + PINLINE_THICKNESS,
-    y: y + PINLINE_THICKNESS,
-    width: width - PINLINE_THICKNESS * 2,
-    height: height - PINLINE_THICKNESS * 2 - 2,
-    lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: InkColors.LINE,
-    fillStyle: InkColors.PAPER,
+    cardColorIdentity,
+    shape: 'capsule',
+    innerHeightAdjustment: -2,
   });
 
   ctx.font = `${STATSLINE_FONT_SIZE}px ${FONT_FAMILY}`;

@@ -7,7 +7,7 @@
 
 .card-search-form input.card-name-input {
     flex: 1;
-    min-width: 20rem;
+    min-width: min(20rem, 100%);
 }
 
 .card-search-form textarea.card-name-input {

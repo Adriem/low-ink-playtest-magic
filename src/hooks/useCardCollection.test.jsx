@@ -2,9 +2,9 @@ import { act, render } from '@testing-library/react';
 import { useCardCollection } from './useCardCollection';
 import { fetchCardData } from '../utils/scryfall';
 
-jest.mock('../utils/scryfall', () => ({
-  fetchCardData: jest.fn(),
-  fetchSymbology: jest.fn(() => Promise.resolve({ data: [] })),
+vi.mock('../utils/scryfall', () => ({
+  fetchCardData: vi.fn(),
+  fetchSymbology: vi.fn(() => Promise.resolve({ data: [] })),
 }));
 
 const deferred = () => {
@@ -73,7 +73,7 @@ test('keeps the order cards were added in, regardless of load order', async () =
 test('removes the placeholder and reports the error when a card fails to load', async () => {
   const pending = deferred();
   fetchCardData.mockReturnValue(pending.promise);
-  const onCardLoadError = jest.fn();
+  const onCardLoadError = vi.fn();
   renderCollection({ onCardLoadError });
 
   act(() => collection.addCardByName('Not a card'));

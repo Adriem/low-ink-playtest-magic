@@ -210,7 +210,7 @@ export const fillMultilineText = (ctx, lines, originX, originY) => {
       const previousLineFontDescent = previousFontSize.fontBoundingBoxDescent;
       const currentLineFontAscent = currentFontSize.fontBoundingBoxAscent;
 
-      currentBaseLine += !!line
+      currentBaseLine += line
         ? previousLineFontDescent + currentLineFontAscent
         : (previousLineFontDescent + currentLineFontAscent) * EMPTY_LINE_RELATIVE_SIZE;
     }

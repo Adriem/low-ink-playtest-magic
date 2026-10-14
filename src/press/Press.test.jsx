@@ -4,12 +4,12 @@ import { SettingsContextProvider } from '../settings';
 import { fetchCardData } from '../utils/scryfall';
 
 // jsdom has no canvas, so card components are replaced with plain elements
-jest.mock('../cards/Card', () => ({ cardName }) => <div>{cardName}</div>);
-jest.mock('../cards/DualCard', () => () => <div>Dual card</div>);
-jest.mock('jspdf', () => ({ jsPDF: jest.fn() }));
-jest.mock('../utils/scryfall', () => ({
-  fetchCardData: jest.fn(),
-  fetchSymbology: jest.fn(() => Promise.resolve({ data: [] })),
+vi.mock('../cards/Card', () => ({ default: ({ cardName }) => <div>{cardName}</div> }));
+vi.mock('../cards/DualCard', () => ({ default: () => <div>Dual card</div> }));
+vi.mock('jspdf', () => ({ jsPDF: vi.fn() }));
+vi.mock('../utils/scryfall', () => ({
+  fetchCardData: vi.fn(),
+  fetchSymbology: vi.fn(() => Promise.resolve({ data: [] })),
 }));
 
 // jsdom has no PointerEvent, which the overlay needs to tell mouse and touch apart

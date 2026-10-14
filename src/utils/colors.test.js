@@ -29,7 +29,7 @@ describe('getColorIdentityStyle', () => {
   const palette = { WHITE: 'w', BLUE: 'u', BLACK: 'b', RED: 'r', GREEN: 'g', COLORLESS: 'c', MULTI: 'm', ARTIFACT: 'a', LAND: 'l' };
   const createCtx = () => {
     const gradient = { stops: [], addColorStop: (offset, color) => gradient.stops.push([offset, color]) };
-    return { canvas: { width: 500 }, createLinearGradient: jest.fn(() => gradient) };
+    return { canvas: { width: 500 }, createLinearGradient: vi.fn(() => gradient) };
   };
 
   test('uses the palette color of single-color identities', () => {

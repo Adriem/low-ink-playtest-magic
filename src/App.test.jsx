@@ -1,10 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-jest.mock('jspdf', () => ({ jsPDF: jest.fn() }));
-jest.mock('./utils/scryfall', () => ({
-  fetchCardData: jest.fn(),
-  fetchSymbology: jest.fn(() => Promise.resolve({ data: [] })),
+vi.mock('jspdf', () => ({ jsPDF: vi.fn() }));
+vi.mock('./utils/scryfall', () => ({
+  fetchCardData: vi.fn(),
+  fetchSymbology: vi.fn(() => Promise.resolve({ data: [] })),
 }));
 
 test('renders the card search form', () => {

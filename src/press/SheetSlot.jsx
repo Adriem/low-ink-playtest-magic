@@ -76,6 +76,8 @@ const SheetSlot = ({ collectionIndex, face, cardName, children }) => {
   };
 
   return (
+    // Not interactive itself: it handles the events bubbling up from the controls inside it
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
     <div
       className="sheet-slot"
       onPointerEnter={handlePointerEnter}

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import CardSearchForm from './CardSearchForm';
 
 const setupForm = () => {
-  const onAddCards = jest.fn();
+  const onAddCards = vi.fn();
   render(<CardSearchForm onAddCards={onAddCards} />);
   return onAddCards;
 };

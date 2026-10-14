@@ -17,7 +17,7 @@ const setupCanvas = () => {
 test('marks the canvas as rendered once its drawings finish', async () => {
   const { canvas, ctx } = setupCanvas();
   const image = deferred();
-  const draw = jest.fn();
+  const draw = vi.fn();
 
   beginRender(canvas);
   void drawWhenLoaded(ctx, image.promise, draw);
@@ -35,7 +35,7 @@ test('a drawing that fails to load does not block the render', async () => {
   const { canvas, ctx } = setupCanvas();
 
   beginRender(canvas);
-  void drawWhenLoaded(ctx, Promise.reject(new Error('Image not found')), jest.fn()).catch(() => {});
+  void drawWhenLoaded(ctx, Promise.reject(new Error('Image not found')), vi.fn()).catch(() => {});
 
   await expect(finishRender(canvas)).resolves.toBe(true);
   expect(canvas.dataset.rendered).toBe('true');
@@ -44,14 +44,14 @@ test('a drawing that fails to load does not block the render', async () => {
 test('drawings from a render replaced by a newer one are skipped', async () => {
   const { canvas, ctx } = setupCanvas();
   const oldImage = deferred();
-  const drawOld = jest.fn();
+  const drawOld = vi.fn();
 
   beginRender(canvas);
   void drawWhenLoaded(ctx, oldImage.promise, drawOld);
   const oldRender = finishRender(canvas);
 
   beginRender(canvas);
-  const drawNew = jest.fn();
+  const drawNew = vi.fn();
   void drawWhenLoaded(ctx, Promise.resolve('new image'), drawNew);
   const newRender = finishRender(canvas);
 
@@ -63,7 +63,7 @@ test('drawings from a render replaced by a newer one are skipped', async () => {
 });
 
 describe('whenRendered', () => {
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => vi.useRealTimers());
 
   test('resolves right away for canvases that are rendered or not tracked', async () => {
     const { canvas } = setupCanvas();
@@ -84,12 +84,12 @@ describe('whenRendered', () => {
   });
 
   test('gives up after the timeout', async () => {
-    jest.useFakeTimers();
+    vi.useFakeTimers();
     const { canvas } = setupCanvas();
     canvas.dataset.rendered = 'false';
 
     const waiting = whenRendered(canvas, 1000);
-    jest.advanceTimersByTime(1000);
+    vi.advanceTimersByTime(1000);
 
     await expect(waiting).resolves.toBe(false);
   });

@@ -36,7 +36,7 @@ const SOLID_COLORS = {
  * @param {object} [options.palette] - e.g. `Colors` or `MinimalistColors`
  * @returns {string|CanvasGradient}
  */
-export const getColorIdentityStyle = (ctx, colorIdentity, { devoid, palette = Colors } = {}) => {
+export const getColorIdentityStyle = (ctx, colorIdentity, { palette = Colors } = {}) => {
   const gradientColors = GRADIENT_COLORS[colorIdentity];
 
   if (gradientColors) {

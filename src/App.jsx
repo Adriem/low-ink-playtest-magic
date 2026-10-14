@@ -6,9 +6,10 @@ import { SettingsContextProvider } from './settings';
 
 const WORKBENCH_PATH = '/workbench';
 
-// The workbench is a development-only page. In production builds NODE_ENV is
-// replaced with a constant, so this branch (and the workbench chunk) is dropped.
-const Workbench = process.env.NODE_ENV === 'development'
+// The workbench is a development-only page. In production builds
+// import.meta.env.DEV is replaced with false, so this branch (and the
+// workbench chunk) is dropped.
+const Workbench = import.meta.env.DEV
   ? lazy(() => import('./workbench/Workbench'))
   : null;
 

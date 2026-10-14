@@ -16,11 +16,11 @@ const SettingsPanel = forwardRef((_props, ref) => {
             <input
               type="radio"
               name="cardVariant"
-              value="original"
-              checked={cardVariant === 'original'}
-              onChange={() => setCardVariant('original')}
+              value="realistic"
+              checked={cardVariant === 'realistic'}
+              onChange={() => setCardVariant('realistic')}
             />
-            Original
+            Realistic
           </label>
           <label>
             <input

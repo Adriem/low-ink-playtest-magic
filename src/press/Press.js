@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import RealisticCard from '../cards/realistic/RealisticCard';
-import MinimalCard from '../cards/minimal/MinimalCard';
+import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
@@ -46,8 +45,6 @@ const Press = () => {
     doubleFacedCardTreatment,
   });
   const settingsDialogRef = useRef(null);
-
-  const Card = cardVariant === 'minimalist' ? MinimalCard : RealisticCard;
 
   useEffect(() => {
     const loadedCards = cardCollection.filter(card => !card._loading);
@@ -110,12 +107,13 @@ const Press = () => {
                       <div>LOADING</div>
                     ) : card.card_faces ? (
                       <DualCard
-                        Card={Card}
+                        cardStyle={cardVariant}
                         cardFaces={card.card_faces}
                         cardSet={card.set.toUpperCase()}
                       />
                     ) : (
                       <Card
+                        cardStyle={cardVariant}
                         cardName={card.name}
                         cardManaCost={card.mana_cost}
                         cardColors={card.colors}

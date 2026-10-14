@@ -42,6 +42,7 @@ export const renderRealisticCard = (canvas, {
   cardName,
   cardManaCost,
   cardArtUrl,
+  cropArt,
   cardColors,
   cardTypeLine,
   cardOracleText,
@@ -59,7 +60,7 @@ export const renderRealisticCard = (canvas, {
 
   drawOuterFrame(ctx, { blackBordered });
   drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity });
-  drawArtBox(ctx, { cardArtUrl, cardColorIdentity });
+  drawArtBox(ctx, { cardArtUrl, cropArt, cardColorIdentity });
   drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
   const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
   if (cardLoyalty) {

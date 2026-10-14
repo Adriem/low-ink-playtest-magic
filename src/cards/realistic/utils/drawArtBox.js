@@ -6,6 +6,7 @@ import { drawFramedBox } from './drawFramedBox';
 export const drawArtBox = (ctx, {
   cardColorIdentity,
   cardArtUrl,
+  cropArt,
 }) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;
@@ -30,7 +31,14 @@ export const drawArtBox = (ctx, {
   if (!cardArtUrl) return;
 
   void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
-    ctx.drawImage(artImage, imageX, imageY, imageWidth, imageHeight);
+    if (cropArt) {
+      // Draw only this face's half of an image with both faces' art side by side
+      const halfWidth = artImage.naturalWidth / 2;
+      const sourceX = cropArt === 'right-half' ? halfWidth : 0;
+      ctx.drawImage(artImage, sourceX, 0, halfWidth, artImage.naturalHeight, imageX, imageY, imageWidth, imageHeight);
+    } else {
+      ctx.drawImage(artImage, imageX, imageY, imageWidth, imageHeight);
+    }
     midBrightnessPass(ctx, imageX, imageY, imageWidth, imageHeight);
   });
 };

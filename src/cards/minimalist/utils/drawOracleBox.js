@@ -1,9 +1,9 @@
 import { drawRectangle } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitTextIntoBox } from '../../../utils/canvasText';
-import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y, PINLINE_THICKNESS } from '../config';
+import { CONTENT_WIDTH, ORACLE_EXTENDED_EXTRA, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_TEXT_PADDING_TOP, ORACLE_Y, PINLINE_THICKNESS, TEXT_FONT_FAMILY } from '../config';
+import { InkColors } from '../../../utils/colors';
 
-const ORACLE_EXTENDED_EXTRA = 40;
 const DIVIDER_TEXT_PADDING = 8;
 
 const drawSubCardDivider = (ctx, { cardColorIdentity, height }) => {
@@ -60,13 +60,13 @@ export const drawOracleBox = (ctx, {
   const textX = layout === 'right-half' ? x + textPaddingX : x;
   const textWidth = width - textPaddingX;
 
-  const textPaddingTop = 50;
+  const textPaddingTop = ORACLE_TEXT_PADDING_TOP;
   const textPaddingBottom = 0;
   const textY = y + textPaddingTop;
   const textHeight = height - textPaddingTop - textPaddingBottom;
 
-  ctx.font = `${ORACLE_FONT_SIZE}px Verdana`;
-  ctx.fillStyle = 'black';
+  ctx.font = `${ORACLE_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
+  ctx.fillStyle = InkColors.TEXT;
   ctx.textAlign = 'start';
 
   const paragraphs = fitTextIntoBox(

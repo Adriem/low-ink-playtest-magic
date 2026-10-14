@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { beginRender, drawWhenLoaded, finishRender } from '../utils/canvasRendering';
-import { colorsFromManaCost } from '../utils/colors';
+import { colorsFromManaCost, InkColors } from '../utils/colors';
 import { CARD_HEIGHT, CARD_WIDTH, getCardRenderer } from './styles';
 
 const HALF_HEIGHT = CARD_HEIGHT / 2;
@@ -70,7 +70,7 @@ const DualCard = ({ cardStyle, cardFaces, cardSet }) => {
       const [faceCanvas1, faceCanvas2] = faceCanvases;
 
       ctx.clearRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = InkColors.PAPER;
       ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
       drawRotatedCW(ctx, faceCanvas1, 0, 0, CARD_WIDTH, HALF_HEIGHT);
@@ -85,7 +85,7 @@ const DualCard = ({ cardStyle, cardFaces, cardSet }) => {
       ref={setCanvas}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
-      style={{ background: 'white' }}
+      style={{ background: InkColors.PAPER }}
     />
   );
 };

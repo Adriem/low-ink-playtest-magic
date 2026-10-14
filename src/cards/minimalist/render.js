@@ -10,6 +10,7 @@ import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
 import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
+import { DISPLAY_FONT_FAMILY, LOYALTY_BOX_SCALE, LOYALTY_BOX_X, LOYALTY_BOX_Y, TITLE_HEIGHT } from './config';
 
 const drawSubCard = (ctx, { subCard, subCardPosition }) => {
   const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
@@ -57,7 +58,7 @@ export const renderMinimalistCard = (canvas, {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   drawOuterFrame(ctx, { blackBordered });
-  drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: 110 });
+  drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
 
   if (subCard && subCardPosition) {
     drawSubCard(ctx, { subCard, subCardPosition });
@@ -96,6 +97,12 @@ export const renderMinimalistCard = (canvas, {
   }
 
   if (cardLoyalty) {
-    drawLoyaltyBox(ctx, { cardLoyalty, x: 430, y: 675, scale: 1.20, fontFamily: 'Tahoma' });
+    drawLoyaltyBox(ctx, {
+      cardLoyalty,
+      x: LOYALTY_BOX_X,
+      y: LOYALTY_BOX_Y,
+      scale: LOYALTY_BOX_SCALE,
+      fontFamily: DISPLAY_FONT_FAMILY,
+    });
   }
 };

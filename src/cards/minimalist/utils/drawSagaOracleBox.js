@@ -1,22 +1,29 @@
 import { drawRectangle, drawSagaChapter } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitTextIntoBox } from '../../../utils/canvasText';
-import { MinimalistColors } from '../../../utils/colors';
+import { InkColors, MinimalistColors } from '../../../utils/colors';
 import { parseSagaOracleText } from '../../../utils/sagaParser';
-import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y, PINLINE_THICKNESS } from '../config';
+import {
+  CONTENT_WIDTH,
+  DISPLAY_FONT_FAMILY,
+  ORACLE_FONT_SIZE,
+  ORACLE_HEIGHT,
+  ORACLE_Y,
+  PINLINE_THICKNESS,
+  SAGA_ORACLE_EXTENDED_EXTRA,
+  SIDE_BORDER_PADDING,
+  SIDE_BORDER_WIDTH,
+} from '../config';
+import { getSideBorderEdges } from './sideBorder';
 
-const SAGA_ORACLE_EXTRA_PADDING = 20;
-const SAGA_ORACLE_BORDER_WIDTH = 16;
 const SAGA_CHAPTER_ICON_SPACING = 50;
 const SAGA_TEXT_LEFT_OFFSET = 36;
 const SAGA_CHAPTER_DIVIDER_HEIGHT = 1;
-const ORACLE_EXTENDED_EXTRA = 30;
 
 const drawSagaOracleBorder = (ctx, { cardColorIdentity, x, y, height }) => {
   ctx.fillStyle = getColorIdentityStyle(ctx, cardColorIdentity, { palette: MinimalistColors });
 
-  const xOffsetL = x + SAGA_ORACLE_EXTRA_PADDING - SAGA_ORACLE_BORDER_WIDTH * .65;
-  const xOffsetR = x + SAGA_ORACLE_EXTRA_PADDING + SAGA_ORACLE_BORDER_WIDTH * .35;
+  const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
   const tipX = (xOffsetL + xOffsetR) / 2;
   const tipHeight = 16;
 
@@ -41,7 +48,7 @@ export const drawSagaOracleBox = (ctx, {
 
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
-  const height = hasStats ? ORACLE_HEIGHT : ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
+  const height = hasStats ? ORACLE_HEIGHT : ORACLE_HEIGHT + SAGA_ORACLE_EXTENDED_EXTRA;
 
   const textPaddingTop = 15;
   const textX = x;
@@ -51,13 +58,13 @@ export const drawSagaOracleBox = (ctx, {
 
   const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(cardOracleText);
 
-  const contentLeftX = textX + SAGA_ORACLE_EXTRA_PADDING;
-  const contentWidth = textWidth - SAGA_ORACLE_EXTRA_PADDING - SAGA_ORACLE_BORDER_WIDTH * 1.5;
+  const contentLeftX = textX + SIDE_BORDER_PADDING;
+  const contentWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
   const chapterTextX = contentLeftX + SAGA_TEXT_LEFT_OFFSET;
   const chapterTextWidth = contentWidth - SAGA_TEXT_LEFT_OFFSET;
-  const borderCenterX = textX + SAGA_ORACLE_EXTRA_PADDING - SAGA_ORACLE_BORDER_WIDTH * 0.15;
+  const borderCenterX = textX + SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 0.15;
 
-  const dividerLeftX = textX + SAGA_ORACLE_EXTRA_PADDING + SAGA_ORACLE_BORDER_WIDTH * 0.35 + 1;
+  const dividerLeftX = textX + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * 0.35 + 1;
   const dividerWidth = (contentLeftX + contentWidth) - dividerLeftX;
 
   const totalSlots = topParagraphs.length + chapters.length + bottomParagraphs.length;
@@ -70,12 +77,12 @@ export const drawSagaOracleBox = (ctx, {
     : height + 10;
   drawSagaOracleBorder(ctx, { cardColorIdentity, x: textX, y: borderTopY, height: borderHeight, width: textWidth });
 
-  ctx.font = `${ORACLE_FONT_SIZE}px Tahoma`;
-  ctx.fillStyle = 'black';
+  ctx.font = `${ORACLE_FONT_SIZE}px ${DISPLAY_FONT_FAMILY}`;
+  ctx.fillStyle = InkColors.TEXT;
   ctx.textAlign = 'start';
 
   const renderParagraph = (content, slotY, leftX, width, align = 'center') => {
-    ctx.font = `${ORACLE_FONT_SIZE}px Tahoma`;
+    ctx.font = `${ORACLE_FONT_SIZE}px ${DISPLAY_FONT_FAMILY}`;
     const fitted = fitTextIntoBox(
       ctx,
       [{ content, width }],
@@ -110,6 +117,7 @@ export const drawSagaOracleBox = (ctx, {
         romanNumeral: label,
         x: borderCenterX,
         y: firstIconY + labelIndex * SAGA_CHAPTER_ICON_SPACING,
+        fontFamily: DISPLAY_FONT_FAMILY,
       });
     });
 
@@ -121,7 +129,7 @@ export const drawSagaOracleBox = (ctx, {
         y: groupY + slotHeight - SAGA_CHAPTER_DIVIDER_HEIGHT / 2,
         width: dividerWidth,
         height: SAGA_CHAPTER_DIVIDER_HEIGHT,
-        fillStyle: 'black',
+        fillStyle: InkColors.LINE,
       });
     }
 
@@ -134,7 +142,7 @@ export const drawSagaOracleBox = (ctx, {
       y: chaptersEndY - SAGA_CHAPTER_DIVIDER_HEIGHT / 2,
       width: dividerWidth,
       height: SAGA_CHAPTER_DIVIDER_HEIGHT,
-      fillStyle: 'black',
+      fillStyle: InkColors.LINE,
     });
 
     ctx.textAlign = 'center';

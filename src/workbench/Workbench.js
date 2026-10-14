@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Card from '../cards/Card';
 import useCardData from './useCardData';
 import Reference from './Reference';
-import { useSetting } from '../settings';
+import { SETTINGS_DEFINITIONS, useSetting } from '../settings';
 
 import './Workbench.css';
 
@@ -67,8 +67,9 @@ const Workbench = () => {
           onChange={(e) => setCardVariant(e.target.value)}
           style={{ marginRight: '0.5em' }}
         >
-          <option value="realistic">Realistic</option>
-          <option value="minimalist">Minimalist</option>
+          {SETTINGS_DEFINITIONS.cardVariant.options.map(option => (
+            <option key={option.value} value={option.value}>{option.label}</option>
+          ))}
         </select>
         <select
           name="borderColor"

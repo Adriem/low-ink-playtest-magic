@@ -1,7 +1,8 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, TITLE_WIDTH, TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_Y } from '../config';
+import { CAPSULE_INNER_STROKE, CAPSULE_TEXT_INSET, FONT_FAMILY, PINLINE_THICKNESS, TITLE_WIDTH, TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_TEXT_BASELINE_OFFSET, TYPELINE_Y } from '../config';
+import { InkColors } from '../../../utils/colors';
 
 export const drawTypeBox = (ctx, {
   cardType,
@@ -27,17 +28,17 @@ export const drawTypeBox = (ctx, {
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2 - 2,
     lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: 'black',
-    fillStyle: 'white',
+    strokeStyle: InkColors.LINE,
+    fillStyle: InkColors.PAPER,
   });
 
-  const textX = x + PINLINE_THICKNESS * 2 + 7;
-  const textRight = x + width - PINLINE_THICKNESS * 2 - 7;
+  const textX = x + PINLINE_THICKNESS * 2 + CAPSULE_TEXT_INSET;
+  const textRight = x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
   const innerCenterY = y + height / 2;
 
-  ctx.font = `bold ${TYPELINE_FONT_SIZE}px Serif`;
-  ctx.fillStyle = 'black';
+  ctx.font = `bold ${TYPELINE_FONT_SIZE}px ${FONT_FAMILY}`;
+  ctx.fillStyle = InkColors.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType, textRight - textX);
-  ctx.fillText(cardType, textX, innerCenterY + 7);
+  ctx.fillText(cardType, textX, innerCenterY + TYPELINE_TEXT_BASELINE_OFFSET);
 };

@@ -1,4 +1,8 @@
 import { useMemo } from 'react';
+import { chunk } from '../utils/array';
+
+/** Cards in each sheet, the same as in each page of the exported PDF (3x3) */
+export const CARDS_PER_SHEET = 9;
 
 const SPLIT_LAYOUTS = ['split'];
 const DUAL_FACE_LAYOUTS = ['flip', 'transform', 'modal_dfc', 'meld', 'reversible_card', 'double_faced_token'];
@@ -27,7 +31,7 @@ const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
  * @returns {SheetCard[][]}
  */
 export const groupCardsIntoSheets = (cards, {
-  sheetSize = 9,
+  sheetSize = CARDS_PER_SHEET,
   splitCardTreatment = 'separate',
   doubleFacedCardTreatment = 'separate',
 } = {}) => {
@@ -55,11 +59,7 @@ export const groupCardsIntoSheets = (cards, {
       const { card_faces, ...cardWithoutFaces } = card;
       return card_faces.map((face, faceIndex) => ({ ...cardWithoutFaces, ...face, _faceIndex: faceIndex }));
     });
-  const cardSheets = []
-
-  while (sheetCards.length) cardSheets.push(sheetCards.splice(0, sheetSize));
-
-  return cardSheets;
+  return chunk(sheetCards, sheetSize);
 };
 
 /**

@@ -1,10 +1,8 @@
 import { drawLoyaltyBox, drawRectangle } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fillMultilineText, fitFontSizeInXY } from '../../../utils/canvasText';
-import { CONTENT_WIDTH, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_Y, PINLINE_THICKNESS } from '../config';
-
-const LOYALTY_INDICATOR_X = 439;
-const LOYALTY_INDICATOR_Y = 664;
+import { CONTENT_WIDTH, FONT_FAMILY, LOYALTY_BOX_X, LOYALTY_BOX_Y, ORACLE_FONT_SIZE, ORACLE_HEIGHT, ORACLE_TEXT_PADDING_X, ORACLE_TEXT_PADDING_Y, ORACLE_TEXT_STATS_CLEARANCE, ORACLE_Y, PINLINE_THICKNESS } from '../config';
+import { InkColors } from '../../../utils/colors';
 
 export const drawPlaneswalkerOracleBox = (ctx, {
   cardOracleText,
@@ -32,21 +30,21 @@ export const drawPlaneswalkerOracleBox = (ctx, {
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2,
     lineWidth: PINLINE_THICKNESS,
-    strokeStyle: 'black',
-    fillStyle: 'white',
+    strokeStyle: InkColors.LINE,
+    fillStyle: InkColors.PAPER,
   });
 
-  const textPaddingX = 8;
+  const textPaddingX = ORACLE_TEXT_PADDING_X;
   const textX = x + PINLINE_THICKNESS + textPaddingX;
   const textWidth = width - PINLINE_THICKNESS * 2 - textPaddingX * 2;
 
-  const textPaddingTop = ORACLE_FONT_SIZE + 11;
-  const textPaddingBottom = layout !== 'left-half' ? 26 : 11;
+  const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
+  const textPaddingBottom = layout !== 'left-half' ? ORACLE_TEXT_STATS_CLEARANCE : ORACLE_TEXT_PADDING_Y;
   const textY = y + PINLINE_THICKNESS + textPaddingTop;
   const textHeight = height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom;
 
-  ctx.font = `${ORACLE_FONT_SIZE}px Serif`;
-  ctx.fillStyle = 'black';
+  ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
+  ctx.fillStyle = InkColors.TEXT;
   ctx.textAlign = 'start';
 
   fillMultilineText(ctx, fitFontSizeInXY(
@@ -56,5 +54,5 @@ export const drawPlaneswalkerOracleBox = (ctx, {
     textHeight,
   ), textX, textY);
 
-  drawLoyaltyBox(ctx, { cardLoyalty, x: LOYALTY_INDICATOR_X, y: LOYALTY_INDICATOR_Y });
+  drawLoyaltyBox(ctx, { cardLoyalty, x: LOYALTY_BOX_X, y: LOYALTY_BOX_Y, fontFamily: FONT_FAMILY });
 };

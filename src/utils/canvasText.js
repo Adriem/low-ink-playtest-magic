@@ -177,6 +177,24 @@ export const fitTextIntoBox = (ctx, paragraphs, maxHeight) => {
   return processedParagraphs;
 };
 
+/**
+ * Height of lines of text as drawn by `fillMultilineText`, from the top of the
+ * first line to the bottom of the last one, with the current font.
+ *
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string[]} lines - Empty lines separate paragraphs
+ * @returns {number}
+ */
+export const getMultilineTextHeight = (ctx, lines) => {
+  const { fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = ctx.measureText('');
+  const lineHeight = ascent + descent;
+
+  return lines.reduce((height, line, index) => {
+    if (index === 0) return lineHeight;
+    return height + (line ? lineHeight : lineHeight * EMPTY_LINE_RELATIVE_SIZE);
+  }, 0);
+};
+
 export const fillMultilineText = (ctx, lines, originX, originY) => {
   let currentBaseLine = originY;
   let previousFontSize = null;

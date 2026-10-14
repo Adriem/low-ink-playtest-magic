@@ -28,7 +28,14 @@ export const STATSLINE_FONT_SIZE = 28;
 export const SAGA_TYPELINE_RAISE = 15;
 export const SAGA_TYPELINE_Y = ORACLE_Y + ORACLE_HEIGHT - TYPELINE_HEIGHT - SAGA_TYPELINE_RAISE;
 export const SAGA_COLUMNS_Y = ARTWORK_Y;
-export const SAGA_COLUMNS_HEIGHT = SAGA_TYPELINE_Y - SAGA_COLUMNS_Y + (ARTWORK_Y + ARTWORK_HEIGHT - TYPELINE_Y);
+export const SAGA_COLUMNS_TYPELINE_OVERLAP = ARTWORK_Y + ARTWORK_HEIGHT - TYPELINE_Y;
+
+// Saga creatures have an extra oracle box below the type line for their
+// creature abilities, which raises the type line and shortens the columns.
+// It overlaps the type line like the oracle box does on other cards.
+export const SAGA_CREATURE_ORACLE_HEIGHT = TYPELINE_HEIGHT * 1.5;
+export const SAGA_CREATURE_TYPELINE_Y = SAGA_TYPELINE_Y - TYPELINE_HEIGHT * 1.25;
+export const SAGA_CREATURE_ORACLE_Y = SAGA_CREATURE_TYPELINE_Y + TYPELINE_HEIGHT - (TYPELINE_Y + TYPELINE_HEIGHT - ORACLE_Y);
 
 export const TITLE_WIDTH = 450;
 export const CONTENT_WIDTH = 434;

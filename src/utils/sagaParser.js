@@ -39,3 +39,21 @@ export const parseSagaOracleText = (oracleText) => {
 
   return { topParagraphs, chapters, bottomParagraphs };
 };
+
+/**
+ * Split the oracle text of a saga creature into its saga text (paragraphs
+ * before the chapters and the chapters) and its creature abilities (the
+ * paragraphs after the last chapter).
+ *
+ * @param {string} oracleText
+ * @returns {{ sagaText: string, creatureText: string }}
+ */
+export const splitSagaCreatureText = (oracleText) => {
+  const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(oracleText);
+  const chapterLines = chapters.map(({ labels, text }) => `${labels.join(', ')} — ${text}`);
+
+  return {
+    sagaText: [...topParagraphs, ...chapterLines].join('\n'),
+    creatureText: bottomParagraphs.join('\n'),
+  };
+};

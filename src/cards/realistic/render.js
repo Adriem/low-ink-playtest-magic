@@ -9,7 +9,9 @@ import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
 import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
-import { SAGA_TYPELINE_Y } from './config';
+import { splitSagaCreatureText } from '../../utils/sagaParser';
+import { SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } from './config';
+import { drawSagaCreatureOracleBox } from './utils/drawSagaCreatureOracleBox';
 import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 
 const drawSubCard = (ctx, { subCard, subCardPosition }) => {
@@ -65,8 +67,17 @@ export const renderRealisticCard = (canvas, {
 
   const isSaga = /\bSaga\b/i.test(cardTypeLine ?? '');
   if (isSaga) {
-    drawSagaOracleAndArtBox(ctx, { cardOracleText, cardArtUrl, cropArt, cardColorIdentity });
-    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity, y: SAGA_TYPELINE_Y });
+    const isCreature = cardPower != null && cardToughness != null;
+
+    if (isCreature) {
+      const { sagaText, creatureText } = splitSagaCreatureText(cardOracleText);
+      drawSagaOracleAndArtBox(ctx, { cardOracleText: sagaText, cardArtUrl, cropArt, cardColorIdentity, typelineY: SAGA_CREATURE_TYPELINE_Y });
+      drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity, y: SAGA_CREATURE_TYPELINE_Y });
+      drawSagaCreatureOracleBox(ctx, { cardOracleText: creatureText, cardColorIdentity });
+    } else {
+      drawSagaOracleAndArtBox(ctx, { cardOracleText, cardArtUrl, cropArt, cardColorIdentity });
+      drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity, y: SAGA_TYPELINE_Y });
+    }
   } else {
     drawArtBox(ctx, { cardArtUrl, cropArt, cardColorIdentity });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });

@@ -46,6 +46,114 @@ const parseCardList = (cardList) => cardList
 const repeatCardName = (cardName, quantity) => Array.from({ length: quantity }, () => cardName);
 
 /**
+ * Radio buttons to switch between adding a single card and a card list.
+ *
+ * @param {object} props
+ * @param {boolean} props.multipleSearch - Whether the card list mode is selected
+ * @param {function(multipleSearch: boolean): void} props.onChange
+ */
+const SearchModeToggle = ({ multipleSearch, onChange }) => (
+  <div
+    className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
+    role="radiogroup"
+    aria-labelledby="search-mode-label"
+  >
+    <span id="search-mode-label">Search mode:</span>
+    <label>
+      <input
+        type="radio"
+        name="searchMode"
+        value="single"
+        checked={!multipleSearch}
+        onChange={() => onChange(false)}
+      />
+      single card
+    </label>
+    <label>
+      <input
+        type="radio"
+        name="searchMode"
+        value="list"
+        checked={multipleSearch}
+        onChange={() => onChange(true)}
+      />
+      card list
+    </label>
+  </div>
+);
+
+/**
+ * Fields to add a single card by name.
+ *
+ * @param {object} props
+ * @param {function(multipleSearch: boolean): void} props.onSearchModeChange
+ */
+const SingleCardFields = ({ onSearchModeChange }) => (
+  <>
+    <input
+      className="card-name-input"
+      name="cardName"
+      placeholder="e.g. Colossal Dreadmaw"
+    />
+    <input
+      className="submit-card-search single"
+      type="submit"
+      value="Add card"
+    />
+    <SearchModeToggle multipleSearch={false} onChange={onSearchModeChange} />
+  </>
+);
+
+/**
+ * Fields to add a list of cards, one per line.
+ *
+ * @param {object} props
+ * @param {function(multipleSearch: boolean): void} props.onSearchModeChange
+ */
+const CardListFields = ({ onSearchModeChange }) => {
+  // Editing the card list clears the error about an invalid quantity
+  const handleInput = useCallback((event) => {
+    event.currentTarget.setCustomValidity('');
+  }, []);
+
+  // Enter adds a new line in the card list, so Cmd/Ctrl+Enter submits it.
+  // Intentionally undocumented in the UI: a shortcut for power users.
+  const handleKeyDown = useCallback((event) => {
+    const isSubmitShortcut = event.key === 'Enter' && (event.metaKey || event.ctrlKey);
+    if (!isSubmitShortcut || event.nativeEvent.isComposing) return;
+
+    event.preventDefault();
+    event.currentTarget.form.requestSubmit();
+  }, []);
+
+  return (
+    <>
+      <textarea
+        className="card-name-input"
+        name="cardNamesList"
+        placeholder="e.g. Colossal Dreadmaw"
+        onKeyDown={handleKeyDown}
+        onInput={handleInput}
+      />
+      {/* Invisible copy of the submit button that keeps the toggle centered */}
+      <input
+        className="submit-card-search multiple ghost"
+        type="button"
+        value="Add cards"
+        tabIndex={-1}
+        aria-hidden="true"
+      />
+      <SearchModeToggle multipleSearch onChange={onSearchModeChange} />
+      <input
+        className="submit-card-search multiple"
+        type="submit"
+        value="Add cards"
+      />
+    </>
+  );
+};
+
+/**
  * Search form to add cards by name, either one at a time or as a list.
  *
  * @param {object} props
@@ -84,92 +192,15 @@ const CardSearchForm = ({ onAddCards }) => {
     form.elements.namedItem(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
   }, [multipleSearch, onAddCards]);
 
-  // Editing the card list clears the error about an invalid quantity
-  const handleCardListInput = useCallback((event) => {
-    event.currentTarget.setCustomValidity('');
+  const handleSearchModeChange = useCallback((multiple) => {
+    setMultipleSearch(multiple);
   }, []);
-
-  // Enter adds a new line in the card list, so Cmd/Ctrl+Enter submits it.
-  // Intentionally undocumented in the UI: a shortcut for power users.
-  const handleCardListKeyDown = useCallback((event) => {
-    const isSubmitShortcut = event.key === 'Enter' && (event.metaKey || event.ctrlKey);
-    if (!isSubmitShortcut || event.nativeEvent.isComposing) return;
-
-    event.preventDefault();
-    event.currentTarget.form.requestSubmit();
-  }, []);
-
-  const searchModeToggle = (
-    <div
-      className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
-      role="radiogroup"
-      aria-labelledby="search-mode-label"
-    >
-      <span id="search-mode-label">Search mode:</span>
-      <label>
-        <input
-          type="radio"
-          name="searchMode"
-          value="single"
-          checked={!multipleSearch}
-          onChange={() => setMultipleSearch(false)}
-        />
-        single card
-      </label>
-      <label>
-        <input
-          type="radio"
-          name="searchMode"
-          value="list"
-          checked={multipleSearch}
-          onChange={() => setMultipleSearch(true)}
-        />
-        card list
-      </label>
-    </div>
-  );
 
   return (
     <form className="card-search-form" action="#" onSubmit={handleSubmit}>
-      {multipleSearch ? (
-        <>
-          <textarea
-            className="card-name-input"
-            name="cardNamesList"
-            placeholder="e.g. Colossal Dreadmaw"
-            onKeyDown={handleCardListKeyDown}
-            onInput={handleCardListInput}
-          />
-          {/* Invisible copy of the submit button that keeps the toggle centered */}
-          <input
-            className="submit-card-search multiple ghost"
-            type="button"
-            value="Add cards"
-            tabIndex={-1}
-            aria-hidden="true"
-          />
-          {searchModeToggle}
-          <input
-            className="submit-card-search multiple"
-            type="submit"
-            value="Add cards"
-          />
-        </>
-      ) : (
-        <>
-          <input
-            className="card-name-input"
-            name="cardName"
-            placeholder="e.g. Colossal Dreadmaw"
-          />
-          <input
-            className="submit-card-search single"
-            type="submit"
-            value="Add card"
-          />
-          {searchModeToggle}
-        </>
-      )}
+      {multipleSearch
+        ? <CardListFields onSearchModeChange={handleSearchModeChange} />
+        : <SingleCardFields onSearchModeChange={handleSearchModeChange} />}
     </form>
   );
 };

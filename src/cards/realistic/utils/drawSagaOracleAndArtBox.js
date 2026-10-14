@@ -1,8 +1,10 @@
-import { drawRectangle } from '../../../utils/canvasShapes';
+import { drawRectangle, drawSagaChapter } from '../../../utils/canvasShapes';
 import { InkColors } from '../../../utils/colors';
+import { distributeHeight } from '../../../utils/layout';
 import { parseSagaOracleText } from '../../../utils/sagaParser';
 import {
   CONTENT_WIDTH,
+  FONT_FAMILY,
   ORACLE_FONT_SIZE,
   ORACLE_TEXT_PADDING_X,
   ORACLE_TEXT_PADDING_Y,
@@ -13,15 +15,25 @@ import {
 } from '../config';
 import { drawArtImage } from './drawArtImage';
 import { drawFramedBox } from './drawFramedBox';
-import { drawOracleText, drawTextInArea } from './drawOracleText';
+import { drawOracleText, drawTextInArea, getFittingFontSize } from './drawOracleText';
 
 const CHAPTER_SEPARATOR_THICKNESS = 1;
+// Chapter numbers are hexagons centered on the column's left pinline, stacked
+// when a chapter has several numbers
+const CHAPTER_ICON_SPACING = 50;
+const CHAPTER_ICON_HALF_WIDTH = 22.5 * Math.sqrt(3) / 2;
+// Minimum height of each paragraph and chapter of the saga's text
+const MIN_SLOT_HEIGHT = 75;
+// Height of a hexagon chapter icon (at scale 1)
+const CHAPTER_ICON_HEIGHT = 45;
 
 /**
  * Draw the text of a saga in its column: the paragraphs before the chapters
- * (e.g. reminder text), each chapter and the paragraphs after them get the
- * same height, with a thin line above and below each chapter. Like the
- * minimalist style.
+ * (e.g. reminder text), each chapter and the paragraphs after them get a slot
+ * as tall as their share of the text, like printed sagas, with a thin line
+ * above and below each chapter, and its numbers as icons on the pinline to
+ * its left. All the slots use the same font size: the largest at which every
+ * slot's text fits.
  *
  * @param {CanvasRenderingContext2D} ctx
  * @param {string} cardOracleText
@@ -32,28 +44,42 @@ const drawSagaChapters = (ctx, cardOracleText, { x, y, width, height }) => {
   const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(cardOracleText);
   if (chapters.length === 0) return false;
 
-  // TODO: Draw the chapter numbers as icons instead of keeping them in the text
   const slots = [
     ...topParagraphs.map(content => ({ content, align: 'top' })),
-    ...chapters.map(({ labels, text }) => ({ content: `${labels.join(', ')} — ${text}`, align: 'center', isChapter: true })),
+    ...chapters.map(({ labels, text }) => ({ content: text, labels, align: 'center', isChapter: true })),
     ...bottomParagraphs.map(content => ({ content, align: 'center' })),
   ];
-  const slotHeight = height / slots.length;
-  const textX = x + ORACLE_TEXT_PADDING_X;
-  const textWidth = width - ORACLE_TEXT_PADDING_X * 2;
+  // Slots are as tall as their share of the characters (including spaces), but
+  // at least the minimum height, and tall enough for a chapter's icons
+  const slotHeights = distributeHeight(height, slots.map(({ content, labels }) => ({
+    weight: content.length,
+    minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * CHAPTER_ICON_SPACING),
+    // When the minimums don't fit, slots get the same height, except that a
+    // chapter still needs room for its icons
+    requiredHeight: labels ? (labels.length - 1) * CHAPTER_ICON_SPACING + CHAPTER_ICON_HEIGHT : 0,
+  })));
+  const textRight = x + width - ORACLE_TEXT_PADDING_X;
+  const iconX = x - PINLINE_THICKNESS / 2;
+  // Chapter text starts after the chapter icons
+  const chapterTextX = iconX + CHAPTER_ICON_HALF_WIDTH + ORACLE_TEXT_PADDING_X;
 
-  slots.forEach(({ content, align, isChapter }, index) => {
-    const slotY = y + index * slotHeight;
-
-    drawTextInArea(ctx, {
+  const textAreas = slots.map(({ content, isChapter }, index) => {
+    const textX = isChapter ? chapterTextX : x + ORACLE_TEXT_PADDING_X;
+    return {
       text: content,
       x: textX,
-      y: slotY,
-      width: textWidth,
-      height: slotHeight,
+      width: textRight - textX,
+      height: slotHeights[index],
       padding: ORACLE_TEXT_PADDING_Y,
-      align,
-    });
+    };
+  });
+  const fontSize = Math.min(...textAreas.map(area => getFittingFontSize(ctx, area)));
+
+  let slotY = y;
+  slots.forEach(({ labels, align, isChapter }, index) => {
+    const slotHeight = slotHeights[index];
+
+    drawTextInArea(ctx, { ...textAreas[index], y: slotY, align, fontSize });
 
     // Line between this slot and the next one, when either is a chapter
     const nextSlot = slots[index + 1];
@@ -66,6 +92,20 @@ const drawSagaChapters = (ctx, cardOracleText, { x, y, width, height }) => {
         fillStyle: InkColors.LINE,
       });
     }
+
+    if (isChapter) {
+      const firstIconY = slotY + slotHeight / 2 - (labels.length - 1) * CHAPTER_ICON_SPACING / 2;
+      labels.forEach((label, labelIndex) => {
+        drawSagaChapter(ctx, {
+          romanNumeral: label,
+          x: iconX,
+          y: firstIconY + labelIndex * CHAPTER_ICON_SPACING,
+          fontFamily: FONT_FAMILY,
+        });
+      });
+    }
+
+    slotY += slotHeight;
   });
 
   return true;

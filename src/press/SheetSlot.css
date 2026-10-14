@@ -1,0 +1,30 @@
+.sheet-slot {
+    width: 250px;
+    height: 350px;
+    background-color: lightgray;
+    position: relative;
+    float: left;
+}
+
+.sheet-slot-card-button {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+    padding: 0;
+    border: none;
+    border-radius: 11px;
+    background: transparent;
+    cursor: pointer;
+}
+.sheet-slot-card-button:focus-visible {
+    outline: 3px solid rgb(30, 100, 220);
+    outline-offset: -3px;
+}
+
+.sheet-slot .card {
+    transform: scale(0.5);
+    transform-origin: top left;
+}

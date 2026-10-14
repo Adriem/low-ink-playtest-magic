@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
+import LoadingCard from '../cards/LoadingCard';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
 import SheetSlot from './SheetSlot';
@@ -94,7 +95,7 @@ const Press = () => {
                     cardName={card._loading ? 'loading card' : card.name}
                   >
                     {card._loading ? (
-                      <div>LOADING</div>
+                      <LoadingCard />
                     ) : card.card_faces ? (
                       <DualCard
                         cardStyle={cardVariant}

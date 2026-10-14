@@ -1,5 +1,76 @@
 .workbench {
   width: 500px;
+  margin: 0 auto;
   background: lightgray;
   padding: 10px;
+  /* Room for the controls fixed at the bottom */
+  margin-bottom: 120px;
+}
+
+.workbench-card {
+  position: relative;
+}
+
+.workbench-reference {
+  position: absolute;
+  width: 500px;
+  z-index: 10;
+}
+
+.workbench-controls {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 10px 24px;
+  padding: 10px 16px;
+  background: lightgray;
+}
+
+/* Grows to fill its line, with the input up to 500px wide */
+.workbench-search {
+  display: flex;
+  flex-grow: 1;
+  gap: 4px;
+  min-width: 240px;
+  justify-content: center;
+}
+
+.workbench-search input[type="text"] {
+  flex: 1;
+  min-width: 0;
+  max-width: 500px;
+}
+
+/* The dropdowns and the reference slider wrap together, staying at the end
+   of their line even when they wrap onto a line of their own */
+.workbench-settings {
+  display: flex;
+  flex-grow: 1;
+  flex-shrink: 0;
+  gap: 12px;
+  margin-left: auto;
+}
+
+.workbench-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: center;
+}
+
+/* At the end of its line, even when it wraps onto a line of its own */
+.workbench-reference-slider {
+  flex-grow: 1;
+  justify-content: end;
+}
+
+.workbench-reference-slider label,
+.workbench-reference-slider input {
+    margin-left: auto;
+    width: 150px;
 }

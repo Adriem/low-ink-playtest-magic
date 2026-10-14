@@ -6,6 +6,27 @@ import { SETTINGS_DEFINITIONS, useSetting } from '../settings';
 
 import './Workbench.css';
 
+const COLOR_OPTIONS = [
+  { value: '', label: 'default' },
+  { value: 'none', label: 'none' },
+  { value: 'W', label: 'white' },
+  { value: 'U', label: 'blue' },
+  { value: 'B', label: 'black' },
+  { value: 'R', label: 'red' },
+  { value: 'G', label: 'green' },
+  { value: 'W,U,B,R,G', label: 'multi' },
+  { value: 'R,G', label: 'gruul' },
+  { value: 'U,R', label: 'izzet' },
+  { value: 'W,B', label: 'orzhov' },
+  { value: 'G,U', label: 'simic' },
+  { value: 'G,B', label: 'golgari' },
+  { value: 'W,U', label: 'azorius' },
+  { value: 'W,G', label: 'selesnya' },
+  { value: 'B,R', label: 'rakdos' },
+  { value: 'B,U', label: 'dimir' },
+  { value: 'W,R', label: 'boros' },
+];
+
 const Workbench = () => {
   const [opacity, setOpacity] = useState(0);
   const [blackBordered, setBlackBordered] = useState(false);
@@ -15,23 +36,27 @@ const Workbench = () => {
 
   const { cardData, loading, error } = useCardData(cardName);
 
-  return (
-    <div className="workbench">
-      {(!cardData || Object.keys(cardData).length === 0) ? <div>NO CARD DATA</div>
-        : (loading) ? <div>LOADING...</div>
-          : (error) ? <div>ERROR ({error.name}): {error.message}</div>
-            : (
-              <div className="workbench">
-                <div style={{
-                  position: 'absolute',
-                  width: '500px',
-                  zIndex: '10',
-                  opacity,
-                }}>
-                  <Reference imageUrl={cardData.image_uris?.normal} />
-                </div>
+  const handleSearchSubmit = (e) => setCardName(e.target.cardName.value);
+  const handleStyleChange = (e) => setCardVariant(e.target.value);
+  const handleColorChange = (e) => {
+    const { value } = e.target;
+    setCardColors(value === '' ? null : value === 'none' ? [] : value.split(','));
+  };
+  const handleBorderChange = (e) => setBlackBordered(e.target.value === 'black');
+  const handleReferenceChange = (e) => setOpacity(parseFloat(e.target.value));
 
-                <div style={{ marginTop: '-2px', zIndex: '0' }}>
+  return (
+    <>
+      <div className="workbench">
+        {(!cardData || Object.keys(cardData).length === 0) ? <div>NO CARD DATA</div>
+          : (loading) ? <div>LOADING...</div>
+            : (error) ? <div>ERROR ({error.name}): {error.message}</div>
+              : (
+                <div className="workbench-card">
+                  <div className="workbench-reference" style={{ opacity }}>
+                    <Reference imageUrl={cardData.image_uris?.normal} />
+                  </div>
+
                   <Card
                     cardStyle={cardVariant}
                     cardName={cardData.name}
@@ -49,67 +74,54 @@ const Workbench = () => {
                     subCard={cardData._subFace}
                   />
                 </div>
-              </div>
-            )}
-      <div style={{ position: 'fixed', bottom: 10, right: 10 }}>
-        <form action="#" style={{display: 'inline-block', padding: '0 1em' }} onSubmit={(e) => setCardName(e.target.cardName.value)}>
-          <label htmlFor="cardName">Card name</label>
-          <input id="cardName" style={{ width: '18em' }} type="text" />
+              )}
+      </div>
+
+      <div className="workbench-controls">
+        <form action="#" className="workbench-search" onSubmit={handleSearchSubmit}>
+          <input id="cardName" type="text" aria-label="Card name" placeholder="Card name" />
           <input type="submit" value="Search" />
         </form>
-        <div style={{display: 'inline-block', padding: '0 1em'}}>
-          <input id="blackBordered" type="checkbox" onChange={(e) => setBlackBordered(e.target.checked)} />
-          <label htmlFor="blackBordered">Black border</label>
+
+        <div className="workbench-settings">
+          <div className="workbench-field">
+            <label htmlFor="cardVariant">Style</label>
+            <select id="cardVariant" value={cardVariant} onChange={handleStyleChange}>
+              {SETTINGS_DEFINITIONS.cardVariant.options.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="workbench-field">
+            <label htmlFor="cardColors">Color</label>
+            <select id="cardColors" defaultValue="" onChange={handleColorChange}>
+              {COLOR_OPTIONS.map(option => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </div>
+          <div className="workbench-field">
+            <label htmlFor="cardBorder">Border</label>
+            <select id="cardBorder" value={blackBordered ? 'black' : 'white'} onChange={handleBorderChange}>
+              <option value="white">White border</option>
+              <option value="black">Black border</option>
+            </select>
+          </div>
+          <div className="workbench-field workbench-reference-slider">
+            <label htmlFor="referenceOpacity">Reference</label>
+            <input
+              id="referenceOpacity"
+              type="range"
+              min={0}
+              max={1}
+              step={0.01}
+              value={opacity}
+              onChange={handleReferenceChange}
+            />
+          </div>
         </div>
-        <select
-          name="cardVariant"
-          value={cardVariant}
-          onChange={(e) => setCardVariant(e.target.value)}
-          style={{ marginRight: '0.5em' }}
-        >
-          {SETTINGS_DEFINITIONS.cardVariant.options.map(option => (
-            <option key={option.value} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-        <select
-          name="borderColor"
-          defaultValue=""
-          onChange={(e) => {
-            const { value } = e.target;
-            setCardColors(value === '' ? null : value === 'none' ? [] : value.split(','));
-          }}
-        >
-          <option value="">default</option>
-          <option value="none">none</option>
-          <option value="W">white</option>
-          <option value="U">blue</option>
-          <option value="B">black</option>
-          <option value="R">red</option>
-          <option value="G">green</option>
-          <option value="W,U,B,R,G">multi</option>
-          <option value="R,G">gruul</option>
-          <option value="U,R">izzet</option>
-          <option value="W,B">orzhov</option>
-          <option value="G,U">simic</option>
-          <option value="G,B">golgari</option>
-          <option value="W,U">azorius</option>
-          <option value="W,G">selesnya</option>
-          <option value="B,R">rakdos</option>
-          <option value="B,U">dimir</option>
-          <option value="W,R">boros</option>
-        </select>
-        <label htmlFor="referenceOpacity" style={{ marginLeft: '1em' }}>Reference</label>
-        <input
-          id="referenceOpacity"
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={opacity}
-          onChange={(e) => setOpacity(parseFloat(e.target.value))}
-        />
       </div>
-    </div>
+    </>
   );
 };
 

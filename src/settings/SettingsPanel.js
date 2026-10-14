@@ -1,123 +1,46 @@
 import { forwardRef } from 'react';
-import { useSetting } from './SettingsContext';
+import { SETTINGS_DEFINITIONS, useSetting } from './SettingsContext';
 
-const SettingsPanel = forwardRef((_props, ref) => {
-  const [cardVariant, setCardVariant] = useSetting('cardVariant');
-  const [splitCardTreatment, setSplitCardTreatment] = useSetting('splitCardTreatment');
-  const [doubleFacedCardTreatment, setDoubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
-  const [inkLevel, setInkLevel] = useSetting('inkLevel');
+/**
+ * Radio buttons to pick the value of a setting.
+ *
+ * @param {object} props
+ * @param {string} props.name - Setting name
+ * @param {import('./SettingsContext').SettingDefinition} props.definition
+ */
+const SettingFieldset = ({ name, definition }) => {
+  const [value, setValue] = useSetting(name);
 
   return (
-    <dialog ref={ref}>
-      <form method="dialog">
-        <fieldset>
-          <legend>Card style</legend>
-          <label>
-            <input
-              type="radio"
-              name="cardVariant"
-              value="realistic"
-              checked={cardVariant === 'realistic'}
-              onChange={() => setCardVariant('realistic')}
-            />
-            Realistic
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="cardVariant"
-              value="minimalist"
-              checked={cardVariant === 'minimalist'}
-              onChange={() => setCardVariant('minimalist')}
-            />
-            Minimalist
-          </label>
-        </fieldset>
-        <fieldset>
-          <legend>Split card treatment</legend>
-          <label>
-            <input
-              type="radio"
-              name="splitCardTreatment"
-              value="unified"
-              checked={splitCardTreatment === 'unified'}
-              onChange={() => setSplitCardTreatment('unified')}
-            />
-            Unified
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="splitCardTreatment"
-              value="separate"
-              checked={splitCardTreatment === 'separate'}
-              onChange={() => setSplitCardTreatment('separate')}
-            />
-            Separate
-          </label>
-        </fieldset>
-        <fieldset>
-          <legend>Double-Faced card treatment</legend>
-          <label>
-            <input
-              type="radio"
-              name="doubleFacedCardTreatment"
-              value="unified"
-              checked={doubleFacedCardTreatment === 'unified'}
-              onChange={() => setDoubleFacedCardTreatment('unified')}
-            />
-            Unified
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="doubleFacedCardTreatment"
-              value="separate"
-              checked={doubleFacedCardTreatment === 'separate'}
-              onChange={() => setDoubleFacedCardTreatment('separate')}
-            />
-            Separate
-          </label>
-        </fieldset>
-        <fieldset disabled>
-          <legend>Ink level</legend>
-          <label>
-            <input
-              type="radio"
-              name="inkLevel"
-              value="low"
-              checked={inkLevel === 'low'}
-              onChange={() => setInkLevel('low')}
-            />
-            Low
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="inkLevel"
-              value="medium"
-              checked={inkLevel === 'medium'}
-              onChange={() => setInkLevel('medium')}
-            />
-            Medium
-          </label>
-          <label>
-            <input
-              type="radio"
-              name="inkLevel"
-              value="splurge"
-              checked={inkLevel === 'splurge'}
-              onChange={() => setInkLevel('splurge')}
-            />
-            Splurge
-          </label>
-        </fieldset>
-        <menu>
-          <button type="submit">Close</button>
-        </menu>
-      </form>
-    </dialog>
+    <fieldset disabled={definition.disabled}>
+      <legend>{definition.label}</legend>
+      {definition.options.map(option => (
+        <label key={option.value}>
+          <input
+            type="radio"
+            name={name}
+            value={option.value}
+            checked={value === option.value}
+            onChange={() => setValue(option.value)}
+          />
+          {option.label}
+        </label>
+      ))}
+    </fieldset>
   );
-});
+};
+
+const SettingsPanel = forwardRef((_props, ref) => (
+  <dialog ref={ref}>
+    <form method="dialog">
+      {Object.entries(SETTINGS_DEFINITIONS).map(([name, definition]) => (
+        <SettingFieldset key={name} name={name} definition={definition} />
+      ))}
+      <menu>
+        <button type="submit">Close</button>
+      </menu>
+    </form>
+  </dialog>
+));
 
 export default SettingsPanel;

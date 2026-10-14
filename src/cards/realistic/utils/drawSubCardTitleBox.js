@@ -1,9 +1,11 @@
 import { drawRoundedBox } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { fitFontSizeInX } from '../../../utils/canvasText';
-import { calculateManaCostWidth, renderManaCost } from '../../../utils/manaCostRenderer';
+import { calculateManaCostWidth, parseManaSymbols, renderManaCost } from '../../../utils/manaCostRenderer';
 import {
   CAPSULE_INNER_STROKE,
+  CAPSULE_TEXT_INSET,
+  FONT_FAMILY,
   PINLINE_THICKNESS,
   SUBCARD_MANA_SYMBOL_DIAMETER,
   SUBCARD_MANA_SYMBOL_EDGE_PADDING,
@@ -13,6 +15,7 @@ import {
   SUBCARD_TITLE_Y,
   TITLE_WIDTH,
 } from '../config';
+import { InkColors } from '../../../utils/colors';
 
 export const drawSubCardTitleBox = (ctx, {
   cardName,
@@ -26,7 +29,7 @@ export const drawSubCardTitleBox = (ctx, {
   const height = SUBCARD_TITLE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
-  const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
+  const manaSymbols = parseManaSymbols(cardManaCost);
   const manaCostWidth = calculateManaCostWidth({
     manaSymbols,
     symbolDiameter: SUBCARD_MANA_SYMBOL_DIAMETER,
@@ -55,13 +58,13 @@ export const drawSubCardTitleBox = (ctx, {
     width: innerWidth,
     height: innerHeight,
     lineWidth: CAPSULE_INNER_STROKE,
-    strokeStyle: 'black',
-    fillStyle: 'white',
+    strokeStyle: InkColors.LINE,
+    fillStyle: InkColors.PAPER,
     flatSide,
   });
 
-  const textX = flatSide === 'left' ? x + PINLINE_THICKNESS : x + PINLINE_THICKNESS * 2 + 7;
-  const textRight = flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - 7;
+  const textX = flatSide === 'left' ? x + PINLINE_THICKNESS : x + PINLINE_THICKNESS * 2 + CAPSULE_TEXT_INSET;
+  const textRight = flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
   const innerCenterY = y + height / 2;
 
   const manaAnchorRight = innerX + innerWidth - PINLINE_THICKNESS - 4;
@@ -69,8 +72,8 @@ export const drawSubCardTitleBox = (ctx, {
     ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING
     : textRight;
 
-  ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px Serif`;
-  ctx.fillStyle = 'black';
+  ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px ${FONT_FAMILY}`;
+  ctx.fillStyle = InkColors.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardName, titleEndX - textX);
   ctx.fillText(cardName, textX, innerCenterY + SUBCARD_TITLE_FONT_SIZE / 3);

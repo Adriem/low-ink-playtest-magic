@@ -1,6 +1,5 @@
-import { fillMultilineText, getFontSize } from '../../../utils/canvasText';
-import { calculateManaCostWidth, renderManaCost } from '../../../utils/manaCostRenderer';
-import { fitTextInTwoLines } from './fitTextInTwoLines';
+import { calculateManaCostWidth, parseManaSymbols, renderManaCost } from '../../../utils/manaCostRenderer';
+import { drawTitleText } from './drawTitleText';
 import { SUBCARD_TITLE_FONT_SIZE, SUBCARD_TITLE_HEIGHT, SUBCARD_TITLE_Y, TITLE_WIDTH } from '../config';
 
 const TITLE_BOX_MARGIN_FROM_CENTER = 10;
@@ -21,7 +20,7 @@ export const drawSubCardTitleBox = (ctx, {
 
   const titleBoxMarginX = (cardWidth - TITLE_WIDTH) / 2;
 
-  const [...manaSymbols] = (cardManaCost ?? '').match(/({.*?})/g) || [];
+  const manaSymbols = parseManaSymbols(cardManaCost);
 
   const manaCostWidth = calculateManaCostWidth({
     manaSymbols,
@@ -36,20 +35,15 @@ export const drawSubCardTitleBox = (ctx, {
   const titleLine1Width = subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER - (manaCostWidth ? (manaCostWidth + TITLE_MANA_COST_GAP) : 0);
   const titleLine2Width = subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER * 2;
 
-  ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px Tahoma`;
-  ctx.fillStyle = 'black';
-  ctx.textAlign = 'start';
-
-  const titleLines = fitTextInTwoLines(ctx, {
+  drawTitleText(ctx, {
     text: cardName,
+    x: titleLinesX,
+    y: titleLinesY,
+    fontSize: SUBCARD_TITLE_FONT_SIZE,
     line1MaxWidth: titleLine1Width,
     line2MaxWidth: titleLine2Width,
     maxHeight,
   });
-
-  const currentFont = getFontSize(ctx);
-  const compensatedTitleLinesY = Math.max(titleLinesY, titleLinesY - (34 - currentFont)); // Compensate bigger fonts
-  fillMultilineText(ctx, titleLines, titleLinesX, compensatedTitleLinesY);
 
   if (manaSymbols.length > 0) {
     renderManaCost(ctx, {

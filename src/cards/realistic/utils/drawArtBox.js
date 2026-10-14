@@ -3,6 +3,7 @@ import { drawWhenLoaded, loadImage } from '../../../utils/canvasRendering';
 import { drawRectangle } from '../../../utils/canvasShapes';
 import { getColorIdentityStyle } from '../../../utils/canvasStyles';
 import { ARTWORK_HEIGHT, ARTWORK_Y, CONTENT_WIDTH, PINLINE_THICKNESS } from '../config';
+import { InkColors } from '../../../utils/colors';
 
 export const drawArtBox = (ctx, {
   cardColorIdentity,
@@ -27,8 +28,8 @@ export const drawArtBox = (ctx, {
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2 + 1,
     lineWidth: PINLINE_THICKNESS,
-    strokeStyle: 'black',
-    fillStyle: 'white',
+    strokeStyle: InkColors.LINE,
+    fillStyle: InkColors.PAPER,
   });
 
   const imageX = x + PINLINE_THICKNESS + 2;

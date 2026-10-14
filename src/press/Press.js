@@ -11,20 +11,11 @@ import './Press.css';
 import { useCardCollection } from '../hooks/useCardCollection';
 import { useCardSheet } from '../hooks/useCardSheet';
 import exportToPDF from '../utils/exportToPdf';
+import { loadFromSessionStorage, saveToSessionStorage } from '../utils/sessionStorage';
 
-const CARDS_PER_SHEET = 9
 const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 
-const loadPersistedCards = () => {
-  try {
-    const raw = sessionStorage.getItem(CARD_COLLECTION_STORAGE_KEY);
-    if (raw == null) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
-  }
-};
+const loadPersistedCards = () => loadFromSessionStorage(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
 
 // TODO: Replace alert with a toast notification
 const handleCardLoadError = (cardName, error) => {
@@ -40,7 +31,6 @@ const Press = () => {
     onCardLoadError: handleCardLoadError,
   });
   const cardSheets = useCardSheet(cardCollection, {
-    sheetSize: CARDS_PER_SHEET,
     splitCardTreatment,
     doubleFacedCardTreatment,
   });
@@ -48,7 +38,7 @@ const Press = () => {
 
   useEffect(() => {
     const loadedCards = cardCollection.filter(card => !card._loading);
-    sessionStorage.setItem(CARD_COLLECTION_STORAGE_KEY, JSON.stringify(loadedCards));
+    saveToSessionStorage(CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
 
   const openSettings = useCallback(() => {

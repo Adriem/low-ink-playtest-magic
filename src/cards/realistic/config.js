@@ -1,3 +1,5 @@
+export const FONT_FAMILY = 'Serif';
+
 export const TITLE_Y = 32;
 export const TITLE_HEIGHT = 48;
 export const TITLE_FONT_SIZE = 28;
@@ -43,3 +45,19 @@ export const SUBCARD_ORACLE_FONT_SIZE = 20;
 export const SUBCARD_MANA_SYMBOL_DIAMETER = 21;
 export const SUBCARD_MANA_SYMBOL_SPACING = 2.5;
 export const SUBCARD_MANA_SYMBOL_EDGE_PADDING = 10;
+
+// Text inside the title, type and subcard capsules starts this far from the inner border
+export const CAPSULE_TEXT_INSET = 7;
+// Baseline of the title and type line text, from the capsule's vertical center
+export const TITLE_TEXT_BASELINE_OFFSET = 9;
+export const TYPELINE_TEXT_BASELINE_OFFSET = 7;
+
+// Oracle text padding inside the box border
+export const ORACLE_TEXT_PADDING_X = 8;
+export const ORACLE_TEXT_PADDING_Y = 11;
+// Bottom padding of the oracle text when the stats or loyalty box overlaps the box
+export const ORACLE_TEXT_STATS_CLEARANCE = 26;
+
+// Center of the bottom of the planeswalker loyalty box
+export const LOYALTY_BOX_X = 439;
+export const LOYALTY_BOX_Y = 664;

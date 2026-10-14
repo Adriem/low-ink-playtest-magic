@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { beginRender, finishRender } from '../utils/canvasRendering';
 import { CARD_HEIGHT, CARD_WIDTH, getCardRenderer } from './styles';
+import { InkColors } from '../utils/colors';
 
 /**
  * Card drawn on a canvas in the given style. The canvas is marked as rendered
@@ -74,7 +75,7 @@ const Card = ({
       ref={setCanvas}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
-      style={{ background: 'white' }}
+      style={{ background: InkColors.PAPER }}
     />
   );
 };

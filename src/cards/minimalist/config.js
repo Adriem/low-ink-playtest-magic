@@ -1,3 +1,8 @@
+// Titles, stats, loyalty and planeswalker/saga text
+export const DISPLAY_FONT_FAMILY = 'Tahoma';
+// Type lines and regular rules text
+export const TEXT_FONT_FAMILY = 'Verdana';
+
 export const TITLE_Y = 35;
 export const TITLE_HEIGHT = 110;
 export const TITLE_FONT_SIZE = 70;
@@ -11,7 +16,17 @@ export const TYPELINE_FONT_SIZE = 22;
 export const ORACLE_Y = 220;
 export const ORACLE_HEIGHT = 375;
 export const ORACLE_FONT_SIZE = 30;
+// Oracle text starts this far below the top of the oracle box
+export const ORACLE_TEXT_PADDING_TOP = 50;
+// Extra oracle box height when the card has no stats line
+export const ORACLE_EXTENDED_EXTRA = 40;
+export const SAGA_ORACLE_EXTENDED_EXTRA = 30;
 
+// Colored border on the left of planeswalker and saga oracle boxes
+export const SIDE_BORDER_PADDING = 20;
+export const SIDE_BORDER_WIDTH = 16;
+
+export const STATSLINE_X = 429;
 export const STATSLINE_Y = 654;
 export const STATSLINE_HEIGHT = 40;
 export const STATSLINE_FONT_SIZE = 40;
@@ -31,3 +46,8 @@ export const SUBCARD_TYPELINE_FONT_SIZE = 18;
 export const SUBCARD_ORACLE_Y = ORACLE_Y + 175;
 export const SUBCARD_ORACLE_HEIGHT = ORACLE_HEIGHT - (SUBCARD_ORACLE_Y - ORACLE_Y);
 export const SUBCARD_ORACLE_FONT_SIZE = 22;
+
+// Center of the bottom of the planeswalker loyalty box
+export const LOYALTY_BOX_X = 430;
+export const LOYALTY_BOX_Y = 675;
+export const LOYALTY_BOX_SCALE = 1.2;

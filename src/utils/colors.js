@@ -10,6 +10,20 @@ export const Colors = {
   LAND: 'rgb(143, 120, 90)',
 };
 
+/**
+ * Colors outside the color identity palettes: text and the structure of the
+ * card (pinlines, frames, backgrounds), kept in one place to tune ink usage.
+ */
+export const InkColors = {
+  TEXT: 'black',
+  // e.g. the type line of colorless cards
+  MUTED_TEXT: 'gray',
+  // Pinlines, frames, dividers and other shapes
+  LINE: 'black',
+  // Background of the card and its boxes
+  PAPER: 'white',
+};
+
 export const MinimalistColors = {
   COLORLESS: 'rgb(210,210,210)',
   WHITE: 'rgb(192,175,148)',
@@ -42,29 +56,47 @@ export const isLandType = (cardTypeLine) => {
   return /land/i.test(cardTypeLine)
 }
 
+// Color identities of one and two colors, by their colors in WUBRG order
+const COLOR_IDENTITIES = {
+  W: 'white',
+  U: 'blue',
+  B: 'black',
+  R: 'red',
+  G: 'green',
+  WU: 'azorius',
+  WB: 'orzhov',
+  WR: 'boros',
+  WG: 'selesnya',
+  UB: 'dimir',
+  UR: 'izzet',
+  UG: 'simic',
+  BR: 'rakdos',
+  BG: 'golgari',
+  RG: 'gruul',
+};
+
+/**
+ * Color identity of a card, used to pick its frame colors.
+ *
+ * @param {string[]} [cardColors] - e.g. `['W', 'U']`
+ * @param {string} [cardTypeLine]
+ * @returns {string|undefined} e.g. `azorius`, `multi`, `artifact` or
+ *   `colorless`; empty without colors, undefined for invalid colors
+ */
 export const getColorMappings = (cardColors, cardTypeLine) => {
   if (!cardColors) return '';
-  if (cardColors.length === 0 && isArtifactType(cardTypeLine)) return 'artifact';
-  if (cardColors.length === 0 && isLandType(cardTypeLine)) return 'land';
-  if (cardColors.length === 0) return 'colorless';
 
-  if (cardColors.length === 1 && cardColors.includes('W')) return 'white';
-  if (cardColors.length === 1 && cardColors.includes('U')) return 'blue';
-  if (cardColors.length === 1 && cardColors.includes('B')) return 'black';
-  if (cardColors.length === 1 && cardColors.includes('R')) return 'red';
-  if (cardColors.length === 1 && cardColors.includes('G')) return 'green';
-
-  if (cardColors.length === 2 && cardColors.includes('W') && cardColors.includes('U')) return 'azorius';
-  if (cardColors.length === 2 && cardColors.includes('W') && cardColors.includes('B')) return 'orzhov';
-  if (cardColors.length === 2 && cardColors.includes('W') && cardColors.includes('R')) return 'boros';
-  if (cardColors.length === 2 && cardColors.includes('W') && cardColors.includes('G')) return 'selesnya';
-  if (cardColors.length === 2 && cardColors.includes('U') && cardColors.includes('B')) return 'dimir';
-  if (cardColors.length === 2 && cardColors.includes('U') && cardColors.includes('R')) return 'izzet';
-  if (cardColors.length === 2 && cardColors.includes('U') && cardColors.includes('G')) return 'simic';
-  if (cardColors.length === 2 && cardColors.includes('B') && cardColors.includes('R')) return 'rakdos';
-  if (cardColors.length === 2 && cardColors.includes('B') && cardColors.includes('G')) return 'golgari';
-  if (cardColors.length === 2 && cardColors.includes('R') && cardColors.includes('G')) return 'gruul';
+  if (cardColors.length === 0) {
+    if (isArtifactType(cardTypeLine)) return 'artifact';
+    if (isLandType(cardTypeLine)) return 'land';
+    return 'colorless';
+  }
 
   if (cardColors.length > 2) return 'multi';
+
+  const colorsInWubrgOrder = [...cardColors]
+    .sort((a, b) => COLOR_SYMBOLS.indexOf(a) - COLOR_SYMBOLS.indexOf(b))
+    .join('');
+  return COLOR_IDENTITIES[colorsInWubrgOrder];
 };
 

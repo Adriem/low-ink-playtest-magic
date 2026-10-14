@@ -1,11 +1,14 @@
 // TODO: Review this
-// NOTE: Scryfall requests should be spaced 100ms each
 import semaphore from 'semaphore'
+
+const SCRYFALL_API_URL = 'https://api.scryfall.com';
+// Scryfall asks to space requests at least 50-100ms apart
+const REQUEST_SPACING_MS = 100;
 
 const sem = semaphore(1)
 const awaitIfNecessary = async () => {
   await new Promise(resolve => sem.take(resolve))
-  setTimeout(() => sem.leave(), 100)
+  setTimeout(() => sem.leave(), REQUEST_SPACING_MS)
 }
 
 /**
@@ -25,7 +28,7 @@ const awaitIfNecessary = async () => {
 export const fetchCardData = async (cardName) => {
   await awaitIfNecessary()
 
-  const response = await fetch(`https://api.scryfall.com/cards/named?exact=${encodeURIComponent(cardName)}`, {
+  const response = await fetch(`${SCRYFALL_API_URL}/cards/named?exact=${encodeURIComponent(cardName)}`, {
     headers: { Origin: window.location.origin }
   });
 
@@ -45,7 +48,7 @@ export const fetchCardData = async (cardName) => {
 export const fetchSymbology = async () => {
   await awaitIfNecessary()
 
-  const response = await fetch('https://api.scryfall.com/symbology')
+  const response = await fetch(`${SCRYFALL_API_URL}/symbology`)
 
   if (!response.ok) {
     const error = await response.json();

@@ -1,6 +1,6 @@
 import '@fortawesome/fontawesome-free/js/all.min.js';
 import { lazy, Suspense } from 'react';
-import Press from './Press';
+import Press from './press/Press';
 
 import { SettingsContextProvider } from './settings';
 

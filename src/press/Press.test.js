@@ -1,13 +1,13 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import Press from './Press';
-import { SettingsContextProvider } from './settings';
+import { SettingsContextProvider } from '../settings';
 
 // jsdom has no canvas, so card components are replaced with plain elements
-jest.mock('./cards/realistic/RealisticCard', () => ({ cardName }) => <div>{cardName}</div>);
-jest.mock('./cards/minimal/MinimalCard', () => ({ cardName }) => <div>{cardName}</div>);
-jest.mock('./cards/DualCard', () => () => <div>Dual card</div>);
+jest.mock('../cards/realistic/RealisticCard', () => ({ cardName }) => <div>{cardName}</div>);
+jest.mock('../cards/minimal/MinimalCard', () => ({ cardName }) => <div>{cardName}</div>);
+jest.mock('../cards/DualCard', () => () => <div>Dual card</div>);
 jest.mock('jspdf', () => ({ jsPDF: jest.fn() }));
-jest.mock('./utils/scryfall', () => ({
+jest.mock('../utils/scryfall', () => ({
   fetchCardData: jest.fn(),
   fetchSymbology: jest.fn(() => Promise.resolve({ data: [] })),
 }));

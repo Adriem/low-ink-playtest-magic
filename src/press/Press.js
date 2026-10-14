@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef } from 'react';
 
-import RealisticCard from './cards/realistic/RealisticCard';
-import MinimalCard from './cards/minimal/MinimalCard';
-import DualCard from './cards/DualCard';
+import RealisticCard from '../cards/realistic/RealisticCard';
+import MinimalCard from '../cards/minimal/MinimalCard';
+import DualCard from '../cards/DualCard';
 import CardSearchForm from './CardSearchForm';
 import SheetSlotOverlay from './SheetSlotOverlay';
-import { SettingsPanel, useSetting } from './settings';
+import { SettingsPanel, useSetting } from '../settings';
 
 import './Press.css';
-import { useCardCollection } from './hooks/useCardCollection';
-import { useCardOverlay } from './hooks/useCardOverlay';
-import { useCardSheet } from './hooks/useCardSheet';
-import exportToPDF from './utils/exportToPdf';
+import { useCardCollection } from '../hooks/useCardCollection';
+import { useCardOverlay } from '../hooks/useCardOverlay';
+import { useCardSheet } from '../hooks/useCardSheet';
+import exportToPDF from '../utils/exportToPdf';
 
 const CARDS_PER_SHEET = 9
 const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';

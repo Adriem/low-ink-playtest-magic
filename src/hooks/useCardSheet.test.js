@@ -98,3 +98,24 @@ test('keeps the art of unified faces that have their own', () => {
 
   expect(card.card_faces.map(face => face.image_uris.art_crop)).toEqual(['front.jpg', 'back.jpg']);
 });
+
+describe('art halves of split cards', () => {
+  const cropArts = (sheets) => sheets.flat().map(card => card._cropArt);
+
+  test('gives each face of a split card its half of the art', () => {
+    expect(cropArts(groupCardsIntoSheets([splitCard], { splitCardTreatment: 'separate' }))).toEqual(['left-half', 'right-half']);
+
+    const [[unified]] = groupCardsIntoSheets([splitCard], { splitCardTreatment: 'unified' });
+    expect(unified.card_faces.map(face => face._cropArt)).toEqual(['left-half', 'right-half']);
+  });
+
+  test('keeps the whole art for aftermath cards, whose arts are not halves', () => {
+    const aftermathCard = { ...splitCard, keywords: ['Aftermath'] };
+
+    expect(cropArts(groupCardsIntoSheets([aftermathCard], { splitCardTreatment: 'separate' }))).toEqual([undefined, undefined]);
+  });
+
+  test('keeps the whole art for double-faced cards, which have an art per face', () => {
+    expect(cropArts(groupCardsIntoSheets([doubleFacedCard], { doubleFacedCardTreatment: 'separate' }))).toEqual([undefined, undefined]);
+  });
+});

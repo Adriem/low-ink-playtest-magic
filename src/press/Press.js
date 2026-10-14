@@ -110,6 +110,7 @@ const Press = () => {
                         cardOracleText={card.oracle_text}
                         cardTypeLine={card.type_line}
                         cardArtUrl={card.image_uris?.art_crop}
+                        cropArt={card._cropArt}
                         cardLoyalty={card.loyalty}
                         cardPower={card.power}
                         cardToughness={card.toughness}

@@ -8,14 +8,23 @@ const SPLIT_LAYOUTS = ['split'];
 const DUAL_FACE_LAYOUTS = ['flip', 'transform', 'modal_dfc', 'meld', 'reversible_card', 'double_faced_token'];
 const SUBCARD_LAYOUTS = ['adventure', 'prepare'];
 
+// Split cards have the art of both faces side by side in a single image,
+// first face on the left. Aftermath cards are excluded: their arts don't take
+// half of the image each.
+const ART_HALVES = ['left-half', 'right-half'];
+const hasSideBySideArt = (card) => SPLIT_LAYOUTS.includes(card.layout) && !card.keywords?.includes('Aftermath');
+const getCropArt = (card, faceIndex) => (hasSideBySideArt(card) ? ART_HALVES[faceIndex] : undefined);
+
 /**
  * @typedef {import('./useCardCollection').CollectionCard & {
  *   _collectionIndex: number,
  *   _faceIndex?: number,
+ *   _cropArt?: 'left-half'|'right-half',
  *   _subFace?: object,
  * }} SheetCard - A collection card (or one of its faces) placed in a sheet.
  *   `_collectionIndex` is the index of the collection card it comes from, and
- *   `_faceIndex` the index of the face when the card is split into faces.
+ *   `_faceIndex` the index of the face when the card is split into faces, and
+ *   `_cropArt` which part of the card's art image belongs to the face.
  */
 
 /**
@@ -53,11 +62,21 @@ export const groupCardsIntoSheets = (cards, {
 
       // Split and flip cards have their art on the card rather than on each face
       if (treatment === 'unified') {
-        return [{ ...card, card_faces: card.card_faces.map(face => ({ image_uris: card.image_uris, ...face })) }];
+        const faces = card.card_faces.map((face, faceIndex) => ({
+          image_uris: card.image_uris,
+          ...face,
+          _cropArt: getCropArt(card, faceIndex),
+        }));
+        return [{ ...card, card_faces: faces }];
       }
 
       const { card_faces, ...cardWithoutFaces } = card;
-      return card_faces.map((face, faceIndex) => ({ ...cardWithoutFaces, ...face, _faceIndex: faceIndex }));
+      return card_faces.map((face, faceIndex) => ({
+        ...cardWithoutFaces,
+        ...face,
+        _faceIndex: faceIndex,
+        _cropArt: getCropArt(card, faceIndex),
+      }));
     });
   return chunk(sheetCards, sheetSize);
 };

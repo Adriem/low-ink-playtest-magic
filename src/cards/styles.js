@@ -9,6 +9,8 @@ export const CARD_HEIGHT = 700;
  * @prop {string} cardName
  * @prop {string} [cardManaCost]
  * @prop {string} [cardArtUrl]
+ * @prop {'left-half'|'right-half'} [cropArt] - Part of the art image to draw, for
+ *   split cards whose faces share an image with both arts side by side
  * @prop {string[]} [cardColors]
  * @prop {string} [cardTypeLine]
  * @prop {string} [cardOracleText]

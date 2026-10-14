@@ -20,6 +20,7 @@ const faceProps = (face, cardSet) => ({
   cardOracleText: face.oracle_text,
   cardTypeLine: face.type_line,
   cardArtUrl: face.image_uris?.art_crop,
+  cropArt: face._cropArt,
   cardLoyalty: face.loyalty,
   cardPower: face.power,
   cardToughness: face.toughness,

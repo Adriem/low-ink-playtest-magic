@@ -36,8 +36,6 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError } = {}) =
   const { findCardByName } = useFetchCard();
   const [cardCollection, setCardCollection] = useState(initialCards);
   const nextLoadingCardIdRef = useRef(0);
-  const onCardLoadErrorRef = useRef(onCardLoadError);
-  onCardLoadErrorRef.current = onCardLoadError;
 
   const addCardByName = useCallback((cardName) => {
     const loadingCardId = nextLoadingCardIdRef.current++;
@@ -51,9 +49,9 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError } = {}) =
       })
       .catch((error) => {
         setCardCollection(collection => collection.filter(c => !isPlaceholder(c)));
-        onCardLoadErrorRef.current?.(cardName, error);
+        onCardLoadError?.(cardName, error);
       });
-  }, [findCardByName]);
+  }, [findCardByName, onCardLoadError]);
 
   const removeCardAt = useCallback((index) => {
     setCardCollection(collection => collection.filter((_card, i) => i !== index));

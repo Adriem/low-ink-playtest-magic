@@ -25,10 +25,7 @@ export default [
       ...js.configs.recommended.rules,
       ...react.configs.recommended.rules,
       ...react.configs['jsx-runtime'].rules,
-      // The rules Create React App had. The rest of the recommended set (React
-      // Compiler rules) comes with the React 19 upgrade
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn',
+      ...reactHooks.configs.recommended.rules,
       ...jsxA11y.configs.recommended.rules,
       'react/prop-types': 'off',
     },
@@ -41,8 +38,6 @@ export default [
     },
     rules: {
       ...testingLibrary.configs['flat/react'].rules,
-      // user-event 12 is synchronous; turn back on with user-event 14
-      'testing-library/await-async-events': 'off',
     },
   },
   {

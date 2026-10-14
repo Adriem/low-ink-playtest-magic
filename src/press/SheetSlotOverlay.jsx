@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import './SheetSlotOverlay.css';
 
@@ -165,11 +165,11 @@ const SheetSlotOverlay = ({
 }) => {
   const controlsRef = useRef(null);
 
-  // Keep a ref to the last render mode so that, while fading out from any mode,
-  // we keep displaying the controls the overlay had while open instead of
-  // switching to the hover controls mid-fade.
-  const renderMode = useRef(mode);
-  if (open) renderMode.current = mode;
+  // Keep the last mode the overlay had while open so that, while fading out
+  // from any mode, we keep displaying its controls instead of switching to the
+  // hover controls mid-fade.
+  const [renderMode, setRenderMode] = useState(mode);
+  if (open && mode !== renderMode) setRenderMode(mode);
 
   useEffect(() => {
     if (!open || !focus || !controlsRef.current) return;
@@ -190,7 +190,7 @@ const SheetSlotOverlay = ({
     <div className={overlayClassName}>
       {face !== 'secondary' && (
         <div className="sheet-slot-overlay-controls" ref={controlsRef}>
-          <OverlayControls mode={renderMode.current} hidden={!open} {...controlProps} />
+          <OverlayControls mode={renderMode} hidden={!open} {...controlProps} />
         </div>
       )}
     </div>

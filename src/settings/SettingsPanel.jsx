@@ -1,4 +1,3 @@
-import { forwardRef } from 'react';
 import { SETTINGS_DEFINITIONS, useSetting } from './SettingsContext';
 
 /**
@@ -30,19 +29,17 @@ const SettingFieldset = ({ name, definition }) => {
   );
 };
 
-const SettingsPanel = forwardRef(function SettingsPanel(_props, ref) {
-  return (
-    <dialog ref={ref}>
-      <form method="dialog">
-        {Object.entries(SETTINGS_DEFINITIONS).map(([name, definition]) => (
-          <SettingFieldset key={name} name={name} definition={definition} />
-        ))}
-        <menu>
-          <button type="submit">Close</button>
-        </menu>
-      </form>
-    </dialog>
-  );
-});
+const SettingsPanel = ({ ref }) => (
+  <dialog ref={ref}>
+    <form method="dialog">
+      {Object.entries(SETTINGS_DEFINITIONS).map(([name, definition]) => (
+        <SettingFieldset key={name} name={name} definition={definition} />
+      ))}
+      <menu>
+        <button type="submit">Close</button>
+      </menu>
+    </form>
+  </dialog>
+);
 
 export default SettingsPanel;

@@ -11,6 +11,11 @@ const renderPanel = () => render(
 
 afterEach(() => sessionStorage.clear());
 
+let user;
+beforeEach(() => {
+  user = userEvent.setup();
+});
+
 test('shows a group of options for each setting, with the defaults selected', () => {
   renderPanel();
 
@@ -21,10 +26,10 @@ test('shows a group of options for each setting, with the defaults selected', ()
   expect(screen.getByLabelText('Low')).toBeChecked();
 });
 
-test('changes and saves a setting', () => {
+test('changes and saves a setting', async () => {
   renderPanel();
 
-  userEvent.click(screen.getByLabelText('Minimalist'));
+  await user.click(screen.getByLabelText('Minimalist'));
 
   expect(screen.getByLabelText('Minimalist')).toBeChecked();
   expect(sessionStorage.getItem('press:cardVariant')).toBe('"minimalist"');

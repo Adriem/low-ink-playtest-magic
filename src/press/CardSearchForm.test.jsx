@@ -2,87 +2,92 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CardSearchForm from './CardSearchForm';
 
+let user;
+beforeEach(() => {
+  user = userEvent.setup();
+});
+
 const setupForm = () => {
   const onAddCards = vi.fn();
   render(<CardSearchForm onAddCards={onAddCards} />);
   return onAddCards;
 };
 
-test('adds a single card by name', () => {
+test('adds a single card by name', async () => {
   const onAddCards = setupForm();
 
-  userEvent.type(screen.getByPlaceholderText(/colossal dreadmaw/i), '  Lightning Bolt ');
-  userEvent.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.type(screen.getByPlaceholderText(/colossal dreadmaw/i), '  Lightning Bolt ');
+  await user.click(screen.getByRole('button', { name: 'Add card' }));
 
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
 });
 
-test('clears the card name after adding it', () => {
+test('clears the card name after adding it', async () => {
   setupForm();
   const input = screen.getByPlaceholderText(/colossal dreadmaw/i);
 
-  userEvent.type(input, 'Lightning Bolt');
-  userEvent.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.type(input, 'Lightning Bolt');
+  await user.click(screen.getByRole('button', { name: 'Add card' }));
 
   expect(input).toHaveValue('');
 });
 
-test('does not add anything for an empty name', () => {
+test('does not add anything for an empty name', async () => {
   const onAddCards = setupForm();
 
-  userEvent.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.click(screen.getByRole('button', { name: 'Add card' }));
 
   expect(onAddCards).not.toHaveBeenCalled();
 });
 
-test('adds a list of cards in order, ignoring empty lines', () => {
+test('adds a list of cards in order, ignoring empty lines', async () => {
   const onAddCards = setupForm();
 
-  userEvent.click(screen.getByLabelText('card list'));
+  await user.click(screen.getByLabelText('card list'));
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
     target: { value: 'Lightning Bolt\n\nCounterspell\n  Island  \n' },
   });
-  userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+  await user.click(screen.getByRole('button', { name: 'Add cards' }));
 
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt', 'Counterspell', 'Island']);
 });
 
-test('clears the card list after adding it', () => {
+test('clears the card list after adding it', async () => {
   setupForm();
 
-  userEvent.click(screen.getByLabelText('card list'));
+  await user.click(screen.getByLabelText('card list'));
   const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
   fireEvent.change(textarea, { target: { value: 'Lightning Bolt\nCounterspell' } });
-  userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+  await user.click(screen.getByRole('button', { name: 'Add cards' }));
 
   expect(textarea).toHaveValue('');
 });
 
-test('switches between single card and card list modes', () => {
+test('switches between single card and card list modes', async () => {
   setupForm();
 
   expect(screen.getByLabelText('single card')).toBeChecked();
   expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
 
-  userEvent.click(screen.getByLabelText('card list'));
+  await user.click(screen.getByLabelText('card list'));
   expect(screen.getByLabelText('card list')).toBeChecked();
   expect(screen.getByRole('button', { name: 'Add cards' })).toBeInTheDocument();
 
-  userEvent.click(screen.getByLabelText('single card'));
+  await user.click(screen.getByLabelText('single card'));
   expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
 });
 
 describe('card list shortcut', () => {
-  const fillCardList = (cardList) => {
-    userEvent.click(screen.getByLabelText('card list'));
+  const fillCardList = async (cardList) => {
+    await user.click(screen.getByLabelText('card list'));
     const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
     fireEvent.change(textarea, { target: { value: cardList } });
     return textarea;
   };
 
-  test('submits the list with Ctrl+Enter', () => {
+  test('submits the list with Ctrl+Enter', async () => {
     const onAddCards = setupForm();
-    const textarea = fillCardList('Lightning Bolt\nCounterspell');
+    const textarea = await fillCardList('Lightning Bolt\nCounterspell');
 
     fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
 
@@ -90,18 +95,18 @@ describe('card list shortcut', () => {
     expect(textarea).toHaveValue('');
   });
 
-  test('submits the list with Cmd+Enter', () => {
+  test('submits the list with Cmd+Enter', async () => {
     const onAddCards = setupForm();
-    const textarea = fillCardList('Lightning Bolt');
+    const textarea = await fillCardList('Lightning Bolt');
 
     fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
 
     expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
   });
 
-  test('does not submit the list with Enter alone', () => {
+  test('does not submit the list with Enter alone', async () => {
     const onAddCards = setupForm();
-    const textarea = fillCardList('Lightning Bolt');
+    const textarea = await fillCardList('Lightning Bolt');
 
     fireEvent.keyDown(textarea, { key: 'Enter' });
 
@@ -110,18 +115,18 @@ describe('card list shortcut', () => {
 });
 
 describe('quantities', () => {
-  const submitCardList = (cardList) => {
-    userEvent.click(screen.getByLabelText('card list'));
+  const submitCardList = async (cardList) => {
+    await user.click(screen.getByLabelText('card list'));
     const textarea = screen.getByPlaceholderText(/colossal dreadmaw/i);
     fireEvent.change(textarea, { target: { value: cardList } });
-    userEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+    await user.click(screen.getByRole('button', { name: 'Add cards' }));
     return textarea;
   };
 
-  test('adds as many copies as the quantity of each line in the list', () => {
+  test('adds as many copies as the quantity of each line in the list', async () => {
     const onAddCards = setupForm();
 
-    submitCardList('2 Lightning Bolt\n3x Counterspell\n1X Colossal Dreadmaw\nIsland');
+    await submitCardList('2 Lightning Bolt\n3x Counterspell\n1X Colossal Dreadmaw\nIsland');
 
     expect(onAddCards).toHaveBeenCalledWith([
       'Lightning Bolt', 'Lightning Bolt',
@@ -131,10 +136,10 @@ describe('quantities', () => {
     ]);
   });
 
-  test('treats numbers too big to be a quantity as part of the card name', () => {
+  test('treats numbers too big to be a quantity as part of the card name', async () => {
     const onAddCards = setupForm();
 
-    submitCardList('1996 World Champion\n2 1996 World Champion');
+    await submitCardList('1996 World Champion\n2 1996 World Champion');
 
     expect(onAddCards).toHaveBeenCalledWith([
       '1996 World Champion',
@@ -142,19 +147,19 @@ describe('quantities', () => {
     ]);
   });
 
-  test('rejects a list with a quantity of 0 without adding or clearing it', () => {
+  test('rejects a list with a quantity of 0 without adding or clearing it', async () => {
     const onAddCards = setupForm();
 
-    const textarea = submitCardList('Island\n0 Lightning Bolt');
+    const textarea = await submitCardList('Island\n0 Lightning Bolt');
 
     expect(onAddCards).not.toHaveBeenCalled();
     expect(textarea).toHaveValue('Island\n0 Lightning Bolt');
     expect(textarea.validationMessage).toBe('"0 Lightning Bolt": the quantity must be between 1 and 100');
   });
 
-  test('editing the list clears the quantity error', () => {
+  test('editing the list clears the quantity error', async () => {
     setupForm();
-    const textarea = submitCardList('0 Lightning Bolt');
+    const textarea = await submitCardList('0 Lightning Bolt');
 
     fireEvent.input(textarea, { target: { value: '1 Lightning Bolt' } });
 

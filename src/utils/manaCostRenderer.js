@@ -31,7 +31,7 @@ export const renderManaCost = (ctx, { manaSymbols, x, y, symbolDiameter, symbolS
     ctx.fill();
 
     // Symbol image
-    drawWhenLoaded(ctx, getSymbolImage(symbol), (symbolImage) => {
+    void drawWhenLoaded(ctx, getSymbolImage(symbol), (symbolImage) => {
       ctx.drawImage(
         symbolImage,
         symbolX,

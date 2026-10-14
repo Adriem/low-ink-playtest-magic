@@ -20,7 +20,7 @@ test('marks the canvas as rendered once its drawings finish', async () => {
   const draw = jest.fn();
 
   beginRender(canvas);
-  drawWhenLoaded(ctx, image.promise, draw);
+  void drawWhenLoaded(ctx, image.promise, draw);
   const finished = finishRender(canvas);
 
   expect(canvas.dataset.rendered).toBe('false');
@@ -35,7 +35,7 @@ test('a drawing that fails to load does not block the render', async () => {
   const { canvas, ctx } = setupCanvas();
 
   beginRender(canvas);
-  drawWhenLoaded(ctx, Promise.reject(new Error('Image not found')), jest.fn()).catch(() => {});
+  void drawWhenLoaded(ctx, Promise.reject(new Error('Image not found')), jest.fn()).catch(() => {});
 
   await expect(finishRender(canvas)).resolves.toBe(true);
   expect(canvas.dataset.rendered).toBe('true');
@@ -47,12 +47,12 @@ test('drawings from a render replaced by a newer one are skipped', async () => {
   const drawOld = jest.fn();
 
   beginRender(canvas);
-  drawWhenLoaded(ctx, oldImage.promise, drawOld);
+  void drawWhenLoaded(ctx, oldImage.promise, drawOld);
   const oldRender = finishRender(canvas);
 
   beginRender(canvas);
   const drawNew = jest.fn();
-  drawWhenLoaded(ctx, Promise.resolve('new image'), drawNew);
+  void drawWhenLoaded(ctx, Promise.resolve('new image'), drawNew);
   const newRender = finishRender(canvas);
 
   oldImage.resolve('old image');

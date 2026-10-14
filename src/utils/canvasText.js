@@ -228,7 +228,7 @@ export const renderTextWithSymbols = (ctx, text, x, y) => {
       const symbolX = currentX;
       const symbolY = y - symbolSize + (fontBoundingBoxAscent + fontBoundingBoxDescent - symbolSize) / 2;
 
-      drawWhenLoaded(ctx, getSymbolImage(symbol), (img) => {
+      void drawWhenLoaded(ctx, getSymbolImage(symbol), (img) => {
         ctx.drawImage(img, symbolX, symbolY, symbolSize, symbolSize);
       });
 

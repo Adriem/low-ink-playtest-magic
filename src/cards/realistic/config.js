@@ -20,6 +20,16 @@ export const STATSLINE_WIDTH = 88;
 export const STATSLINE_HEIGHT = 41;
 export const STATSLINE_FONT_SIZE = 28;
 
+// Sagas have the type line at the bottom of the card, and two columns between
+// it and the title: the oracle box on the left half and the art on the right.
+// The columns overlap the type line as much as the art box does on other cards.
+// The type line sits a bit above where the oracle box ends on other cards, to
+// match printed sagas
+export const SAGA_TYPELINE_RAISE = 15;
+export const SAGA_TYPELINE_Y = ORACLE_Y + ORACLE_HEIGHT - TYPELINE_HEIGHT - SAGA_TYPELINE_RAISE;
+export const SAGA_COLUMNS_Y = ARTWORK_Y;
+export const SAGA_COLUMNS_HEIGHT = SAGA_TYPELINE_Y - SAGA_COLUMNS_Y + (ARTWORK_Y + ARTWORK_HEIGHT - TYPELINE_Y);
+
 export const TITLE_WIDTH = 450;
 export const CONTENT_WIDTH = 434;
 

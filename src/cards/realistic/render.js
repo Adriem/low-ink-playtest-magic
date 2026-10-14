@@ -9,6 +9,8 @@ import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
 import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
+import { SAGA_TYPELINE_Y } from './config';
+import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 
 const drawSubCard = (ctx, { subCard, subCardPosition }) => {
   const subColors = subCard.colors ?? colorsFromManaCost(subCard.mana_cost);
@@ -60,13 +62,20 @@ export const renderRealisticCard = (canvas, {
 
   drawOuterFrame(ctx, { blackBordered });
   drawTitleBox(ctx, { cardName, cardManaCost, cardColorIdentity });
-  drawArtBox(ctx, { cardArtUrl, cropArt, cardColorIdentity });
-  drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
-  const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
-  if (cardLoyalty) {
-    drawPlaneswalkerOracleBox(ctx, { cardOracleText, cardLoyalty, cardColorIdentity, layout: oracleLayout });
+
+  const isSaga = /\bSaga\b/i.test(cardTypeLine ?? '');
+  if (isSaga) {
+    drawSagaOracleAndArtBox(ctx, { cardOracleText, cardArtUrl, cropArt, cardColorIdentity });
+    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity, y: SAGA_TYPELINE_Y });
   } else {
-    drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardColorIdentity, layout: oracleLayout });
+    drawArtBox(ctx, { cardArtUrl, cropArt, cardColorIdentity });
+    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorIdentity });
+    const oracleLayout = subCardPosition === 'left' ? 'right-half' : subCardPosition === 'right' ? 'left-half' : 'full-width';
+    if (cardLoyalty) {
+      drawPlaneswalkerOracleBox(ctx, { cardOracleText, cardLoyalty, cardColorIdentity, layout: oracleLayout });
+    } else {
+      drawOracleBox(ctx, { cardOracleText, cardPower, cardToughness, cardColorIdentity, layout: oracleLayout });
+    }
   }
 
   if (subCard && subCardPosition) {

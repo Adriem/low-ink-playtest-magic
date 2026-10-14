@@ -6,9 +6,9 @@ import { drawFramedBox } from './drawFramedBox';
 export const drawTypeBox = (ctx, {
   cardType,
   cardColorIdentity,
+  y = TYPELINE_Y,
 }) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
-  const y = TYPELINE_Y;
   const width = TITLE_WIDTH;
   const height = TYPELINE_HEIGHT;
 

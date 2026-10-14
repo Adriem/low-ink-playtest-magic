@@ -1,7 +1,5 @@
-import { fillMultilineText, fitFontSizeInXY } from '../../../utils/canvasText';
 import {
   CONTENT_WIDTH,
-  FONT_FAMILY,
   ORACLE_FONT_SIZE,
   ORACLE_HEIGHT,
   ORACLE_TEXT_PADDING_X,
@@ -10,8 +8,8 @@ import {
   ORACLE_Y,
   PINLINE_THICKNESS,
 } from '../config';
-import { InkColors } from '../../../utils/colors';
 import { drawFramedBox } from './drawFramedBox';
+import { drawOracleText } from './drawOracleText';
 
 export const drawOracleBox = (ctx, {
   cardOracleText,
@@ -35,22 +33,14 @@ export const drawOracleBox = (ctx, {
   });
 
   const textPaddingX = ORACLE_TEXT_PADDING_X;
-  const textX = x + PINLINE_THICKNESS + textPaddingX;
-  const textWidth = width - PINLINE_THICKNESS * 2 - textPaddingX * 2;
-
   const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
   const textPaddingBottom = (cardPower != null && cardToughness != null) && layout !== 'left-half' ? ORACLE_TEXT_STATS_CLEARANCE : ORACLE_TEXT_PADDING_Y;
-  const textY = y + PINLINE_THICKNESS + textPaddingTop;
-  const textHeight = height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom;
 
-  ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = InkColors.TEXT;
-  ctx.textAlign = 'start';
-
-  fillMultilineText(ctx, fitFontSizeInXY(
-    ctx,
-    cardOracleText.split('\n'),
-    textWidth,
-    textHeight,
-  ), textX, textY);
+  drawOracleText(ctx, {
+    cardOracleText,
+    x: x + PINLINE_THICKNESS + textPaddingX,
+    y: y + PINLINE_THICKNESS + textPaddingTop,
+    width: width - PINLINE_THICKNESS * 2 - textPaddingX * 2,
+    height: height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom,
+  });
 };

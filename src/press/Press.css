@@ -22,14 +22,6 @@ dialog:not([open]) {
     display: none;
 }
 
-.dual-card-sources {
-    position: absolute;
-    width: 0;
-    height: 0;
-    overflow: hidden;
-    visibility: hidden;
-}
-
 /* A sheet of cards and its footer. Three 250px slots per row. On narrower
    screens the page shrinks with the screen and the slots wrap, so the page
    never gets wider than the screen (which makes mobile browsers zoom out the

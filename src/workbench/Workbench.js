@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import Realistic from '../cards/realistic/RealisticCard';
-import Minimal from '../cards/minimal/MinimalCard';
+import Card from '../cards/Card';
 import useCardData from './useCardData';
 import Reference from './Reference';
 import { useSetting } from '../settings';
@@ -15,7 +14,6 @@ const Workbench = () => {
   const [cardVariant, setCardVariant] = useSetting('cardVariant');
 
   const { cardData, loading, error } = useCardData(cardName);
-  const Card = cardVariant === 'minimalist' ? Minimal : Realistic;
 
   return (
     <div className="workbench">
@@ -35,6 +33,7 @@ const Workbench = () => {
 
                 <div style={{ marginTop: '-2px', zIndex: '0' }}>
                   <Card
+                    cardStyle={cardVariant}
                     cardName={cardData.name}
                     cardManaCost={cardData.mana_cost}
                     cardColors={cardColors || cardData.colors}
@@ -68,7 +67,7 @@ const Workbench = () => {
           onChange={(e) => setCardVariant(e.target.value)}
           style={{ marginRight: '0.5em' }}
         >
-          <option value="original">Original</option>
+          <option value="realistic">Realistic</option>
           <option value="minimalist">Minimalist</option>
         </select>
         <select

@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
 const SETTINGS_DEFINITIONS = {
-  cardVariant: { default: 'original', storageKey: 'press:cardVariant' },
+  cardVariant: { default: 'realistic', storageKey: 'press:cardVariant' },
   splitCardTreatment: { default: 'unified', storageKey: 'press:splitCardTreatment' },
   doubleFacedCardTreatment: { default: 'separate', storageKey: 'press:doubleFacedCardTreatment' },
   inkLevel: { default: 'low', storageKey: 'press:inkLevel' },

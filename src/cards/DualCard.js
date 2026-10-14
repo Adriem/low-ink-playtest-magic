@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useEffect, useState } from 'react';
+import { beginRender, drawWhenLoaded, finishRender } from '../utils/canvasRendering';
 import { colorsFromManaCost } from '../utils/colors';
+import { CARD_HEIGHT, CARD_WIDTH, getCardRenderer } from './styles';
 
-const WIDTH = 500;
-const HEIGHT = 700;
-const HALF_HEIGHT = HEIGHT / 2;
+const HALF_HEIGHT = CARD_HEIGHT / 2;
 
 const drawRotatedCW = (ctx, src, dx, dy, dw, dh) => {
   ctx.save();
@@ -24,68 +24,69 @@ const faceProps = (face, cardSet) => ({
   cardPower: face.power,
   cardToughness: face.toughness,
   cardSet,
-  canvasClassName: 'dual-card-source',
 });
 
-const isRendered = (canvas) => canvas?.dataset.rendered === 'true';
+/**
+ * Draw a face on its own off-screen canvas.
+ *
+ * @returns {HTMLCanvasElement}
+ */
+const renderFace = (render, face, cardSet) => {
+  const faceCanvas = document.createElement('canvas');
+  faceCanvas.width = CARD_WIDTH;
+  faceCanvas.height = CARD_HEIGHT;
+
+  beginRender(faceCanvas);
+  render(faceCanvas, faceProps(face, cardSet));
+  return faceCanvas;
+};
 
 /**
  * Card with two faces drawn side by side, rotated, in a single card canvas.
- * Each face is rendered in its own hidden canvas, and they're combined once
- * both have finished rendering.
+ * Each face is drawn on an off-screen canvas, and they're combined once both
+ * have finished drawing their images.
+ *
+ * @param {object} props
+ * @param {string} props.cardStyle - e.g. `realistic` or `minimalist`
+ * @param {object[]} props.cardFaces - Scryfall card faces
+ * @param {string} props.cardSet
  */
-const DualCard = ({ Card, cardFaces, cardSet }) => {
-  const outputCanvasRef = useRef(null);
-  const face1CanvasRef = useRef(null);
-  const face2CanvasRef = useRef(null);
+const DualCard = ({ cardStyle, cardFaces, cardSet }) => {
+  const [canvas, setCanvas] = useState(null);
 
-  // Whenever a face starts rendering again, the combined card is outdated
-  // until both faces are done
   useEffect(() => {
-    const faces = [face1CanvasRef.current, face2CanvasRef.current];
-    const observer = new MutationObserver(() => {
-      const output = outputCanvasRef.current;
-      if (output && !faces.every(isRendered)) output.dataset.rendered = 'false';
+    if (canvas == null) return;
+
+    const render = getCardRenderer(cardStyle);
+    const [face1, face2] = cardFaces;
+    const ctx = canvas.getContext('2d');
+
+    beginRender(canvas);
+    const faceCanvases = [renderFace(render, face1, cardSet), renderFace(render, face2, cardSet)];
+
+    // Combining the faces is part of this render, so it's skipped if a newer
+    // render starts before the faces finish
+    void drawWhenLoaded(ctx, Promise.all(faceCanvases.map(finishRender)), () => {
+      const [faceCanvas1, faceCanvas2] = faceCanvases;
+
+      ctx.clearRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
+
+      drawRotatedCW(ctx, faceCanvas1, 0, 0, CARD_WIDTH, HALF_HEIGHT);
+      drawRotatedCW(ctx, faceCanvas2, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
     });
-
-    faces.forEach(face => face && observer.observe(face, { attributes: true, attributeFilter: ['data-rendered'] }));
-    return () => observer.disconnect();
-  }, [Card]);
-
-  const handleFaceRendered = useCallback(() => {
-    const output = outputCanvasRef.current;
-    const f1 = face1CanvasRef.current;
-    const f2 = face2CanvasRef.current;
-    if (!output || !isRendered(f1) || !isRendered(f2)) return;
-
-    const ctx = output.getContext('2d');
-    ctx.clearRect(0, 0, WIDTH, HEIGHT);
-    ctx.fillStyle = 'white';
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    drawRotatedCW(ctx, f1, 0, 0, WIDTH, HALF_HEIGHT);
-    drawRotatedCW(ctx, f2, 0, HALF_HEIGHT, WIDTH, HALF_HEIGHT);
-
-    output.dataset.rendered = 'true';
-  }, []);
-
-  const [face1, face2] = cardFaces;
+    void finishRender(canvas);
+  }, [canvas, cardStyle, cardFaces, cardSet]);
 
   return (
-    <>
-      <canvas
-        ref={outputCanvasRef}
-        className="card"
-        width={WIDTH}
-        height={HEIGHT}
-        style={{ background: 'white' }}
-        data-rendered="false"
-      />
-      <div className="dual-card-sources" aria-hidden="true">
-        <Card {...faceProps(face1, cardSet)} canvasRef={face1CanvasRef} onRendered={handleFaceRendered} />
-        <Card {...faceProps(face2, cardSet)} canvasRef={face2CanvasRef} onRendered={handleFaceRendered} />
-      </div>
-    </>
+    <canvas
+      className="card"
+      ref={setCanvas}
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      style={{ background: 'white' }}
+    />
   );
 };
 

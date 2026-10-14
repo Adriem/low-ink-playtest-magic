@@ -3,8 +3,7 @@ import Press from './Press';
 import { SettingsContextProvider } from '../settings';
 
 // jsdom has no canvas, so card components are replaced with plain elements
-jest.mock('../cards/realistic/RealisticCard', () => ({ cardName }) => <div>{cardName}</div>);
-jest.mock('../cards/minimal/MinimalCard', () => ({ cardName }) => <div>{cardName}</div>);
+jest.mock('../cards/Card', () => ({ cardName }) => <div>{cardName}</div>);
 jest.mock('../cards/DualCard', () => () => <div>Dual card</div>);
 jest.mock('jspdf', () => ({ jsPDF: jest.fn() }));
 jest.mock('../utils/scryfall', () => ({

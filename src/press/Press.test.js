@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import Press from './Press';
 import { SettingsContextProvider } from '../settings';
+import { fetchCardData } from '../utils/scryfall';
 
 // jsdom has no canvas, so card components are replaced with plain elements
 jest.mock('../cards/Card', () => ({ cardName }) => <div>{cardName}</div>);
@@ -83,6 +84,16 @@ test('numbers the pages below each sheet', () => {
 
   expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
   expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+});
+
+test('shows a placeholder while a card is loading', () => {
+  fetchCardData.mockReturnValue(new Promise(() => {}));
+  render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+
+  fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightning Bolt' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
+
+  expect(screen.getByRole('status')).toHaveTextContent('Loading card details');
 });
 
 describe('hovering with a mouse', () => {

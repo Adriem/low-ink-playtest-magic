@@ -45,7 +45,7 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError } = {}) =
 
     setCardCollection(collection => [...collection, { ...LOADING_CARD, _loadingCardId: loadingCardId }]);
 
-    findCardByName(cardName)
+    void findCardByName(cardName)
       .then((card) => {
         setCardCollection(collection => collection.map(c => isPlaceholder(c) ? card : c));
       })

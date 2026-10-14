@@ -13,7 +13,7 @@ const useCardData = (cardName) => {
 
     setLoading(true);
 
-    fetchCardData(cardName)
+    void fetchCardData(cardName)
       .then(data => {
         setLoading(false);
         setError(null);

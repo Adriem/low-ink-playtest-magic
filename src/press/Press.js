@@ -64,7 +64,7 @@ const Press = () => {
   const exportPress = useCallback(() => {
     const canvases = document.querySelectorAll('canvas.card');
 
-    exportToPDF(canvases);
+    void exportToPDF(canvases);
   }, [])
 
   const calculateCardKey = (cardsInSheet, card, position) => {

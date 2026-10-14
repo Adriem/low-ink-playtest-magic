@@ -38,7 +38,7 @@ export const drawArtBox = (ctx, {
 
   if (!cardArtUrl) return;
 
-  drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
+  void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
     ctx.drawImage(artImage, imageX, imageY, imageWidth, imageHeight);
     midBrightnessPass(ctx, imageX, imageY, imageWidth, imageHeight);
   });

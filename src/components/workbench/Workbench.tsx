@@ -59,24 +59,29 @@ const Workbench = () => {
   return (
     <>
       <div className="workbench">
-        {(!card || !face) ? <div>NO CARD DATA</div>
-          : (loading) ? <div>LOADING...</div>
-            : (error) ? <div>ERROR ({error.name}): {error.message}</div>
-              : (
-                <div className="workbench-card">
-                  <div className="workbench-reference" style={{ opacity }}>
-                    <Reference imageUrl={referenceImageUrl} />
-                  </div>
+        {!card || !face ? (
+          <div>NO CARD DATA</div>
+        ) : loading ? (
+          <div>LOADING...</div>
+        ) : error ? (
+          <div>
+            ERROR ({error.name}): {error.message}
+          </div>
+        ) : (
+          <div className="workbench-card">
+            <div className="workbench-reference" style={{ opacity }}>
+              <Reference imageUrl={referenceImageUrl} />
+            </div>
 
-                  <Card
-                    cardStyle={cardVariant}
-                    face={face}
-                    subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
-                    subFacePosition={getSubCardPosition(card)}
-                    blackBordered={blackBordered}
-                  />
-                </div>
-              )}
+            <Card
+              cardStyle={cardVariant}
+              face={face}
+              subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
+              subFacePosition={getSubCardPosition(card)}
+              blackBordered={blackBordered}
+            />
+          </div>
+        )}
       </div>
 
       <div className="workbench-controls">
@@ -89,16 +94,20 @@ const Workbench = () => {
           <div className="workbench-field">
             <label htmlFor="cardVariant">Style</label>
             <select id="cardVariant" value={cardVariant} onChange={handleStyleChange}>
-              {SETTINGS_DEFINITIONS.cardVariant.options.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {SETTINGS_DEFINITIONS.cardVariant.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>
           <div className="workbench-field">
             <label htmlFor="cardColors">Color</label>
             <select id="cardColors" defaultValue="" onChange={handleColorChange}>
-              {COLOR_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>{option.label}</option>
+              {COLOR_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
               ))}
             </select>
           </div>

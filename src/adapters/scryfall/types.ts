@@ -36,5 +36,5 @@ export interface ScryfallCard {
 }
 
 export interface ScryfallSymbology {
-  data: { symbol: string, svg_uri: string }[];
+  data: { symbol: string; svg_uri: string }[];
 }

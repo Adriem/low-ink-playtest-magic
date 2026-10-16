@@ -25,7 +25,11 @@ export const beginRender = (canvas: HTMLCanvasElement) => {
  *
  * @param loading - e.g. an image being loaded
  */
-export const drawWhenLoaded = <T>(ctx: CanvasRenderingContext2D, loading: Promise<T>, draw: (loaded: T) => void): Promise<void> => {
+export const drawWhenLoaded = <T>(
+  ctx: CanvasRenderingContext2D,
+  loading: Promise<T>,
+  draw: (loaded: T) => void,
+): Promise<void> => {
   const render = renders.get(ctx.canvas);
 
   const drawing = loading.then((loaded) => {
@@ -62,40 +66,42 @@ export const finishRender = async (canvas: HTMLCanvasElement): Promise<boolean> 
  * @param timeout - Maximum time to wait, in milliseconds
  * @returns Whether it finished rendering before the timeout
  */
-export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) => new Promise<boolean>((resolve) => {
-  if (canvas.dataset.rendered !== 'false') {
-    resolve(true);
-    return;
-  }
+export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) =>
+  new Promise<boolean>((resolve) => {
+    if (canvas.dataset.rendered !== 'false') {
+      resolve(true);
+      return;
+    }
 
-  const observer = new MutationObserver(() => {
-    if (canvas.dataset.rendered === 'false') return;
-    stopWaiting();
-    resolve(true);
+    const observer = new MutationObserver(() => {
+      if (canvas.dataset.rendered === 'false') return;
+      stopWaiting();
+      resolve(true);
+    });
+    const timer = setTimeout(() => {
+      stopWaiting();
+      resolve(false);
+    }, timeout);
+    const stopWaiting = () => {
+      observer.disconnect();
+      clearTimeout(timer);
+    };
+
+    observer.observe(canvas, { attributes: true, attributeFilter: ['data-rendered'] });
   });
-  const timer = setTimeout(() => {
-    stopWaiting();
-    resolve(false);
-  }, timeout);
-  const stopWaiting = () => {
-    observer.disconnect();
-    clearTimeout(timer);
-  };
-
-  observer.observe(canvas, { attributes: true, attributeFilter: ['data-rendered'] });
-});
 
 /**
  * Load an image that can be drawn on a canvas and read back (e.g. by filters
  * or the PDF export).
  */
-export const loadImage = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
-  const image = new Image();
-  image.crossOrigin = 'Anonymous';
-  image.onload = () => resolve(image);
-  image.onerror = reject;
-  image.src = src;
-});
+export const loadImage = (src: string) =>
+  new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = 'Anonymous';
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
 
 /**
  * The 2D context of a canvas, which every supported browser provides.

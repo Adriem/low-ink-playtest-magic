@@ -20,7 +20,10 @@ import { getFillStyle } from '../../common/canvasStyles';
 const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character here! D:
 const LOYALTY_ABILITY_OFFSET = 45;
 
-const drawPlaneswalkerOracleBorder = (ctx: CanvasRenderingContext2D, { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment, x: number, y: number, height: number }) => {
+const drawPlaneswalkerOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
+) => {
   ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
 
   const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
@@ -36,10 +39,10 @@ const drawPlaneswalkerOracleBorder = (ctx: CanvasRenderingContext2D, { cardColor
   ctx.fill();
 };
 
-export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText,
-  cardColorTreatment,
-}: { cardOracleText?: string, cardColorTreatment: ColorTreatment }) => {
+export const drawPlaneswalkerOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  { cardOracleText, cardColorTreatment }: { cardOracleText?: string; cardColorTreatment: ColorTreatment },
+) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
   const height = ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
@@ -54,7 +57,12 @@ export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
   const loyaltyAbilityWidth = textWidth - SIDE_BORDER_PADDING - LOYALTY_ABILITY_OFFSET;
   const regularOracleWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
 
-  drawPlaneswalkerOracleBorder(ctx, { cardColorTreatment, x: textX, y: textY - textPaddingTop, height: textHeight + 60 });
+  drawPlaneswalkerOracleBorder(ctx, {
+    cardColorTreatment,
+    x: textX,
+    y: textY - textPaddingTop,
+    height: textHeight + 60,
+  });
 
   ctx.font = `${ORACLE_FONT_SIZE}px ${DISPLAY_FONT_FAMILY}`;
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
@@ -64,7 +72,7 @@ export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    originalParagraphs.map(content => {
+    originalParagraphs.map((content) => {
       const isLoyaltyAbility = LOYALTY_COST_REGEX.test(content);
 
       return {
@@ -87,7 +95,7 @@ export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
       drawLoyaltyCost(ctx, {
         loyaltyCost: loyaltyCostLabel.replace(':', ''),
         x: paddedX,
-        y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1) / 2),
+        y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1)) / 2,
         scale: 1.1,
         fontFamily: DISPLAY_FONT_FAMILY,
         colors: MINIMALIST_PALETTE,

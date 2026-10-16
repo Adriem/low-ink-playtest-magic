@@ -1,25 +1,25 @@
 .press-actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 0.5rem;
-    max-width: 750px;
-    margin: 0 auto 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 750px;
+  margin: 0 auto 1rem;
 }
 
 .press-actions .clear {
-    margin-right: auto;
-    font-weight: bold;
-    color: #A03;
+  margin-right: auto;
+  font-weight: bold;
+  color: #a03;
 }
 
 .press-actions .export {
-    font-weight: bold;
-    padding: 0.5em 1em;
+  font-weight: bold;
+  padding: 0.5em 1em;
 }
 
 dialog:not([open]) {
-    display: none;
+  display: none;
 }
 
 /* A sheet of cards and its footer. Three 250px slots per row. On narrower
@@ -27,22 +27,21 @@ dialog:not([open]) {
    never gets wider than the screen (which makes mobile browsers zoom out the
    whole page) */
 .press-page {
-    margin: 0 auto 5rem;
-    max-width: 750px;
+  margin: 0 auto 5rem;
+  max-width: 750px;
 }
 
 .press-sheet {
-    overflow: auto;
+  overflow: auto;
 }
 .press-sheet:before {
-    content: "";
-    clear: both;
-    display: table;
+  content: '';
+  clear: both;
+  display: table;
 }
 
 .press-page-footer {
-    margin-top: 0.5rem;
-    text-align: center;
-    color: gray;
+  margin-top: 0.5rem;
+  text-align: center;
+  color: gray;
 }
-

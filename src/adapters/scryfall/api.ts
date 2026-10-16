@@ -1,5 +1,5 @@
 // TODO: Review this
-import semaphore from 'semaphore'
+import semaphore from 'semaphore';
 import type { Card } from '../../domain/cards';
 import { toCard } from './toCard';
 import type { ScryfallCard, ScryfallSymbology } from './types';
@@ -8,20 +8,20 @@ const SCRYFALL_API_URL = 'https://api.scryfall.com';
 // Scryfall asks to space requests at least 50-100ms apart
 const REQUEST_SPACING_MS = 100;
 
-const sem = semaphore(1)
+const sem = semaphore(1);
 const awaitIfNecessary = async () => {
-  await new Promise<void>(resolve => sem.take(() => resolve()))
-  setTimeout(() => sem.leave(), REQUEST_SPACING_MS)
-}
+  await new Promise<void>((resolve) => sem.take(() => resolve()));
+  setTimeout(() => sem.leave(), REQUEST_SPACING_MS);
+};
 
 /**
  * Fetch the data of a card given its name in Scryfall.io
  */
 export const fetchCardData = async (cardName: string): Promise<ScryfallCard> => {
-  await awaitIfNecessary()
+  await awaitIfNecessary();
 
   const response = await fetch(`${SCRYFALL_API_URL}/cards/named?exact=${encodeURIComponent(cardName)}`, {
-    headers: { Origin: window.location.origin }
+    headers: { Origin: window.location.origin },
   });
 
   if (!response.ok) {
@@ -30,7 +30,7 @@ export const fetchCardData = async (cardName: string): Promise<ScryfallCard> => 
   }
 
   return await response.json();
-}
+};
 
 /**
  * Fetch a card given its name in Scryfall.io
@@ -41,9 +41,9 @@ export const fetchCard = async (cardName: string): Promise<Card> => toCard(await
  * Fetch the symbology data from Scryfall.io
  */
 export const fetchSymbology = async (): Promise<ScryfallSymbology> => {
-  await awaitIfNecessary()
+  await awaitIfNecessary();
 
-  const response = await fetch(`${SCRYFALL_API_URL}/symbology`)
+  const response = await fetch(`${SCRYFALL_API_URL}/symbology`);
 
   if (!response.ok) {
     const error = await response.json();
@@ -52,5 +52,5 @@ export const fetchSymbology = async (): Promise<ScryfallSymbology> => {
     throw new Error(error.details);
   }
 
-  return await response.json()
-}
+  return await response.json();
+};

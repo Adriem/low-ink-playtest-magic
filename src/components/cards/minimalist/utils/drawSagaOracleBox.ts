@@ -42,7 +42,10 @@ interface SagaSlot {
   isBottom?: boolean;
 }
 
-const drawSagaOracleBorder = (ctx: CanvasRenderingContext2D, { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment, x: number, y: number, height: number }) => {
+const drawSagaOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
+) => {
   ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
 
   const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
@@ -60,12 +63,15 @@ const drawSagaOracleBorder = (ctx: CanvasRenderingContext2D, { cardColorTreatmen
   ctx.fill();
 };
 
-export const drawSagaOracleBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText,
-  cardColorTreatment,
-  cardPower,
-  cardToughness,
-}: { cardOracleText?: string, cardColorTreatment: ColorTreatment, cardPower?: string, cardToughness?: string }) => {
+export const drawSagaOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText,
+    cardColorTreatment,
+    cardPower,
+    cardToughness,
+  }: { cardOracleText?: string; cardColorTreatment: ColorTreatment; cardPower?: string; cardToughness?: string },
+) => {
   const hasStats = cardPower != null && cardToughness != null;
 
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
@@ -89,32 +95,49 @@ export const drawSagaOracleBox = (ctx: CanvasRenderingContext2D, {
   const dividerLeftX = textX + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * 0.35 + 1;
   // Paragraphs before the chapters start after the side border, so they don't overlap it
   const topParagraphX = getSideBorderEdges(textX).right + SIDE_BORDER_TEXT_GAP;
-  const dividerWidth = (contentLeftX + contentWidth) - dividerLeftX;
+  const dividerWidth = contentLeftX + contentWidth - dividerLeftX;
 
   // The paragraphs before the chapters (e.g. reminder text), each chapter and
   // the paragraphs after them get a slot as tall as their share of the
   // characters (including spaces), but at least the minimum height and tall
   // enough for a chapter's icons, like printed sagas
   const slots: SagaSlot[] = [
-    ...topParagraphs.map(content => ({ content, leftX: topParagraphX, width: contentLeftX + contentWidth - topParagraphX, align: 'top' as const })),
-    ...chapters.map(({ labels, text }) => ({ content: text, labels, leftX: chapterTextX, width: chapterTextWidth, isChapter: true })),
-    ...bottomParagraphs.map(content => ({ content, leftX: textX + textWidth / 2, width: contentWidth, isBottom: true })),
+    ...topParagraphs.map((content) => ({
+      content,
+      leftX: topParagraphX,
+      width: contentLeftX + contentWidth - topParagraphX,
+      align: 'top' as const,
+    })),
+    ...chapters.map(({ labels, text }) => ({
+      content: text,
+      labels,
+      leftX: chapterTextX,
+      width: chapterTextWidth,
+      isChapter: true,
+    })),
+    ...bottomParagraphs.map((content) => ({
+      content,
+      leftX: textX + textWidth / 2,
+      width: contentWidth,
+      isBottom: true,
+    })),
   ];
-  const slotHeights = distributeHeight(textHeight, slots.map(({ content, labels }) => ({
-    weight: content.length,
-    minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * SAGA_CHAPTER_ICON_SPACING),
-    // When the minimums don't fit, slots get the same height, except that a
-    // chapter still needs room for its icons
-    requiredHeight: labels ? (labels.length - 1) * SAGA_CHAPTER_ICON_SPACING + CHAPTER_ICON_HEIGHT : 0,
-  })));
+  const slotHeights = distributeHeight(
+    textHeight,
+    slots.map(({ content, labels }) => ({
+      weight: content.length,
+      minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * SAGA_CHAPTER_ICON_SPACING),
+      // When the minimums don't fit, slots get the same height, except that a
+      // chapter still needs room for its icons
+      requiredHeight: labels ? (labels.length - 1) * SAGA_CHAPTER_ICON_SPACING + CHAPTER_ICON_HEIGHT : 0,
+    })),
+  );
 
   const borderTopY = y;
-  const chaptersEndY = textY + slotHeights
-    .slice(0, topParagraphs.length + chapters.length)
-    .reduce((sum, slotHeight) => sum + slotHeight, 0);
-  const borderHeight = bottomParagraphs.length > 0
-    ? chaptersEndY - borderTopY
-    : height + 10;
+  const chaptersEndY =
+    textY +
+    slotHeights.slice(0, topParagraphs.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
+  const borderHeight = bottomParagraphs.length > 0 ? chaptersEndY - borderTopY : height + 10;
   drawSagaOracleBorder(ctx, { cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
 
   // All the slots use the same font size: the largest at which every slot's text fits
@@ -122,10 +145,12 @@ export const drawSagaOracleBox = (ctx: CanvasRenderingContext2D, {
     ctx.font = `${fontSize}px ${DISPLAY_FONT_FAMILY}`;
     return fitTextIntoBox(ctx, [{ content, width }], slotHeight);
   };
-  const fontSize = Math.min(...slots.map(({ content, width }, index) => {
-    fitParagraph(content, width, slotHeights[index], ORACLE_FONT_SIZE);
-    return getFontSize(ctx);
-  }));
+  const fontSize = Math.min(
+    ...slots.map(({ content, width }, index) => {
+      fitParagraph(content, width, slotHeights[index], ORACLE_FONT_SIZE);
+      return getFontSize(ctx);
+    }),
+  );
 
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
 
@@ -137,9 +162,10 @@ export const drawSagaOracleBox = (ctx: CanvasRenderingContext2D, {
     ctx.textAlign = isBottom ? 'center' : 'start';
     const fitted = fitParagraph(content, width, slotHeight, fontSize);
     const totalTextHeight = fitted.reduce((sum, p) => sum + p.paragraphHeight, 0);
-    let paragraphY = align === 'top'
-      ? slotY + ORACLE_FONT_SIZE * 0.7
-      : slotY + slotHeight / 2 - totalTextHeight / 2 + ORACLE_FONT_SIZE * 0.7;
+    let paragraphY =
+      align === 'top'
+        ? slotY + ORACLE_FONT_SIZE * 0.7
+        : slotY + slotHeight / 2 - totalTextHeight / 2 + ORACLE_FONT_SIZE * 0.7;
     for (const paragraph of fitted) {
       fillMultilineText(ctx, paragraph.lines, leftX, paragraphY);
       paragraphY += paragraph.paragraphHeight;

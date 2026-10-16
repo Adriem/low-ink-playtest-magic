@@ -19,7 +19,7 @@ const useCardData = (cardName: string) => {
 
     let ignore = false;
     void fetchCardData(cardName)
-      .then(data => {
+      .then((data) => {
         if (ignore) return;
         setResult({
           cardName,
@@ -30,7 +30,7 @@ const useCardData = (cardName: string) => {
       })
       .catch((error: Error) => {
         if (ignore) return;
-        setResult(previous => ({ ...previous, cardName, error }));
+        setResult((previous) => ({ ...previous, cardName, error }));
       });
 
     return () => {

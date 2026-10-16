@@ -3,11 +3,12 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import SettingsPanel from './SettingsPanel';
 import { SettingsContextProvider } from './SettingsContext';
 
-const renderPanel = () => render(
-  <SettingsContextProvider>
-    <SettingsPanel />
-  </SettingsContextProvider>,
-);
+const renderPanel = () =>
+  render(
+    <SettingsContextProvider>
+      <SettingsPanel />
+    </SettingsContextProvider>,
+  );
 
 afterEach(() => sessionStorage.clear());
 

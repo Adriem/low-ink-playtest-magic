@@ -1,4 +1,14 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react';
 import { isKeyboardClick } from '../../utils/events';
 
 /**
@@ -50,7 +60,6 @@ const CLOSED_OVERLAY: OverlayState = {
 
 const isSticky = (overlay: OverlayState) => overlay.mode !== 'hover';
 
-
 const CardOverlayContext = createContext<CardOverlayContextValue | null>(null);
 
 /**
@@ -69,11 +78,16 @@ const CardOverlayContext = createContext<CardOverlayContextValue | null>(null);
  *
  * @param props.collectionSize - Number of cards in the collection
  */
-export const CardOverlayProvider = ({ collectionSize, moveCard, removeCardAt, children }: {
-  collectionSize: number,
-  moveCard: (fromIndex: number, toIndex: number) => void,
-  removeCardAt: (index: number) => void,
-  children: ReactNode,
+export const CardOverlayProvider = ({
+  collectionSize,
+  moveCard,
+  removeCardAt,
+  children,
+}: {
+  collectionSize: number;
+  moveCard: (fromIndex: number, toIndex: number) => void;
+  removeCardAt: (index: number) => void;
+  children: ReactNode;
 }) => {
   const [overlay, setOverlay] = useState(CLOSED_OVERLAY);
   // Card under the mouse pointer, tracked even while the overlay is sticky
@@ -82,15 +96,19 @@ export const CardOverlayProvider = ({ collectionSize, moveCard, removeCardAt, ch
   const cardButtonsRef = useRef(new Map<number, HTMLButtonElement>());
 
   const openHover = useCallback((collectionIndex: number) => {
-    setOverlay(current => (isSticky(current) || current.collectionIndex === collectionIndex)
-      ? current
-      : { ...CLOSED_OVERLAY, collectionIndex, focusRequestId: current.focusRequestId });
+    setOverlay((current) =>
+      isSticky(current) || current.collectionIndex === collectionIndex
+        ? current
+        : { ...CLOSED_OVERLAY, collectionIndex, focusRequestId: current.focusRequestId },
+    );
   }, []);
 
   const closeHover = useCallback((collectionIndex: number) => {
-    setOverlay(current => (isSticky(current) || current.collectionIndex !== collectionIndex)
-      ? current
-      : { ...CLOSED_OVERLAY, focusRequestId: current.focusRequestId });
+    setOverlay((current) =>
+      isSticky(current) || current.collectionIndex !== collectionIndex
+        ? current
+        : { ...CLOSED_OVERLAY, focusRequestId: current.focusRequestId },
+    );
   }, []);
 
   const openMenu = useCallback((collectionIndex: number, { focusFirstControl }: { focusFirstControl: boolean }) => {
@@ -107,7 +125,7 @@ export const CardOverlayProvider = ({ collectionSize, moveCard, removeCardAt, ch
   // card under the mouse pointer, if any. `returnFocusTo` is the collection
   // card whose button gets the focus back (e.g. when closed from the keyboard).
   const dismissMenu = useCallback(({ returnFocusTo = null }: { returnFocusTo?: number | null } = {}) => {
-    setOverlay(current => ({
+    setOverlay((current) => ({
       ...CLOSED_OVERLAY,
       collectionIndex: hoveredCollectionIndexRef.current,
       focusRequestId: current.focusRequestId,
@@ -121,29 +139,37 @@ export const CardOverlayProvider = ({ collectionSize, moveCard, removeCardAt, ch
   }, []);
 
   const handleDangerChange = useCallback((danger: boolean) => {
-    setOverlay(current => ({ ...current, danger }));
+    setOverlay((current) => ({ ...current, danger }));
   }, []);
 
-  const moveCardBy = useCallback((collectionIndex: number, offset: number, event?: ClickLike) => {
-    const targetIndex = collectionIndex + offset;
-    moveCard(collectionIndex, targetIndex);
+  const moveCardBy = useCallback(
+    (collectionIndex: number, offset: number, event?: ClickLike) => {
+      const targetIndex = collectionIndex + offset;
+      moveCard(collectionIndex, targetIndex);
 
-    // A sticky overlay follows the moved card so it can be moved again right
-    // away. When just hovering, it stays on the slot under the pointer.
-    setOverlay((current): OverlayState => isSticky(current)
-      ? {
-        ...current,
-        collectionIndex: targetIndex,
-        focus: isKeyboardClick(event) ? (offset < 0 ? 'move-up' : 'move-down') : null,
-        focusRequestId: current.focusRequestId + 1,
-      }
-      : current);
-  }, [moveCard]);
+      // A sticky overlay follows the moved card so it can be moved again right
+      // away. When just hovering, it stays on the slot under the pointer.
+      setOverlay((current): OverlayState =>
+        isSticky(current)
+          ? {
+              ...current,
+              collectionIndex: targetIndex,
+              focus: isKeyboardClick(event) ? (offset < 0 ? 'move-up' : 'move-down') : null,
+              focusRequestId: current.focusRequestId + 1,
+            }
+          : current,
+      );
+    },
+    [moveCard],
+  );
 
-  const deleteCard = useCallback((collectionIndex: number) => {
-    dismissMenu();
-    removeCardAt(collectionIndex);
-  }, [dismissMenu, removeCardAt]);
+  const deleteCard = useCallback(
+    (collectionIndex: number) => {
+      dismissMenu();
+      removeCardAt(collectionIndex);
+    },
+    [dismissMenu, removeCardAt],
+  );
 
   // Clicking or tapping anywhere outside a sticky overlay dismisses it
   const isOverlaySticky = overlay.collectionIndex != null && isSticky(overlay);
@@ -158,20 +184,34 @@ export const CardOverlayProvider = ({ collectionSize, moveCard, removeCardAt, ch
     return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, [isOverlaySticky, dismissMenu]);
 
-  const value = useMemo((): CardOverlayContextValue => ({
-    overlay,
-    hoveredCollectionIndexRef,
-    cardButtonsRef,
-    collectionSize,
-    openHover,
-    closeHover,
-    openMenu,
-    dismissMenu,
-    handleStartMove,
-    handleDangerChange,
-    moveCardBy,
-    deleteCard,
-  }), [overlay, collectionSize, openHover, closeHover, openMenu, dismissMenu, handleStartMove, handleDangerChange, moveCardBy, deleteCard]);
+  const value = useMemo(
+    (): CardOverlayContextValue => ({
+      overlay,
+      hoveredCollectionIndexRef,
+      cardButtonsRef,
+      collectionSize,
+      openHover,
+      closeHover,
+      openMenu,
+      dismissMenu,
+      handleStartMove,
+      handleDangerChange,
+      moveCardBy,
+      deleteCard,
+    }),
+    [
+      overlay,
+      collectionSize,
+      openHover,
+      closeHover,
+      openMenu,
+      dismissMenu,
+      handleStartMove,
+      handleDangerChange,
+      moveCardBy,
+      deleteCard,
+    ],
+  );
 
   return <CardOverlayContext.Provider value={value}>{children}</CardOverlayContext.Provider>;
 };

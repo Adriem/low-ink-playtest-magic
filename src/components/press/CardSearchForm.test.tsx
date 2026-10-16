@@ -129,8 +129,11 @@ describe('quantities', () => {
     await submitCardList('2 Lightning Bolt\n3x Counterspell\n1X Colossal Dreadmaw\nIsland');
 
     expect(onAddCards).toHaveBeenCalledWith([
-      'Lightning Bolt', 'Lightning Bolt',
-      'Counterspell', 'Counterspell', 'Counterspell',
+      'Lightning Bolt',
+      'Lightning Bolt',
+      'Counterspell',
+      'Counterspell',
+      'Counterspell',
       'Colossal Dreadmaw',
       'Island',
     ]);
@@ -141,10 +144,7 @@ describe('quantities', () => {
 
     await submitCardList('1996 World Champion\n2 1996 World Champion');
 
-    expect(onAddCards).toHaveBeenCalledWith([
-      '1996 World Champion',
-      '1996 World Champion', '1996 World Champion',
-    ]);
+    expect(onAddCards).toHaveBeenCalledWith(['1996 World Champion', '1996 World Champion', '1996 World Champion']);
   });
 
   test('rejects a list with a quantity of 0 without adding or clearing it', async () => {

@@ -43,8 +43,8 @@ const getStats = ({ power, toughness, loyalty }: ScryfallCardFace): CardFace['st
  * flipped side of flip cards). Faces without their own art use the card's.
  */
 const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: number): CardFace => {
-  const colors = face.colors
-    ?? (face.mana_cost ? computeCardColors({ manaCost: face.mana_cost }) : card.colors ?? []);
+  const colors =
+    face.colors ?? (face.mana_cost ? computeCardColors({ manaCost: face.mana_cost }) : (card.colors ?? []));
 
   return {
     name: face.name,

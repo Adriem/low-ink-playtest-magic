@@ -1,12 +1,14 @@
 import { getSymbolImage } from './symbology';
 
 vi.mock('./api', () => ({
-  fetchSymbology: vi.fn(() => Promise.resolve({
-    data: [
-      { symbol: '{W}', svg_uri: 'white.svg' },
-      { symbol: '{U}', svg_uri: 'blue.svg' },
-    ],
-  })),
+  fetchSymbology: vi.fn(() =>
+    Promise.resolve({
+      data: [
+        { symbol: '{W}', svg_uri: 'white.svg' },
+        { symbol: '{U}', svg_uri: 'blue.svg' },
+      ],
+    }),
+  ),
 }));
 
 describe('getSymbolImage', () => {
@@ -17,7 +19,9 @@ describe('getSymbolImage', () => {
     onerror: (() => void) | null = null;
     #src = '';
 
-    get src() { return this.#src; }
+    get src() {
+      return this.#src;
+    }
 
     set src(src: string) {
       this.#src = src;
@@ -27,7 +31,12 @@ describe('getSymbolImage', () => {
 
   beforeEach(() => {
     // A regular function, so it can be called with `new`
-    vi.stubGlobal('Image', vi.fn(function () { return new FakeImage(); }));
+    vi.stubGlobal(
+      'Image',
+      vi.fn(function () {
+        return new FakeImage();
+      }),
+    );
   });
 
   afterEach(() => {

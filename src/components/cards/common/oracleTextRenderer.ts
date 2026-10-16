@@ -10,9 +10,12 @@ const SYMBOL_PADDING = 1;
 /**
  * A line as measured: its text, with a placeholder for each symbol.
  */
-const toMeasurableLine = (line: string) => parseTextWithSymbols(line)
-  .map(chunk => chunk.chunkType === 'text' ? chunk.value : SYMBOL_PLACEHOLDER.repeat(splitSymbols(chunk.value).length))
-  .join('');
+const toMeasurableLine = (line: string) =>
+  parseTextWithSymbols(line)
+    .map((chunk) =>
+      chunk.chunkType === 'text' ? chunk.value : SYMBOL_PLACEHOLDER.repeat(splitSymbols(chunk.value).length),
+    )
+    .join('');
 
 /**
  * Draw lines of rules text, with their symbols as images. `originY` is the

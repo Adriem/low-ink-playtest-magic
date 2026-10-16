@@ -3,7 +3,14 @@ import { drawTypeLine } from './drawTypeLine';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { SubCardPosition } from '../../../../domain/cards';
 
-export const drawSubCardTypeBox = (ctx: CanvasRenderingContext2D, { cardType, cardColorTreatment, position }: { cardType?: string, cardColorTreatment: ColorTreatment, position: SubCardPosition }) => {
+export const drawSubCardTypeBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardType,
+    cardColorTreatment,
+    position,
+  }: { cardType?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+) => {
   const cardWidth = ctx.canvas.width;
   const typeBoxMarginX = (cardWidth - TYPELINE_WIDTH) / 2;
 

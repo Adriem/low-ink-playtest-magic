@@ -11,7 +11,7 @@ const SYMBOL_RUN_REGEX = /(?:\{[^}]+\})+/g;
  * Symbols in a text, in order, e.g. `['{2}', '{W}', '{U}']` for `{2}{W}{U}`.
  */
 export const splitSymbols = (str: string): CardSymbol[] => {
-    return (str.match(SYMBOL_REGEX) ?? []) as CardSymbol[];
+  return (str.match(SYMBOL_REGEX) ?? []) as CardSymbol[];
 };
 
 /**
@@ -19,27 +19,26 @@ export const splitSymbols = (str: string): CardSymbol[] => {
  * for `{U/P}`.
  */
 export const getSymbolValue = (sym: CardSymbol): string => {
-    return sym.slice(1, -1);
+  return sym.slice(1, -1);
 };
 
-type TextChunk = { chunkType: "text" | "symbols", value: string };
+type TextChunk = { chunkType: 'text' | 'symbols'; value: string };
 
 /**
  * Split a text into runs of plain text and runs of symbols, in order, e.g.
  * `{T}: Add {G}.` is `{T}`, `: Add `, `{G}` and `.`.
  */
 export const parseTextWithSymbols = (str: string): TextChunk[] => {
-    const chunks: TextChunk[] = [];
-    let textStart = 0;
+  const chunks: TextChunk[] = [];
+  let textStart = 0;
 
-    for (const match of str.matchAll(SYMBOL_RUN_REGEX)) {
-        if (match.index > textStart) chunks.push({ chunkType: "text", value: str.slice(textStart, match.index) });
-        chunks.push({ chunkType: "symbols", value: match[0] });
-        textStart = match.index + match[0].length;
-    }
+  for (const match of str.matchAll(SYMBOL_RUN_REGEX)) {
+    if (match.index > textStart) chunks.push({ chunkType: 'text', value: str.slice(textStart, match.index) });
+    chunks.push({ chunkType: 'symbols', value: match[0] });
+    textStart = match.index + match[0].length;
+  }
 
-    if (textStart < str.length) chunks.push({ chunkType: "text", value: str.slice(textStart) });
+  if (textStart < str.length) chunks.push({ chunkType: 'text', value: str.slice(textStart) });
 
-    return chunks;
+  return chunks;
 };
-

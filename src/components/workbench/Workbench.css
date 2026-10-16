@@ -40,7 +40,7 @@
   justify-content: center;
 }
 
-.workbench-search input[type="text"] {
+.workbench-search input[type='text'] {
   flex: 1;
   min-width: 0;
   max-width: 500px;
@@ -71,6 +71,6 @@
 
 .workbench-reference-slider label,
 .workbench-reference-slider input {
-    margin-left: auto;
-    width: 150px;
+  margin-left: auto;
+  width: 150px;
 }

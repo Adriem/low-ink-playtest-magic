@@ -19,22 +19,42 @@ describe('normalizeColors', () => {
   });
 
   test.each([
-    ['UW', 'WU'], ['BU', 'UB'], ['RB', 'BR'], ['GR', 'RG'], ['GW', 'WG'],
-    ['BW', 'WB'], ['RU', 'UR'], ['GB', 'BG'], ['WR', 'RW'], ['GU', 'UG'],
+    ['UW', 'WU'],
+    ['BU', 'UB'],
+    ['RB', 'BR'],
+    ['GR', 'RG'],
+    ['GW', 'WG'],
+    ['BW', 'WB'],
+    ['RU', 'UR'],
+    ['GB', 'BG'],
+    ['WR', 'RW'],
+    ['GU', 'UG'],
   ])('puts the color pair %s in its usual order, %s', (colors, expected) => {
     expect(normalized(colors)).toBe(expected);
     expect(normalized(expected)).toBe(expected);
   });
 
   test.each([
-    ['WUG', 'GWU'], ['BWU', 'WUB'], ['RUB', 'UBR'], ['GRB', 'BRG'], ['WGR', 'RGW'],
-    ['WBR', 'RWB'], ['RUG', 'GUR'], ['GBW', 'WBG'], ['WRU', 'URW'], ['UGB', 'BGU'],
+    ['WUG', 'GWU'],
+    ['BWU', 'WUB'],
+    ['RUB', 'UBR'],
+    ['GRB', 'BRG'],
+    ['WGR', 'RGW'],
+    ['WBR', 'RWB'],
+    ['RUG', 'GUR'],
+    ['GBW', 'WBG'],
+    ['WRU', 'URW'],
+    ['UGB', 'BGU'],
   ])('puts the three colors %s in their usual order, %s', (colors, expected) => {
     expect(normalized(colors)).toBe(expected);
   });
 
   test.each([
-    ['RBUW', 'WUBR'], ['GRBU', 'UBRG'], ['WGRB', 'BRGW'], ['UWGR', 'RGWU'], ['BUWG', 'GWUB'],
+    ['RBUW', 'WUBR'],
+    ['GRBU', 'UBRG'],
+    ['WGRB', 'BRGW'],
+    ['UWGR', 'RGWU'],
+    ['BUWG', 'GWUB'],
   ])('puts the four colors %s in their usual order, %s', (colors, expected) => {
     expect(normalized(colors)).toBe(expected);
   });

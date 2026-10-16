@@ -7,6 +7,6 @@ import { SIDE_BORDER_PADDING, SIDE_BORDER_WIDTH } from '../config';
  * @param x - Left of the oracle box
  */
 export const getSideBorderEdges = (x: number) => ({
-  left: x + SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * .65,
-  right: x + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * .35,
+  left: x + SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 0.65,
+  right: x + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * 0.35,
 });

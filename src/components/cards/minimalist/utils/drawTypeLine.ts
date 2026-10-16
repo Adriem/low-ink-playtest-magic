@@ -18,16 +18,28 @@ const TYPELINE_SHRINK_BASELINE_RATIO = 0.33;
  * @param options.flatSide - Side without rounded
  *   corners, for the type lines of subcards that take half the card
  */
-export const drawTypeLine = (ctx: CanvasRenderingContext2D, {
-  cardType = '',
-  cardColorTreatment,
-  x,
-  y,
-  width,
-  height,
-  fontSize,
-  flatSide = null,
-}: { cardType?: string, cardColorTreatment: ColorTreatment, x: number, y: number, width: number, height: number, fontSize: number, flatSide?: 'left' | 'right' | null }) => {
+export const drawTypeLine = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardType = '',
+    cardColorTreatment,
+    x,
+    y,
+    width,
+    height,
+    fontSize,
+    flatSide = null,
+  }: {
+    cardType?: string;
+    cardColorTreatment: ColorTreatment;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fontSize: number;
+    flatSide?: 'left' | 'right' | null;
+  },
+) => {
   drawRoundedBox(ctx, {
     x,
     y,
@@ -55,7 +67,8 @@ export const drawTypeLine = (ctx: CanvasRenderingContext2D, {
   const textX = x + (flatSide === 'left' ? PINLINE_THICKNESS : 0) + TYPELINE_BOX_PADDING_X;
   const textWidth = width - TYPELINE_BOX_PADDING_X * 2;
 
-  ctx.fillStyle = cardColorTreatment === 'colorless' ? MINIMALIST_PALETTE.COLORLESS_TYPELINE_TEXT : MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle =
+    cardColorTreatment === 'colorless' ? MINIMALIST_PALETTE.COLORLESS_TYPELINE_TEXT : MINIMALIST_PALETTE.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType.toUpperCase(), textWidth);
   const textY = y + height * TYPELINE_BASELINE_RATIO - (fontSize - getFontSize(ctx)) * TYPELINE_SHRINK_BASELINE_RATIO;

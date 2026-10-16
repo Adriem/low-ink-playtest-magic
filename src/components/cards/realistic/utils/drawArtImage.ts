@@ -9,7 +9,17 @@ import type { ArtCrop } from '../../../../domain/cards';
  * @param options.cropArt - Draw only this part of
  *   the image, for split cards whose faces share an image with both arts
  */
-export const drawArtImage = (ctx: CanvasRenderingContext2D, { cardArtUrl, cropArt, x, y, width, height }: { cardArtUrl?: string, cropArt?: ArtCrop, x: number, y: number, width: number, height: number }) => {
+export const drawArtImage = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardArtUrl,
+    cropArt,
+    x,
+    y,
+    width,
+    height,
+  }: { cardArtUrl?: string; cropArt?: ArtCrop; x: number; y: number; width: number; height: number },
+) => {
   if (!cardArtUrl) return;
 
   void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {

@@ -12,15 +12,26 @@ const TITLE_REFERENCE_FONT_SIZE = 34;
  * Draw a card title in up to two lines, shrinking the font until it fits. The
  * first line is usually shorter, to leave room for the mana cost.
  */
-export const drawTitleText = (ctx: CanvasRenderingContext2D, {
-  text,
-  x,
-  y,
-  fontSize,
-  line1MaxWidth,
-  line2MaxWidth,
-  maxHeight,
-}: { text: string, x: number, y: number, fontSize: number, line1MaxWidth: number, line2MaxWidth: number, maxHeight: number }) => {
+export const drawTitleText = (
+  ctx: CanvasRenderingContext2D,
+  {
+    text,
+    x,
+    y,
+    fontSize,
+    line1MaxWidth,
+    line2MaxWidth,
+    maxHeight,
+  }: {
+    text: string;
+    x: number;
+    y: number;
+    fontSize: number;
+    line1MaxWidth: number;
+    line2MaxWidth: number;
+    maxHeight: number;
+  },
+) => {
   ctx.font = `bold ${fontSize}px ${DISPLAY_FONT_FAMILY}`;
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
   ctx.textAlign = 'start';

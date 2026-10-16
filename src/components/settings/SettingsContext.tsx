@@ -15,7 +15,7 @@ export type SettingName = keyof Settings;
 
 export interface SettingDefinition<T extends string> {
   label: string;
-  options: { value: T, label: string }[];
+  options: { value: T; label: string }[];
   /** Value of the default option */
   default: T;
   /** Session storage key the value is saved in */
@@ -89,7 +89,7 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
   const [settings, setSettings] = useState(loadInitialSettings);
 
   const setSetting = useCallback(<Name extends SettingName>(name: Name, value: Settings[Name]) => {
-    setSettings(prev => ({ ...prev, [name]: value }));
+    setSettings((prev) => ({ ...prev, [name]: value }));
   }, []);
 
   useEffect(() => {
@@ -98,11 +98,7 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
     }
   }, [settings]);
 
-  return (
-    <SettingsContext.Provider value={{ settings, setSetting }}>
-      {children}
-    </SettingsContext.Provider>
-  );
+  return <SettingsContext.Provider value={{ settings, setSetting }}>{children}</SettingsContext.Provider>;
 };
 
 export const useSetting = <Name extends SettingName>(name: Name): [Settings[Name], (value: Settings[Name]) => void] => {

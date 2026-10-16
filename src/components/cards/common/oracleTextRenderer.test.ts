@@ -5,12 +5,20 @@ vi.mock('../../../adapters/scryfall', () => ({
 }));
 
 // Text is 10px wide per character, and the font 8px tall above the baseline and 2px below
-const createCtx = () => ({
-  measureText: vi.fn((text: string) => ({ width: text.length * 10, fontBoundingBoxAscent: 8, fontBoundingBoxDescent: 2 })),
-  fillText: vi.fn(),
-  drawImage: vi.fn(),
-  canvas: document.createElement('canvas'),
-}) as unknown as CanvasRenderingContext2D & { fillText: ReturnType<typeof vi.fn>, measureText: ReturnType<typeof vi.fn> };
+const createCtx = () =>
+  ({
+    measureText: vi.fn((text: string) => ({
+      width: text.length * 10,
+      fontBoundingBoxAscent: 8,
+      fontBoundingBoxDescent: 2,
+    })),
+    fillText: vi.fn(),
+    drawImage: vi.fn(),
+    canvas: document.createElement('canvas'),
+  }) as unknown as CanvasRenderingContext2D & {
+    fillText: ReturnType<typeof vi.fn>;
+    measureText: ReturnType<typeof vi.fn>;
+  };
 
 test('draws the text between symbols after them, leaving room for symbols as wide as the font is tall', () => {
   const ctx = createCtx();

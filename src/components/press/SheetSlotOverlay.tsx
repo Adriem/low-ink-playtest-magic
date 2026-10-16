@@ -29,13 +29,17 @@ interface OverlayControlsProps extends MoveButtonsProps {
  * Button of the overlay. Hidden buttons (of closed overlays) are out of the
  * tab order.
  */
-const OverlayButton = ({ hidden, children, ...buttonProps }: ButtonHTMLAttributes<HTMLButtonElement> & { hidden: boolean }) => (
+const OverlayButton = ({
+  hidden,
+  children,
+  ...buttonProps
+}: ButtonHTMLAttributes<HTMLButtonElement> & { hidden: boolean }) => (
   <button type="button" tabIndex={hidden ? -1 : 0} {...buttonProps}>
     {children}
   </button>
 );
 
-const MoveSubmenuButton = ({ hidden, onClick }: { hidden: boolean, onClick: () => void }) => (
+const MoveSubmenuButton = ({ hidden, onClick }: { hidden: boolean; onClick: () => void }) => (
   <OverlayButton className="sheet-slot-overlay-start-move" hidden={hidden} onClick={onClick}>
     <i className="fa fa-arrows-alt-h" /> Move...
   </OverlayButton>
@@ -60,23 +64,29 @@ const MoveButtons = ({ hidden, canMoveUp, canMoveDown, onMoveUp, onMoveDown }: M
  * In the menu, shows the danger state while pressed; in the hover overlay,
  * while hovered.
  */
-const DeleteButton = ({ hidden, mode, onClick, onDangerChange }: {
-  hidden: boolean,
-  mode: OverlayMode,
-  onClick: () => void,
-  onDangerChange: (danger: boolean) => void,
+const DeleteButton = ({
+  hidden,
+  mode,
+  onClick,
+  onDangerChange,
+}: {
+  hidden: boolean;
+  mode: OverlayMode;
+  onClick: () => void;
+  onDangerChange: (danger: boolean) => void;
 }) => {
-  const dangerHandlers = mode === 'menu'
-    ? {
-      onPointerDown: () => onDangerChange(true),
-      onPointerUp: () => onDangerChange(false),
-      onPointerCancel: () => onDangerChange(false),
-      onPointerLeave: () => onDangerChange(false),
-    }
-    : {
-      onMouseEnter: () => onDangerChange(true),
-      onMouseLeave: () => onDangerChange(false),
-    };
+  const dangerHandlers =
+    mode === 'menu'
+      ? {
+          onPointerDown: () => onDangerChange(true),
+          onPointerUp: () => onDangerChange(false),
+          onPointerCancel: () => onDangerChange(false),
+          onPointerLeave: () => onDangerChange(false),
+        }
+      : {
+          onMouseEnter: () => onDangerChange(true),
+          onMouseLeave: () => onDangerChange(false),
+        };
 
   return (
     <OverlayButton className="sheet-slot-overlay-delete" hidden={hidden} onClick={onClick} {...dangerHandlers}>
@@ -85,13 +95,13 @@ const DeleteButton = ({ hidden, mode, onClick, onDangerChange }: {
   );
 };
 
-const DismissButton = ({ hidden, onClick }: { hidden: boolean, onClick: ClickHandler }) => (
+const DismissButton = ({ hidden, onClick }: { hidden: boolean; onClick: ClickHandler }) => (
   <OverlayButton className="sheet-slot-overlay-dismiss" hidden={hidden} onClick={onClick}>
     Dismiss
   </OverlayButton>
 );
 
-const CloseButton = ({ hidden, onClick }: { hidden: boolean, onClick: ClickHandler }) => (
+const CloseButton = ({ hidden, onClick }: { hidden: boolean; onClick: ClickHandler }) => (
   <OverlayButton className="sheet-slot-overlay-close" hidden={hidden} onClick={onClick}>
     Close
   </OverlayButton>
@@ -116,44 +126,44 @@ const OverlayControls = ({
   onDangerChange,
 }: OverlayControlsProps) => {
   switch (mode) {
-  case 'menu':
-    return (
-      <>
-        <MoveButtons
-          hidden={hidden}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-        />
-        <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
-        <hr className="sheet-slot-overlay-separator" />
-        <DismissButton hidden={hidden} onClick={onDismiss} />
-      </>
-    );
+    case 'menu':
+      return (
+        <>
+          <MoveButtons
+            hidden={hidden}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+          />
+          <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
+          <hr className="sheet-slot-overlay-separator" />
+          <DismissButton hidden={hidden} onClick={onDismiss} />
+        </>
+      );
 
-  case 'move-submenu':
-    return (
-      <>
-        <MoveButtons
-          hidden={hidden}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-        />
-        <hr className="sheet-slot-overlay-separator" />
-        <CloseButton hidden={hidden} onClick={onDismiss} />
-      </>
-    );
+    case 'move-submenu':
+      return (
+        <>
+          <MoveButtons
+            hidden={hidden}
+            canMoveUp={canMoveUp}
+            canMoveDown={canMoveDown}
+            onMoveUp={onMoveUp}
+            onMoveDown={onMoveDown}
+          />
+          <hr className="sheet-slot-overlay-separator" />
+          <CloseButton hidden={hidden} onClick={onDismiss} />
+        </>
+      );
 
-  default:
-    return (
-      <>
-        {(canMoveUp || canMoveDown) && <MoveSubmenuButton hidden={hidden} onClick={onStartMove} />}
-        <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
-      </>
-    );
+    default:
+      return (
+        <>
+          {(canMoveUp || canMoveDown) && <MoveSubmenuButton hidden={hidden} onClick={onStartMove} />}
+          <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
+        </>
+      );
   }
 };
 
@@ -178,11 +188,11 @@ const SheetSlotOverlay = ({
   focusRequestId,
   ...controlProps
 }: Omit<OverlayControlsProps, 'hidden'> & {
-  face: SheetFace,
-  open: boolean,
-  danger: boolean,
-  focus: OverlayFocus | null,
-  focusRequestId: number,
+  face: SheetFace;
+  open: boolean;
+  danger: boolean;
+  focus: OverlayFocus | null;
+  focusRequestId: number;
 }) => {
   const controlsRef = useRef<HTMLDivElement>(null);
 
@@ -195,17 +205,20 @@ const SheetSlotOverlay = ({
   useEffect(() => {
     if (!open || !focus || !controlsRef.current) return;
 
-    const control = controlsRef.current.querySelector<HTMLElement>(`.sheet-slot-overlay-${focus}`)
-      ?? controlsRef.current.querySelector('button');
+    const control =
+      controlsRef.current.querySelector<HTMLElement>(`.sheet-slot-overlay-${focus}`) ??
+      controlsRef.current.querySelector('button');
     control?.focus();
   }, [open, focus, focusRequestId]);
 
   const overlayClassName = [
     'sheet-slot-overlay',
-    face === "main" ? "main-face" : face === "secondary" ? "secondary-face" : '',
+    face === 'main' ? 'main-face' : face === 'secondary' ? 'secondary-face' : '',
     open ? 'open' : '',
     danger ? 'danger' : '',
-  ].filter(Boolean).join(' ');
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <div className={overlayClassName}>

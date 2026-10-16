@@ -1,9 +1,23 @@
-import { FONT_FAMILY, STATSLINE_FONT_SIZE, STATSLINE_HEIGHT, STATSLINE_WIDTH, STATSLINE_Y, TITLE_WIDTH } from '../config';
+import {
+  FONT_FAMILY,
+  STATSLINE_FONT_SIZE,
+  STATSLINE_HEIGHT,
+  STATSLINE_WIDTH,
+  STATSLINE_Y,
+  TITLE_WIDTH,
+} from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 
-export const drawStatsBox = (ctx: CanvasRenderingContext2D, { cardPower, cardToughness, cardColorTreatment }: { cardPower: string, cardToughness: string, cardColorTreatment: ColorTreatment }) => {
+export const drawStatsBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardPower,
+    cardToughness,
+    cardColorTreatment,
+  }: { cardPower: string; cardToughness: string; cardColorTreatment: ColorTreatment },
+) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2 + TITLE_WIDTH - STATSLINE_WIDTH;
   const y = STATSLINE_Y;
   const width = STATSLINE_WIDTH;

@@ -49,9 +49,18 @@ describe('getColorTreatment', () => {
 
 describe('getPaletteColors', () => {
   const palette: Palette = {
-    WHITE: 'w', BLUE: 'u', BLACK: 'b', RED: 'r', GREEN: 'g',
-    COLORLESS: 'c', MULTI: 'm', ARTIFACT: 'a', LAND: 'l',
-    TEXT: 'text', LINE: 'line', PAPER: 'paper',
+    WHITE: 'w',
+    BLUE: 'u',
+    BLACK: 'b',
+    RED: 'r',
+    GREEN: 'g',
+    COLORLESS: 'c',
+    MULTI: 'm',
+    ARTIFACT: 'a',
+    LAND: 'l',
+    TEXT: 'text',
+    LINE: 'line',
+    PAPER: 'paper',
   };
 
   test('uses a single color of the palette for single colors, multicolored and colorless treatments', () => {

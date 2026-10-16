@@ -7,11 +7,12 @@ vi.mock('jspdf', () => ({
   }),
 }));
 
-const createdPdf = () => vi.mocked(jsPDF).mock.results.at(-1)?.value as {
-  addImage: ReturnType<typeof vi.fn>,
-  addPage: ReturnType<typeof vi.fn>,
-  save: ReturnType<typeof vi.fn>,
-};
+const createdPdf = () =>
+  vi.mocked(jsPDF).mock.results.at(-1)?.value as {
+    addImage: ReturnType<typeof vi.fn>;
+    addPage: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+  };
 
 const cardImages = (count: number) => Array.from({ length: count }, (_, i) => `card-${i}`);
 

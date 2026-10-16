@@ -38,15 +38,19 @@ test('splits the height equally, but with the required heights, when the minimum
 });
 
 test('splits the height equally when neither the minimums nor the required heights fit', () => {
-  expect(distributeHeight(90, [
-    { weight: 1, minHeight: 50, requiredHeight: 50 },
-    { weight: 2, minHeight: 50, requiredHeight: 50 },
-  ])).toEqual([45, 45]);
+  expect(
+    distributeHeight(90, [
+      { weight: 1, minHeight: 50, requiredHeight: 50 },
+      { weight: 2, minHeight: 50, requiredHeight: 50 },
+    ]),
+  ).toEqual([45, 45]);
 });
 
 test('splits the height equally when the minimums do not fit and there are no required heights', () => {
-  expect(distributeHeight(90, [
-    { weight: 1, minHeight: 50 },
-    { weight: 2, minHeight: 50 },
-  ])).toEqual([45, 45]);
+  expect(
+    distributeHeight(90, [
+      { weight: 1, minHeight: 50 },
+      { weight: 2, minHeight: 50 },
+    ]),
+  ).toEqual([45, 45]);
 });

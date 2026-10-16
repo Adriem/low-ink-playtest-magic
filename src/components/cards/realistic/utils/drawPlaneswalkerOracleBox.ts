@@ -25,12 +25,15 @@ import type { ColorTreatment } from '../../../../domain/colorTreatment';
  * Draw the oracle text box of a planeswalker, with its loyalty box overlapping
  * the bottom of it.
  */
-export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText = '',
-  cardLoyalty,
-  cardColorTreatment,
-  layout,
-}: { cardOracleText?: string, cardLoyalty: string, cardColorTreatment: ColorTreatment, layout: OracleLayout }) => {
+export const drawPlaneswalkerOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText = '',
+    cardLoyalty,
+    cardColorTreatment,
+    layout,
+  }: { cardOracleText?: string; cardLoyalty: string; cardColorTreatment: ColorTreatment; layout: OracleLayout },
+) => {
   const x = layout === 'right-half' ? ctx.canvas.width / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
   const width = layout === 'full-width' ? CONTENT_WIDTH : CONTENT_WIDTH / 2;
@@ -58,12 +61,13 @@ export const drawPlaneswalkerOracleBox = (ctx: CanvasRenderingContext2D, {
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitFontSizeInXY(
-    ctx,
-    cardOracleText.split('\n'),
-    textWidth,
-    textHeight,
-  ), textX, textY);
+  fillMultilineText(ctx, fitFontSizeInXY(ctx, cardOracleText.split('\n'), textWidth, textHeight), textX, textY);
 
-  drawLoyaltyBox(ctx, { cardLoyalty, x: LOYALTY_BOX_X, y: LOYALTY_BOX_Y, fontFamily: FONT_FAMILY, colors: REALISTIC_PALETTE });
+  drawLoyaltyBox(ctx, {
+    cardLoyalty,
+    x: LOYALTY_BOX_X,
+    y: LOYALTY_BOX_Y,
+    fontFamily: FONT_FAMILY,
+    colors: REALISTIC_PALETTE,
+  });
 };

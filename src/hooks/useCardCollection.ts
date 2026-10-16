@@ -1,5 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
-import { isLoadingCard, moveCard as moveCardInCollection, type CollectionCard, type LoadingCard } from '../domain/press';
+import {
+  isLoadingCard,
+  moveCard as moveCardInCollection,
+  type CollectionCard,
+  type LoadingCard,
+} from '../domain/press';
 import { useFetchCard } from './useFetchCard';
 
 interface CardCollectionOptions {
@@ -20,25 +25,28 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
   const [cardCollection, setCardCollection] = useState<CollectionCard[]>(initialCards);
   const nextLoadingCardIdRef = useRef(0);
 
-  const addCardByName = useCallback((cardName: string) => {
-    const loadingCardId = nextLoadingCardIdRef.current++;
-    const isPlaceholder = (card: CollectionCard) => isLoadingCard(card) && card.loadingCardId === loadingCardId;
-    const placeholder: LoadingCard = { loading: true, loadingCardId };
+  const addCardByName = useCallback(
+    (cardName: string) => {
+      const loadingCardId = nextLoadingCardIdRef.current++;
+      const isPlaceholder = (card: CollectionCard) => isLoadingCard(card) && card.loadingCardId === loadingCardId;
+      const placeholder: LoadingCard = { loading: true, loadingCardId };
 
-    setCardCollection(collection => [...collection, placeholder]);
+      setCardCollection((collection) => [...collection, placeholder]);
 
-    void findCardByName(cardName)
-      .then((card) => {
-        setCardCollection(collection => collection.map(c => isPlaceholder(c) ? card : c));
-      })
-      .catch((error: Error) => {
-        setCardCollection(collection => collection.filter(c => !isPlaceholder(c)));
-        onCardLoadError?.(cardName, error);
-      });
-  }, [findCardByName, onCardLoadError]);
+      void findCardByName(cardName)
+        .then((card) => {
+          setCardCollection((collection) => collection.map((c) => (isPlaceholder(c) ? card : c)));
+        })
+        .catch((error: Error) => {
+          setCardCollection((collection) => collection.filter((c) => !isPlaceholder(c)));
+          onCardLoadError?.(cardName, error);
+        });
+    },
+    [findCardByName, onCardLoadError],
+  );
 
   const removeCardAt = useCallback((index: number) => {
-    setCardCollection(collection => collection.filter((_card, i) => i !== index));
+    setCardCollection((collection) => collection.filter((_card, i) => i !== index));
   }, []);
 
   /**
@@ -46,7 +54,7 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
    * collection are ignored.
    */
   const moveCard = useCallback((fromIndex: number, toIndex: number) => {
-    setCardCollection(collection => moveCardInCollection(collection, fromIndex, toIndex));
+    setCardCollection((collection) => moveCardInCollection(collection, fromIndex, toIndex));
   }, []);
 
   const clearCollection = useCallback(() => {

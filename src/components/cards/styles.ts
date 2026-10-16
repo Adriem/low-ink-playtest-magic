@@ -41,6 +41,5 @@ export const DEFAULT_CARD_STYLE: CardStyle = 'realistic';
  *
  * @param cardStyle - e.g. `realistic` or `minimalist`
  */
-export const getCardStyle = (cardStyle: string): CardStyleDefinition => (
-  CARD_STYLES[cardStyle as CardStyle] ?? CARD_STYLES[DEFAULT_CARD_STYLE]
-);
+export const getCardStyle = (cardStyle: string): CardStyleDefinition =>
+  CARD_STYLES[cardStyle as CardStyle] ?? CARD_STYLES[DEFAULT_CARD_STYLE];

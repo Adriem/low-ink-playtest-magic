@@ -4,11 +4,14 @@ import { drawFramedBox } from './drawFramedBox';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { ArtCrop } from '../../../../domain/cards';
 
-export const drawArtBox = (ctx: CanvasRenderingContext2D, {
-  cardColorTreatment,
-  cardArtUrl,
-  cropArt,
-}: { cardColorTreatment: ColorTreatment, cardArtUrl?: string, cropArt?: ArtCrop }) => {
+export const drawArtBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardColorTreatment,
+    cardArtUrl,
+    cropArt,
+  }: { cardColorTreatment: ColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop },
+) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;
   const y = ARTWORK_Y;

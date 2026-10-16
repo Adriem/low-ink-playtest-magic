@@ -24,7 +24,11 @@ export const distributeHeight = (totalHeight: number, items: HeightItem[]): numb
 
   if (sumOf(minHeights) <= totalHeight) return distributeWithMinimums(totalHeight, items, minHeights);
   if (sumOf(requiredHeights) <= totalHeight) {
-    return distributeWithMinimums(totalHeight, items.map(() => ({ weight: 1 })), requiredHeights);
+    return distributeWithMinimums(
+      totalHeight,
+      items.map(() => ({ weight: 1 })),
+      requiredHeights,
+    );
   }
   return items.map(() => totalHeight / items.length);
 };
@@ -43,11 +47,9 @@ const distributeWithMinimums = (totalHeight: number, items: { weight: number }[]
       return freeWeight > 0 ? freeHeight * (weight / freeWeight) : freeHeight / freeItems;
     });
 
-    const belowMinHeight = items
-      .map((_item, i) => i)
-      .filter(i => !atMinHeight.has(i) && heights[i] < minHeights[i]);
+    const belowMinHeight = items.map((_item, i) => i).filter((i) => !atMinHeight.has(i) && heights[i] < minHeights[i]);
     if (belowMinHeight.length === 0) return heights;
 
-    belowMinHeight.forEach(i => atMinHeight.add(i));
+    belowMinHeight.forEach((i) => atMinHeight.add(i));
   }
 };

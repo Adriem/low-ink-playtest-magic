@@ -25,12 +25,12 @@ const rejectCard = async (pending: Deferred<Card>, error: Error) => {
   });
 };
 
-const cardNames = (collection: CollectionCard[]) => collection.map(card => isLoadingCard(card) ? 'loading' : card.name);
+const cardNames = (collection: CollectionCard[]) =>
+  collection.map((card) => (isLoadingCard(card) ? 'loading' : card.name));
 
 // The hook's latest result, as `collection.current`
-const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) => (
-  renderHook(() => useCardCollection(options)).result
-);
+const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) =>
+  renderHook(() => useCardCollection(options)).result;
 
 beforeEach(() => {
   vi.mocked(fetchCard).mockReset();
@@ -49,8 +49,9 @@ test('adds a loading placeholder that is replaced once the card loads', async ()
 });
 
 test('keeps the order cards were added in, regardless of load order', async () => {
-  const a = deferred<Card>(), b = deferred<Card>();
-  vi.mocked(fetchCard).mockImplementation(name => ({ A: a, B: b } as Record<string, Deferred<Card>>)[name].promise);
+  const a = deferred<Card>(),
+    b = deferred<Card>();
+  vi.mocked(fetchCard).mockImplementation((name) => (({ A: a, B: b }) as Record<string, Deferred<Card>>)[name].promise);
   const collection = setupCollection();
 
   act(() => {
@@ -96,7 +97,8 @@ test('fetches each card name only once', async () => {
 });
 
 test('fetches a failed card again when it is added again', async () => {
-  const failing = deferred<Card>(), retry = deferred<Card>();
+  const failing = deferred<Card>(),
+    retry = deferred<Card>();
   vi.mocked(fetchCard).mockReturnValueOnce(failing.promise).mockReturnValueOnce(retry.promise);
   const collection = setupCollection();
 
@@ -123,7 +125,9 @@ test('drops a card that loads after its placeholder was removed', async () => {
 });
 
 test('moves cards to another position', () => {
-  const collection = setupCollection({ initialCards: [testCard({ name: 'A' }), testCard({ name: 'B' }), testCard({ name: 'C' })] });
+  const collection = setupCollection({
+    initialCards: [testCard({ name: 'A' }), testCard({ name: 'B' }), testCard({ name: 'C' })],
+  });
 
   act(() => collection.current.moveCard(0, 1));
   expect(cardNames(collection.current.cardCollection)).toEqual(['B', 'A', 'C']);
@@ -144,7 +148,9 @@ test('ignores moves outside the collection', () => {
 });
 
 test('removes cards by index and clears the collection', () => {
-  const collection = setupCollection({ initialCards: () => [testCard({ name: 'A' }), testCard({ name: 'B' }), testCard({ name: 'C' })] });
+  const collection = setupCollection({
+    initialCards: () => [testCard({ name: 'A' }), testCard({ name: 'B' }), testCard({ name: 'C' })],
+  });
 
   act(() => collection.current.removeCardAt(1));
   expect(cardNames(collection.current.cardCollection)).toEqual(['A', 'C']);

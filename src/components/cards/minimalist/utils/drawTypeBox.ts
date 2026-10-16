@@ -2,7 +2,10 @@ import { TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_WIDTH, TYPELINE_Y } from 
 import { drawTypeLine } from './drawTypeLine';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 
-export const drawTypeBox = (ctx: CanvasRenderingContext2D, { cardType, cardColorTreatment }: { cardType?: string, cardColorTreatment: ColorTreatment }) => {
+export const drawTypeBox = (
+  ctx: CanvasRenderingContext2D,
+  { cardType, cardColorTreatment }: { cardType?: string; cardColorTreatment: ColorTreatment },
+) => {
   drawTypeLine(ctx, {
     cardType,
     cardColorTreatment,

@@ -23,7 +23,7 @@ const CHAPTER_SEPARATOR_THICKNESS = 1;
 // Chapter numbers are hexagons centered on the column's left pinline, stacked
 // when a chapter has several numbers
 const CHAPTER_ICON_SPACING = 50;
-const CHAPTER_ICON_HALF_WIDTH = 22.5 * Math.sqrt(3) / 2;
+const CHAPTER_ICON_HALF_WIDTH = (22.5 * Math.sqrt(3)) / 2;
 // Minimum height of each paragraph and chapter of the saga's text
 const MIN_SLOT_HEIGHT = 75;
 // Height of a hexagon chapter icon (at scale 1)
@@ -49,24 +49,31 @@ interface SagaSlot {
  * @param column - Area inside the frame, between its pinlines
  * @returns Whether the text had chapters to lay out
  */
-const drawSagaChapters = (ctx: CanvasRenderingContext2D, cardOracleText: string, { x, y, width, height }: Box): boolean => {
+const drawSagaChapters = (
+  ctx: CanvasRenderingContext2D,
+  cardOracleText: string,
+  { x, y, width, height }: Box,
+): boolean => {
   const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(cardOracleText);
   if (chapters.length === 0) return false;
 
   const slots: SagaSlot[] = [
-    ...topParagraphs.map(content => ({ content, align: 'top' as const })),
+    ...topParagraphs.map((content) => ({ content, align: 'top' as const })),
     ...chapters.map(({ labels, text }) => ({ content: text, labels, align: 'center' as const, isChapter: true })),
-    ...bottomParagraphs.map(content => ({ content, align: 'center' as const })),
+    ...bottomParagraphs.map((content) => ({ content, align: 'center' as const })),
   ];
   // Slots are as tall as their share of the characters (including spaces), but
   // at least the minimum height, and tall enough for a chapter's icons
-  const slotHeights = distributeHeight(height, slots.map(({ content, labels }) => ({
-    weight: content.length,
-    minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * CHAPTER_ICON_SPACING),
-    // When the minimums don't fit, slots get the same height, except that a
-    // chapter still needs room for its icons
-    requiredHeight: labels ? (labels.length - 1) * CHAPTER_ICON_SPACING + CHAPTER_ICON_HEIGHT : 0,
-  })));
+  const slotHeights = distributeHeight(
+    height,
+    slots.map(({ content, labels }) => ({
+      weight: content.length,
+      minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * CHAPTER_ICON_SPACING),
+      // When the minimums don't fit, slots get the same height, except that a
+      // chapter still needs room for its icons
+      requiredHeight: labels ? (labels.length - 1) * CHAPTER_ICON_SPACING + CHAPTER_ICON_HEIGHT : 0,
+    })),
+  );
   const textRight = x + width - ORACLE_TEXT_PADDING_X;
   const iconX = x - PINLINE_THICKNESS / 2;
   // Chapter text starts after the chapter icons
@@ -82,7 +89,7 @@ const drawSagaChapters = (ctx: CanvasRenderingContext2D, cardOracleText: string,
       padding: ORACLE_TEXT_PADDING_Y,
     };
   });
-  const fontSize = Math.min(...textAreas.map(area => getFittingFontSize(ctx, area)));
+  const fontSize = Math.min(...textAreas.map((area) => getFittingFontSize(ctx, area)));
 
   let slotY = y;
   slots.forEach(({ labels, align, isChapter }, index) => {
@@ -103,7 +110,7 @@ const drawSagaChapters = (ctx: CanvasRenderingContext2D, cardOracleText: string,
     }
 
     if (labels) {
-      const firstIconY = slotY + slotHeight / 2 - (labels.length - 1) * CHAPTER_ICON_SPACING / 2;
+      const firstIconY = slotY + slotHeight / 2 - ((labels.length - 1) * CHAPTER_ICON_SPACING) / 2;
       labels.forEach((label, labelIndex) => {
         drawSagaChapter(ctx, {
           romanNumeral: label,
@@ -128,13 +135,22 @@ const drawSagaChapters = (ctx: CanvasRenderingContext2D, cardOracleText: string,
  *
  * @param options.typelineY - Where the type line below the box starts
  */
-export const drawSagaOracleAndArtBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText = '',
-  cardArtUrl,
-  cropArt,
-  cardColorTreatment,
-  typelineY = SAGA_TYPELINE_Y,
-}: { cardOracleText?: string, cardArtUrl?: string, cropArt?: ArtCrop, cardColorTreatment: ColorTreatment, typelineY?: number }) => {
+export const drawSagaOracleAndArtBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText = '',
+    cardArtUrl,
+    cropArt,
+    cardColorTreatment,
+    typelineY = SAGA_TYPELINE_Y,
+  }: {
+    cardOracleText?: string;
+    cardArtUrl?: string;
+    cropArt?: ArtCrop;
+    cardColorTreatment: ColorTreatment;
+    typelineY?: number;
+  },
+) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = SAGA_COLUMNS_Y;
   const width = CONTENT_WIDTH;
@@ -163,7 +179,7 @@ export const drawSagaOracleAndArtBox = (ctx: CanvasRenderingContext2D, {
   const textColumn = {
     x: inner.x + PINLINE_THICKNESS,
     y: inner.y + PINLINE_THICKNESS,
-    width: (x + halfWidth - PINLINE_THICKNESS / 2) - (inner.x + PINLINE_THICKNESS),
+    width: x + halfWidth - PINLINE_THICKNESS / 2 - (inner.x + PINLINE_THICKNESS),
     height: inner.height - PINLINE_THICKNESS * 2,
   };
   const hasChapters = drawSagaChapters(ctx, cardOracleText, textColumn);

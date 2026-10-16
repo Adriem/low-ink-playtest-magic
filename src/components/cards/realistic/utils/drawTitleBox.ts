@@ -18,11 +18,14 @@ import { drawFramedBox } from './drawFramedBox';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 
-export const drawTitleBox = (ctx: CanvasRenderingContext2D, {
-  cardName,
-  cardColorTreatment,
-  cardManaCost,
-}: { cardName: string, cardColorTreatment: ColorTreatment, cardManaCost?: string }) => {
+export const drawTitleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardName,
+    cardColorTreatment,
+    cardManaCost,
+  }: { cardName: string; cardColorTreatment: ColorTreatment; cardManaCost?: string },
+) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const y = TITLE_Y;
   const width = TITLE_WIDTH;

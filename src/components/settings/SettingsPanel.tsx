@@ -11,7 +11,7 @@ const SettingFieldset = <Name extends SettingName>({ name }: { name: Name }) => 
   return (
     <fieldset disabled={definition.disabled}>
       <legend>{definition.label}</legend>
-      {definition.options.map(option => (
+      {definition.options.map((option) => (
         <label key={option.value}>
           <input
             type="radio"
@@ -30,7 +30,7 @@ const SettingFieldset = <Name extends SettingName>({ name }: { name: Name }) => 
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => (
   <dialog ref={ref}>
     <form method="dialog">
-      {SETTING_NAMES.map(name => (
+      {SETTING_NAMES.map((name) => (
         <SettingFieldset key={name} name={name} />
       ))}
       <menu>

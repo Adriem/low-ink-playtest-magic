@@ -4,7 +4,11 @@
  * @param fallback - Returned when nothing valid is saved
  * @param isValid - Check for the loaded value
  */
-export const loadFromSessionStorage = <T>(key: string, fallback: T, isValid: (value: unknown) => boolean = () => true): T => {
+export const loadFromSessionStorage = <T>(
+  key: string,
+  fallback: T,
+  isValid: (value: unknown) => boolean = () => true,
+): T => {
   try {
     const raw = sessionStorage.getItem(key);
     if (raw == null) return fallback;

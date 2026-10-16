@@ -11,21 +11,24 @@ import type { Card } from '../domain/cards';
  *   or fetches it, and rejects if the card cannot be fetched.
  */
 export const useFetchCard = () => {
-  const cacheRef = useRef(new Map<string, Promise<Card>>())
+  const cacheRef = useRef(new Map<string, Promise<Card>>());
 
-  return useMemo(() => ({
-    findCardByName: (cardName: string): Promise<Card> => {
-      const cache = cacheRef.current
-      const cached = cache.get(cardName)
-      if (cached) return cached
+  return useMemo(
+    () => ({
+      findCardByName: (cardName: string): Promise<Card> => {
+        const cache = cacheRef.current;
+        const cached = cache.get(cardName);
+        if (cached) return cached;
 
-      const cardPromise = fetchCard(cardName).catch((error) => {
-        cache.delete(cardName)
-        throw error
-      })
+        const cardPromise = fetchCard(cardName).catch((error) => {
+          cache.delete(cardName);
+          throw error;
+        });
 
-      cache.set(cardName, cardPromise)
-      return cardPromise
-    },
-  }), [])
-}
+        cache.set(cardName, cardPromise);
+        return cardPromise;
+      },
+    }),
+    [],
+  );
+};

@@ -33,11 +33,12 @@ const parseCardListLine = (line: string): CardListEntry => {
  * Turn the content of the card list textarea into entries: one card per line,
  * ignoring empty lines.
  */
-const parseCardList = (cardList: string): CardListEntry[] => cardList
-  .split('\n')
-  .map(line => line.trim())
-  .filter(Boolean)
-  .map(parseCardListLine);
+const parseCardList = (cardList: string): CardListEntry[] =>
+  cardList
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map(parseCardListLine);
 
 const repeatCardName = (cardName: string, quantity: number) => Array.from({ length: quantity }, () => cardName);
 
@@ -46,7 +47,13 @@ const repeatCardName = (cardName: string, quantity: number) => Array.from({ leng
  *
  * @param props.multipleSearch - Whether the card list mode is selected
  */
-const SearchModeToggle = ({ multipleSearch, onChange }: { multipleSearch: boolean, onChange: SearchModeChangeHandler }) => (
+const SearchModeToggle = ({
+  multipleSearch,
+  onChange,
+}: {
+  multipleSearch: boolean;
+  onChange: SearchModeChangeHandler;
+}) => (
   <div
     className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
     role="radiogroup"
@@ -54,23 +61,11 @@ const SearchModeToggle = ({ multipleSearch, onChange }: { multipleSearch: boolea
   >
     <span id="search-mode-label">Search mode:</span>
     <label>
-      <input
-        type="radio"
-        name="searchMode"
-        value="single"
-        checked={!multipleSearch}
-        onChange={() => onChange(false)}
-      />
+      <input type="radio" name="searchMode" value="single" checked={!multipleSearch} onChange={() => onChange(false)} />
       single card
     </label>
     <label>
-      <input
-        type="radio"
-        name="searchMode"
-        value="list"
-        checked={multipleSearch}
-        onChange={() => onChange(true)}
-      />
+      <input type="radio" name="searchMode" value="list" checked={multipleSearch} onChange={() => onChange(true)} />
       card list
     </label>
   </div>
@@ -81,16 +76,8 @@ const SearchModeToggle = ({ multipleSearch, onChange }: { multipleSearch: boolea
  */
 const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchModeChangeHandler }) => (
   <>
-    <input
-      className="card-name-input"
-      name="cardName"
-      placeholder="e.g. Colossal Dreadmaw"
-    />
-    <input
-      className="submit-card-search single"
-      type="submit"
-      value="Add card"
-    />
+    <input className="card-name-input" name="cardName" placeholder="e.g. Colossal Dreadmaw" />
+    <input className="submit-card-search single" type="submit" value="Add card" />
     <SearchModeToggle multipleSearch={false} onChange={onSearchModeChange} />
   </>
 );
@@ -132,11 +119,7 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
         aria-hidden="true"
       />
       <SearchModeToggle multipleSearch onChange={onSearchModeChange} />
-      <input
-        className="submit-card-search multiple"
-        type="submit"
-        value="Add cards"
-      />
+      <input className="submit-card-search multiple" type="submit" value="Add cards" />
     </>
   );
 };
@@ -149,36 +132,39 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
 const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => void }) => {
   const [multipleSearch, setMultipleSearch] = useState(false);
 
-  const handleSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleSubmit = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    const form = event.currentTarget;
-    const formData = new FormData(form);
-    const getField = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement;
-    const getValue = (name: string) => String(formData.get(name) ?? '');
-    let cardNames;
+      const form = event.currentTarget;
+      const formData = new FormData(form);
+      const getField = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLTextAreaElement;
+      const getValue = (name: string) => String(formData.get(name) ?? '');
+      let cardNames;
 
-    if (multipleSearch) {
-      const cardList = getField('cardNamesList');
-      const entries = parseCardList(getValue('cardNamesList'));
-      const invalidEntry = entries.find(({ quantity }) => quantity < 1);
+      if (multipleSearch) {
+        const cardList = getField('cardNamesList');
+        const entries = parseCardList(getValue('cardNamesList'));
+        const invalidEntry = entries.find(({ quantity }) => quantity < 1);
 
-      if (invalidEntry) {
-        cardList.setCustomValidity(`"${invalidEntry.line}": the quantity must be between 1 and ${MAX_QUANTITY}`);
-        cardList.reportValidity();
-        return;
+        if (invalidEntry) {
+          cardList.setCustomValidity(`"${invalidEntry.line}": the quantity must be between 1 and ${MAX_QUANTITY}`);
+          cardList.reportValidity();
+          return;
+        }
+
+        cardNames = entries.flatMap(({ cardName, quantity }) => repeatCardName(cardName, quantity));
+      } else {
+        cardNames = [getValue('cardName').trim()].filter(Boolean);
       }
 
-      cardNames = entries.flatMap(({ cardName, quantity }) => repeatCardName(cardName, quantity));
-    } else {
-      cardNames = [getValue('cardName').trim()].filter(Boolean);
-    }
+      if (cardNames.length > 0) onAddCards(cardNames);
 
-    if (cardNames.length > 0) onAddCards(cardNames);
-
-    // The input starts over after adding the cards, so it's ready for the next ones
-    getField(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
-  }, [multipleSearch, onAddCards]);
+      // The input starts over after adding the cards, so it's ready for the next ones
+      getField(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
+    },
+    [multipleSearch, onAddCards],
+  );
 
   const handleSearchModeChange = useCallback((multiple: boolean) => {
     setMultipleSearch(multiple);
@@ -186,9 +172,11 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
 
   return (
     <form className="card-search-form" action="#" onSubmit={handleSubmit}>
-      {multipleSearch
-        ? <CardListFields onSearchModeChange={handleSearchModeChange} />
-        : <SingleCardFields onSearchModeChange={handleSearchModeChange} />}
+      {multipleSearch ? (
+        <CardListFields onSearchModeChange={handleSearchModeChange} />
+      ) : (
+        <SingleCardFields onSearchModeChange={handleSearchModeChange} />
+      )}
     </form>
   );
 };

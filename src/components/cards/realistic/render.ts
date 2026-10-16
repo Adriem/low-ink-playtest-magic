@@ -43,12 +43,10 @@ const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position:
  *
  * @param canvas - 500x700 canvas
  */
-export const renderRealisticCard = (canvas: HTMLCanvasElement, {
-  face,
-  subFace,
-  subFacePosition,
-  blackBordered,
-}: CardRenderProps) => {
+export const renderRealisticCard = (
+  canvas: HTMLCanvasElement,
+  { face, subFace, subFacePosition, blackBordered }: CardRenderProps,
+) => {
   const cardColorTreatment = getColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
@@ -68,7 +66,13 @@ export const renderRealisticCard = (canvas: HTMLCanvasElement, {
   if (face.faceLayout === 'saga') {
     if (powerAndToughness) {
       const { sagaText, creatureText } = splitSagaCreatureText(cardOracleText);
-      drawSagaOracleAndArtBox(ctx, { cardOracleText: sagaText, cardArtUrl, cropArt, cardColorTreatment, typelineY: SAGA_CREATURE_TYPELINE_Y });
+      drawSagaOracleAndArtBox(ctx, {
+        cardOracleText: sagaText,
+        cardArtUrl,
+        cropArt,
+        cardColorTreatment,
+        typelineY: SAGA_CREATURE_TYPELINE_Y,
+      });
       drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, y: SAGA_CREATURE_TYPELINE_Y });
       drawSagaCreatureOracleBox(ctx, { cardOracleText: creatureText, cardColorTreatment });
     } else {
@@ -78,11 +82,18 @@ export const renderRealisticCard = (canvas: HTMLCanvasElement, {
   } else {
     drawArtBox(ctx, { cardArtUrl, cropArt, cardColorTreatment });
     drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment });
-    const oracleLayout = subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
+    const oracleLayout =
+      subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
     if (cardLoyalty) {
       drawPlaneswalkerOracleBox(ctx, { cardOracleText, cardLoyalty, cardColorTreatment, layout: oracleLayout });
     } else {
-      drawOracleBox(ctx, { cardOracleText, cardPower: powerAndToughness?.power, cardToughness: powerAndToughness?.toughness, cardColorTreatment, layout: oracleLayout });
+      drawOracleBox(ctx, {
+        cardOracleText,
+        cardPower: powerAndToughness?.power,
+        cardToughness: powerAndToughness?.toughness,
+        cardColorTreatment,
+        layout: oracleLayout,
+      });
     }
   }
 
@@ -91,6 +102,10 @@ export const renderRealisticCard = (canvas: HTMLCanvasElement, {
   }
 
   if (powerAndToughness) {
-    drawStatsBox(ctx, { cardPower: powerAndToughness.power, cardToughness: powerAndToughness.toughness, cardColorTreatment });
+    drawStatsBox(ctx, {
+      cardPower: powerAndToughness.power,
+      cardToughness: powerAndToughness.toughness,
+      cardColorTreatment,
+    });
   }
 };

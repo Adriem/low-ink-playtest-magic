@@ -13,13 +13,22 @@ import { drawOracleText } from './drawOracleText';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleLayout } from '../../styles';
 
-export const drawOracleBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText = '',
-  cardPower,
-  cardToughness,
-  cardColorTreatment,
-  layout,
-}: { cardOracleText?: string, cardPower?: string, cardToughness?: string, cardColorTreatment: ColorTreatment, layout: OracleLayout }) => {
+export const drawOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText = '',
+    cardPower,
+    cardToughness,
+    cardColorTreatment,
+    layout,
+  }: {
+    cardOracleText?: string;
+    cardPower?: string;
+    cardToughness?: string;
+    cardColorTreatment: ColorTreatment;
+    layout: OracleLayout;
+  },
+) => {
   const x = layout === 'right-half' ? ctx.canvas.width / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
   const width = layout === 'full-width' ? CONTENT_WIDTH : CONTENT_WIDTH / 2;
@@ -36,7 +45,10 @@ export const drawOracleBox = (ctx: CanvasRenderingContext2D, {
 
   const textPaddingX = ORACLE_TEXT_PADDING_X;
   const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
-  const textPaddingBottom = (cardPower != null && cardToughness != null) && layout !== 'left-half' ? ORACLE_TEXT_STATS_CLEARANCE : ORACLE_TEXT_PADDING_Y;
+  const textPaddingBottom =
+    cardPower != null && cardToughness != null && layout !== 'left-half'
+      ? ORACLE_TEXT_STATS_CLEARANCE
+      : ORACLE_TEXT_PADDING_Y;
 
   drawOracleText(ctx, {
     cardOracleText,

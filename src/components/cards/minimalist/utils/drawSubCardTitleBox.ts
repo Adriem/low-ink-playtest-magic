@@ -10,12 +10,15 @@ const TITLE_MANA_COST_GAP = 3;
 const MANA_SYMBOL_DIAMETER = 22;
 const MANA_SYMBOLS_SPACING = 4;
 
-export const drawSubCardTitleBox = (ctx: CanvasRenderingContext2D, {
-  cardName,
-  cardManaCost,
-  position,
-  maxHeight = SUBCARD_TITLE_HEIGHT,
-}: { cardName: string, cardManaCost?: string, position: SubCardPosition, maxHeight?: number }) => {
+export const drawSubCardTitleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardName,
+    cardManaCost,
+    position,
+    maxHeight = SUBCARD_TITLE_HEIGHT,
+  }: { cardName: string; cardManaCost?: string; position: SubCardPosition; maxHeight?: number },
+) => {
   const cardWidth = ctx.canvas.width;
   const subCardWidth = cardWidth / 2;
   const subTitleWidth = TITLE_WIDTH / 2;
@@ -30,11 +33,10 @@ export const drawSubCardTitleBox = (ctx: CanvasRenderingContext2D, {
     symbolSpacing: MANA_SYMBOLS_SPACING,
   });
 
-  const titleLinesX = position === "left"
-    ? titleBoxMarginX
-    : cardWidth / 2 + TITLE_BOX_MARGIN_FROM_CENTER;
+  const titleLinesX = position === 'left' ? titleBoxMarginX : cardWidth / 2 + TITLE_BOX_MARGIN_FROM_CENTER;
   const titleLinesY = SUBCARD_TITLE_Y + 30;
-  const titleLine1Width = subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER - (manaCostWidth ? (manaCostWidth + TITLE_MANA_COST_GAP) : 0);
+  const titleLine1Width =
+    subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER - (manaCostWidth ? manaCostWidth + TITLE_MANA_COST_GAP : 0);
   const titleLine2Width = subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER * 2;
 
   drawTitleText(ctx, {
@@ -50,9 +52,10 @@ export const drawSubCardTitleBox = (ctx: CanvasRenderingContext2D, {
   if (manaSymbols.length > 0) {
     renderManaCost(ctx, {
       manaSymbols,
-      x: position === "left"
-        ? subCardWidth - manaCostWidth - TITLE_BOX_MARGIN_FROM_CENTER - TITLE_MANA_COST_GAP
-        : cardWidth - manaCostWidth - titleBoxMarginX - TITLE_MANA_COST_GAP,
+      x:
+        position === 'left'
+          ? subCardWidth - manaCostWidth - TITLE_BOX_MARGIN_FROM_CENTER - TITLE_MANA_COST_GAP
+          : cardWidth - manaCostWidth - titleBoxMarginX - TITLE_MANA_COST_GAP,
       y: SUBCARD_TITLE_Y,
       symbolDiameter: MANA_SYMBOL_DIAMETER,
       symbolSpacing: MANA_SYMBOLS_SPACING,

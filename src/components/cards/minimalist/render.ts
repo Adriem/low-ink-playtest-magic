@@ -41,12 +41,10 @@ const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position:
  *
  * @param canvas - 500x700 canvas
  */
-export const renderMinimalistCard = (canvas: HTMLCanvasElement, {
-  face,
-  subFace,
-  subFacePosition,
-  blackBordered,
-}: CardRenderProps) => {
+export const renderMinimalistCard = (
+  canvas: HTMLCanvasElement,
+  { face, subFace, subFacePosition, blackBordered }: CardRenderProps,
+) => {
   const cardColorTreatment = getColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
@@ -65,7 +63,8 @@ export const renderMinimalistCard = (canvas: HTMLCanvasElement, {
     drawSubCard(ctx, subFace, subFacePosition);
   }
 
-  const oracleLayout = subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
+  const oracleLayout =
+    subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
 
   if (face.faceLayout === 'saga') {
     drawSagaOracleBox(ctx, {

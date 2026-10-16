@@ -16,11 +16,18 @@ export const calculateManaCostWidth = ({ manaSymbols, symbolDiameter, symbolSpac
   if (manaSymbols.length === 0) return 0;
 
   return symbolDiameter * manaSymbols.length + symbolSpacing * (manaSymbols.length - 1);
-}
+};
 
 export const renderManaCost = (
   ctx: CanvasRenderingContext2D,
-  { manaSymbols, x, y, symbolDiameter, symbolSpacing, addShadow = true }: ManaCostSize & { x: number, y: number, addShadow?: boolean },
+  {
+    manaSymbols,
+    x,
+    y,
+    symbolDiameter,
+    symbolSpacing,
+    addShadow = true,
+  }: ManaCostSize & { x: number; y: number; addShadow?: boolean },
 ) => {
   manaSymbols.forEach((symbol, i) => {
     const symbolRadius = symbolDiameter / 2;
@@ -47,13 +54,7 @@ export const renderManaCost = (
     // Symbol image
     void drawWhenLoaded(ctx, getSymbolImage(symbol), (symbolImage) => {
       if (!symbolImage) return;
-      ctx.drawImage(
-        symbolImage,
-        symbolX,
-        symbolY,
-        symbolDiameter,
-        symbolDiameter,
-      );
+      ctx.drawImage(symbolImage, symbolX, symbolY, symbolDiameter, symbolDiameter);
     });
   });
-}
+};

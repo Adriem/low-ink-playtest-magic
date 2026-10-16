@@ -5,7 +5,14 @@ import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderer } from './styl
 
 const HALF_HEIGHT = CARD_HEIGHT / 2;
 
-const drawRotatedCW = (ctx: CanvasRenderingContext2D, src: HTMLCanvasElement, dx: number, dy: number, dw: number, dh: number) => {
+const drawRotatedCW = (
+  ctx: CanvasRenderingContext2D,
+  src: HTMLCanvasElement,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+) => {
   ctx.save();
   ctx.translate(dx + dw, dy);
   ctx.rotate(Math.PI / 2);
@@ -33,7 +40,7 @@ const renderFace = (render: CardRenderer, face: CardFace): HTMLCanvasElement => 
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
  */
-const DualCard = ({ cardStyle, faces }: { cardStyle: string, faces: [CardFace, CardFace] }) => {
+const DualCard = ({ cardStyle, faces }: { cardStyle: string; faces: [CardFace, CardFace] }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const { render, palette } = getCardStyle(cardStyle);
   const [face1, face2] = faces;

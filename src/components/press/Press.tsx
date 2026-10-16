@@ -26,13 +26,14 @@ const RENDER_TIMEOUT_MS = 10000;
  * loading aren't missing from it.
  */
 const exportCardsToPdf = async (canvases: HTMLCanvasElement[]) => {
-  const rendered = await Promise.all(canvases.map(canvas => whenRendered(canvas, RENDER_TIMEOUT_MS)));
+  const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
   if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
 
   exportToPDF(canvases);
 };
 
-const loadPersistedCards = () => loadFromSessionStorage<CollectionCard[]>(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
+const loadPersistedCards = () =>
+  loadFromSessionStorage<CollectionCard[]>(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
 
 // TODO: Replace alert with a toast notification
 const handleCardLoadError = (cardName: string, error: Error) => {
@@ -54,7 +55,7 @@ const Press = () => {
   const settingsDialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    const loadedCards = cardCollection.filter(card => !isLoadingCard(card));
+    const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
     saveToSessionStorage(CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
 
@@ -62,9 +63,12 @@ const Press = () => {
     settingsDialogRef.current?.showModal();
   }, []);
 
-  const handleAddCards = useCallback((cardNames: string[]) => {
-    cardNames.forEach(cardName => addCardByName(cardName));
-  }, [addCardByName]);
+  const handleAddCards = useCallback(
+    (cardNames: string[]) => {
+      cardNames.forEach((cardName) => addCardByName(cardName));
+    },
+    [addCardByName],
+  );
 
   // While moving a card (mouse only), the overlay stays on it: hovering other
   // cards or leaving it doesn't change it, only closing it does
@@ -72,29 +76,34 @@ const Press = () => {
     const canvases = [...document.querySelectorAll<HTMLCanvasElement>('canvas.card')];
 
     void exportCardsToPdf(canvases);
-  }, [])
+  }, []);
 
   // Cards keep their key while moved around, so their canvases aren't drawn again
   const calculateItemKey = (sheet: SheetItem[], item: SheetItem, position: number) => {
     if (item.kind === 'loading') return `loading_${item.loadingCardId}`;
 
-    const cardId = item.card.multiverseIds[0]
+    const cardId = item.card.multiverseIds[0];
     const cardOccurrenceInSheet = sheet
       .slice(0, position)
-      .filter(previous => previous.kind !== 'loading' && previous.card.multiverseIds[0] === cardId)
-      .length
+      .filter((previous) => previous.kind !== 'loading' && previous.card.multiverseIds[0] === cardId).length;
 
-    return `${cardId}__${cardOccurrenceInSheet}`
-  }
+    return `${cardId}__${cardOccurrenceInSheet}`;
+  };
 
   return (
     <>
       <CardSearchForm onAddCards={handleAddCards} />
       {cardSheets.length > 0 && (
         <div className="press-actions">
-          <button type="button" className="clear" onClick={clearCollection}>Clear</button>
-          <button type="button" onClick={openSettings}>Settings</button>
-          <button type="button" className="export" onClick={exportPress}>EXPORT</button>
+          <button type="button" className="clear" onClick={clearCollection}>
+            Clear
+          </button>
+          <button type="button" onClick={openSettings}>
+            Settings
+          </button>
+          <button type="button" className="export" onClick={exportPress}>
+            EXPORT
+          </button>
         </div>
       )}
       <SettingsPanel ref={settingsDialogRef} />
@@ -107,7 +116,9 @@ const Press = () => {
                   key={calculateItemKey(sheet, item, position)}
                   collectionIndex={item.collectionIndex}
                   face={item.kind === 'face' ? item.sheetFace : 'single'}
-                  cardName={item.kind === 'loading' ? 'loading card' : item.kind === 'face' ? item.face.name : item.card.name}
+                  cardName={
+                    item.kind === 'loading' ? 'loading card' : item.kind === 'face' ? item.face.name : item.card.name
+                  }
                 >
                   {item.kind === 'loading' ? (
                     <LoadingCard />
@@ -131,7 +142,7 @@ const Press = () => {
         ))}
       </CardOverlayProvider>
     </>
-  )
+  );
 };
 
 export default Press;

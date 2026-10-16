@@ -16,11 +16,16 @@ import './SheetSlot.css';
  * @param props.cardName - Name of the card, for the actions button label
  * @param props.children - The card itself
  */
-const SheetSlot = ({ collectionIndex, face, cardName, children }: {
-  collectionIndex: number,
-  face: SheetFace,
-  cardName: string,
-  children: ReactNode,
+const SheetSlot = ({
+  collectionIndex,
+  face,
+  cardName,
+  children,
+}: {
+  collectionIndex: number;
+  face: SheetFace;
+  cardName: string;
+  children: ReactNode;
 }) => {
   const {
     overlay,

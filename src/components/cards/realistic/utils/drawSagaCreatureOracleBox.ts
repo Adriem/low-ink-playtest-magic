@@ -15,7 +15,10 @@ import type { ColorTreatment } from '../../../../domain/colorTreatment';
  * their creature abilities. The text is centered above the stats box, which
  * overlaps the bottom of the box.
  */
-export const drawSagaCreatureOracleBox = (ctx: CanvasRenderingContext2D, { cardOracleText, cardColorTreatment }: { cardOracleText: string, cardColorTreatment: ColorTreatment }) => {
+export const drawSagaCreatureOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  { cardOracleText, cardColorTreatment }: { cardOracleText: string; cardColorTreatment: ColorTreatment },
+) => {
   const inner = drawFramedBox(ctx, {
     x: (ctx.canvas.width - CONTENT_WIDTH) / 2,
     y: SAGA_CREATURE_ORACLE_Y,

@@ -10,7 +10,7 @@ export const getFillStyle = (
 
   const [startColor, endColor] = colors;
   const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
-  gradient.addColorStop(.4, startColor);
-  gradient.addColorStop(.6, endColor);
+  gradient.addColorStop(0.4, startColor);
+  gradient.addColorStop(0.6, endColor);
   return gradient;
 };

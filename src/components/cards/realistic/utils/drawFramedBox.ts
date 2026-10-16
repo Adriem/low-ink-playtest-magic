@@ -17,16 +17,28 @@ import { getFillStyle } from '../../common/canvasStyles';
  *   height
  * @returns The inner box
  */
-export const drawFramedBox = (ctx: CanvasRenderingContext2D, {
-  x,
-  y,
-  width,
-  height,
-  cardColorTreatment,
-  shape,
-  flatSide = null,
-  innerHeightAdjustment = 0,
-}: { x: number, y: number, width: number, height: number, cardColorTreatment: ColorTreatment, shape: 'capsule' | 'rectangle', flatSide?: 'left' | 'right' | null, innerHeightAdjustment?: number }): Box => {
+export const drawFramedBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    x,
+    y,
+    width,
+    height,
+    cardColorTreatment,
+    shape,
+    flatSide = null,
+    innerHeightAdjustment = 0,
+  }: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    cardColorTreatment: ColorTreatment;
+    shape: 'capsule' | 'rectangle';
+    flatSide?: 'left' | 'right' | null;
+    innerHeightAdjustment?: number;
+  },
+): Box => {
   const drawShape = shape === 'capsule' ? drawRoundedBox : drawRectangle;
 
   const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;

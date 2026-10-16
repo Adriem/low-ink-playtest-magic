@@ -18,12 +18,15 @@ import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 
-export const drawSubCardTitleBox = (ctx: CanvasRenderingContext2D, {
-  cardName,
-  cardManaCost,
-  cardColorTreatment,
-  position,
-}: { cardName: string, cardManaCost?: string, cardColorTreatment: ColorTreatment, position: SubCardPosition }) => {
+export const drawSubCardTitleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardName,
+    cardManaCost,
+    cardColorTreatment,
+    position,
+  }: { cardName: string; cardManaCost?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+) => {
   const x = position === 'left' ? (ctx.canvas.width - TITLE_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_TITLE_Y;
   const width = TITLE_WIDTH / 2;
@@ -48,13 +51,12 @@ export const drawSubCardTitleBox = (ctx: CanvasRenderingContext2D, {
   });
 
   const textX = flatSide === 'left' ? x + PINLINE_THICKNESS : x + PINLINE_THICKNESS * 2 + CAPSULE_TEXT_INSET;
-  const textRight = flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
+  const textRight =
+    flatSide === 'right' ? x + width - PINLINE_THICKNESS : x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
   const innerCenterY = y + height / 2;
 
   const manaAnchorRight = inner.x + inner.width - PINLINE_THICKNESS - 4;
-  const titleEndX = manaSymbols.length
-    ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING
-    : textRight;
+  const titleEndX = manaSymbols.length ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING : textRight;
 
   ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px ${FONT_FAMILY}`;
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;

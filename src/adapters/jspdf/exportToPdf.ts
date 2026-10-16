@@ -6,8 +6,8 @@ const CARD_WIDTH_INCHES = 2.5;
 const CARD_HEIGHT_INCHES = 3.5;
 
 const pageDimensionInches = {
-  'letter': { width: 8.5, height: 11 },
-  'a4': { width: millimetersToInches(210), height: millimetersToInches(297) },
+  letter: { width: 8.5, height: 11 },
+  a4: { width: millimetersToInches(210), height: millimetersToInches(297) },
 };
 
 type CardImage = string | HTMLImageElement | HTMLCanvasElement | Uint8Array;

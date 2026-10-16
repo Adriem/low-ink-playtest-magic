@@ -1,10 +1,13 @@
 import { testCard, testFace } from '../testUtils';
 import { groupCardsIntoSheets, moveCard, type SheetItem } from './press';
 
-const names = (sheets: SheetItem[][]) => sheets.map(sheet => sheet.map((item) => {
-  if (item.kind === 'loading') return 'loading';
-  return item.kind === 'face' ? item.face.name : item.card.name;
-}));
+const names = (sheets: SheetItem[][]) =>
+  sheets.map((sheet) =>
+    sheet.map((item) => {
+      if (item.kind === 'loading') return 'loading';
+      return item.kind === 'face' ? item.face.name : item.card.name;
+    }),
+  );
 
 const doubleFacedCard = testCard({
   name: 'Front // Back',
@@ -29,7 +32,7 @@ const adventureCard = testCard({
 
 describe('groupCardsIntoSheets', () => {
   test('groups cards into sheets of the given size', () => {
-    const cards = ['A', 'B', 'C', 'D', 'E'].map(name => testCard({ name }));
+    const cards = ['A', 'B', 'C', 'D', 'E'].map((name) => testCard({ name }));
 
     expect(names(groupCardsIntoSheets(cards, { sheetSize: 2 }))).toEqual([['A', 'B'], ['C', 'D'], ['E']]);
   });
@@ -37,7 +40,7 @@ describe('groupCardsIntoSheets', () => {
   test('defaults to sheets of 9 cards', () => {
     const cards = Array.from({ length: 10 }, (_, i) => testCard({ name: `${i}` }));
 
-    expect(groupCardsIntoSheets(cards).map(sheet => sheet.length)).toEqual([9, 1]);
+    expect(groupCardsIntoSheets(cards).map((sheet) => sheet.length)).toEqual([9, 1]);
   });
 
   test('returns no sheets for an empty collection', () => {
@@ -56,7 +59,7 @@ describe('groupCardsIntoSheets', () => {
     const sheets = groupCardsIntoSheets([doubleFacedCard], { doubleFacedCardTreatment: 'separate' });
 
     expect(names(sheets)).toEqual([['Front', 'Back']]);
-    expect(sheets[0].map(item => item.kind === 'face' && item.sheetFace)).toEqual(['main', 'secondary']);
+    expect(sheets[0].map((item) => item.kind === 'face' && item.sheetFace)).toEqual(['main', 'secondary']);
   });
 
   test('keeps both faces of double-faced cards together when unified', () => {
@@ -71,7 +74,10 @@ describe('groupCardsIntoSheets', () => {
   });
 
   test('draws the secondary face of cards with a sub-card as the sub-card, whatever the treatments', () => {
-    const [[item]] = groupCardsIntoSheets([adventureCard], { splitCardTreatment: 'unified', doubleFacedCardTreatment: 'unified' });
+    const [[item]] = groupCardsIntoSheets([adventureCard], {
+      splitCardTreatment: 'unified',
+      doubleFacedCardTreatment: 'unified',
+    });
 
     expect(item).toMatchObject({
       kind: 'face',
@@ -86,7 +92,7 @@ describe('groupCardsIntoSheets', () => {
     const cards = [testCard({ name: 'A' }), doubleFacedCard, testCard({ name: 'B' })];
     const sheets = groupCardsIntoSheets(cards, { sheetSize: 2, doubleFacedCardTreatment: 'separate' });
 
-    expect(sheets.flat().map(item => item.collectionIndex)).toEqual([0, 1, 1, 2]);
+    expect(sheets.flat().map((item) => item.collectionIndex)).toEqual([0, 1, 1, 2]);
   });
 });
 

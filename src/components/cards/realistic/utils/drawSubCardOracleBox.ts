@@ -1,23 +1,38 @@
 import { fitFontSizeInXY } from '../../common/canvasText';
 import { fillMultilineText } from '../../common/oracleTextRenderer';
-import { CONTENT_WIDTH, FONT_FAMILY, PINLINE_THICKNESS, SUBCARD_ORACLE_FONT_SIZE, SUBCARD_ORACLE_HEIGHT, SUBCARD_ORACLE_Y } from '../config';
+import {
+  CONTENT_WIDTH,
+  FONT_FAMILY,
+  PINLINE_THICKNESS,
+  SUBCARD_ORACLE_FONT_SIZE,
+  SUBCARD_ORACLE_HEIGHT,
+  SUBCARD_ORACLE_Y,
+} from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 
-export const drawSubCardOracleBox = (ctx: CanvasRenderingContext2D, {
-  cardOracleText,
-  cardColorTreatment,
-  position,
-}: { cardOracleText?: string, cardColorTreatment: ColorTreatment, position: SubCardPosition }) => {
+export const drawSubCardOracleBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText,
+    cardColorTreatment,
+    position,
+  }: { cardOracleText?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+) => {
   const x = position === 'left' ? (ctx.canvas.width - CONTENT_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_ORACLE_Y;
   const width = CONTENT_WIDTH / 2;
   const height = SUBCARD_ORACLE_HEIGHT;
   const flatSide = position === 'left' ? 'right' : 'left';
 
-  const { x: innerX, y: innerY, width: innerWidth, height: innerHeight } = drawFramedBox(ctx, {
+  const {
+    x: innerX,
+    y: innerY,
+    width: innerWidth,
+    height: innerHeight,
+  } = drawFramedBox(ctx, {
     x,
     y,
     width,
@@ -37,10 +52,10 @@ export const drawSubCardOracleBox = (ctx: CanvasRenderingContext2D, {
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitFontSizeInXY(
+  fillMultilineText(
     ctx,
-    (cardOracleText ?? '').split('\n'),
-    textRight - textX,
-    textBottomY - textTopY,
-  ), textX, textTopY);
+    fitFontSizeInXY(ctx, (cardOracleText ?? '').split('\n'), textRight - textX, textBottomY - textTopY),
+    textX,
+    textTopY,
+  );
 };

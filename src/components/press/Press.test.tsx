@@ -43,22 +43,24 @@ const doubleFacedCard = testCard({
 const renderPress = () => {
   // Double-faced cards are shown as separate faces by default
   sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard, doubleFacedCard]));
-  const { container } = render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+  const { container } = render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
 
   // The overlay's open and danger states are only visible through its classes
   /* eslint-disable testing-library/no-container, testing-library/no-node-access */
   const slots = [...container.querySelectorAll<HTMLElement>('.sheet-slot')];
   const overlays = [...container.querySelectorAll<HTMLElement>('.sheet-slot-overlay')];
   /* eslint-enable testing-library/no-container, testing-library/no-node-access */
-  const openOverlays = () => overlays.map(overlay => overlay.classList.contains('open'));
-  const dangerOverlays = () => overlays.map(overlay => overlay.classList.contains('danger'));
+  const openOverlays = () => overlays.map((overlay) => overlay.classList.contains('open'));
+  const dangerOverlays = () => overlays.map((overlay) => overlay.classList.contains('danger'));
 
   return { slots, overlays, openOverlays, dangerOverlays };
 };
 
-const cardOrder = () => screen
-  .getAllByText(/^(Colossal Dreadmaw|Front|Back)$/)
-  .map(element => element.textContent);
+const cardOrder = () => screen.getAllByText(/^(Colossal Dreadmaw|Front|Back)$/).map((element) => element.textContent);
 
 const cardButton = (cardName: string) => screen.getByRole('button', { name: `Actions for ${cardName}` });
 
@@ -85,7 +87,11 @@ test('numbers the pages below each sheet', () => {
   // 9 cards fit in a sheet, so 10 cards need two
   const cards = Array.from({ length: 10 }, (_, i) => testCard({ name: `Card ${i}`, multiverseIds: [String(i)] }));
   sessionStorage.setItem('press:cardCollection', JSON.stringify(cards));
-  render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
 
   expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
   expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
@@ -93,7 +99,11 @@ test('numbers the pages below each sheet', () => {
 
 test('shows a placeholder while a card is loading', () => {
   vi.mocked(fetchCard).mockReturnValue(new Promise(() => {}));
-  render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
 
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightning Bolt' } });
   fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
@@ -102,10 +112,14 @@ test('shows a placeholder while a card is loading', () => {
 });
 
 test('shows a card that loads while a card added before it is still loading', async () => {
-  vi.mocked(fetchCard).mockImplementation(cardName => (cardName === 'Lightning Bolt'
-    ? new Promise(() => {})
-    : Promise.resolve(singleCard)));
-  render(<SettingsContextProvider><Press /></SettingsContextProvider>);
+  vi.mocked(fetchCard).mockImplementation((cardName) =>
+    cardName === 'Lightning Bolt' ? new Promise(() => {}) : Promise.resolve(singleCard),
+  );
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
 
   const addCard = (cardName: string) => {
     fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: cardName } });
@@ -217,7 +231,7 @@ describe('hovering with a mouse', () => {
       expect(screen.queryByRole('button', { name: /move (up|down)/i })).not.toBeInTheDocument();
     });
 
-    test('clicking another card leaves the move state and shows that card\'s hover overlay', () => {
+    test("clicking another card leaves the move state and shows that card's hover overlay", () => {
       const { slots, openOverlays } = renderPress();
       startMoving(slots[0], 0);
       unhover(slots[0]);
@@ -325,7 +339,7 @@ describe('keyboard', () => {
     expect(cardButton('Colossal Dreadmaw')).toHaveAttribute('tabindex', '0');
     expect(cardButton('Front')).toHaveAttribute('tabindex', '0');
     expect(cardButton('Back')).toHaveAttribute('tabindex', '-1');
-    screen.getAllByRole('button', { name: /delete|move/i }).forEach(button => {
+    screen.getAllByRole('button', { name: /delete|move/i }).forEach((button) => {
       expect(button).toHaveAttribute('tabindex', '-1');
     });
   });

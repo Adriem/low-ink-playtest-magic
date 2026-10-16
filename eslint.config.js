@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import { defineConfig } from 'eslint/config';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -47,4 +48,6 @@ export default defineConfig([
     extends: [js.configs.recommended],
     languageOptions: { globals: { ...globals.node } },
   },
+  // Formatting is up to Prettier, so rules that would conflict with it are off
+  eslintConfigPrettier,
 ]);

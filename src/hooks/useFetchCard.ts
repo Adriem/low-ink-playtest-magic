@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
-import type { ScryfallCard } from '../types/cards';
-import { fetchCardData } from '../utils/scryfall';
+import { fetchCard } from '../adapters/scryfall';
+import type { Card } from '../domain/cards';
 
 /**
  * Card lookup API backed by a cache. Cards are cached by name, including
@@ -11,15 +11,15 @@ import { fetchCardData } from '../utils/scryfall';
  *   or fetches it, and rejects if the card cannot be fetched.
  */
 export const useFetchCard = () => {
-  const cacheRef = useRef(new Map<string, Promise<ScryfallCard>>())
+  const cacheRef = useRef(new Map<string, Promise<Card>>())
 
   return useMemo(() => ({
-    findCardByName: (cardName: string): Promise<ScryfallCard> => {
+    findCardByName: (cardName: string): Promise<Card> => {
       const cache = cacheRef.current
       const cached = cache.get(cardName)
       if (cached) return cached
 
-      const cardPromise = fetchCardData(cardName).catch((error) => {
+      const cardPromise = fetchCard(cardName).catch((error) => {
         cache.delete(cardName)
         throw error
       })

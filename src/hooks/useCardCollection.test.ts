@@ -1,23 +1,24 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCardCollection } from './useCardCollection';
 import { deferred, testCard, type Deferred } from '../testUtils';
-import { isLoadingCard, type CollectionCard, type ScryfallCard } from '../types/cards';
-import { fetchCardData } from '../utils/scryfall';
+import { fetchCard } from '../adapters/scryfall';
+import type { Card } from '../domain/cards';
+import { isLoadingCard, type CollectionCard } from '../domain/press';
 
-vi.mock('../utils/scryfall', () => ({
-  fetchCardData: vi.fn(),
-  fetchSymbology: vi.fn(() => Promise.resolve({ data: [] })),
+vi.mock('../adapters/scryfall', () => ({
+  fetchCard: vi.fn(),
+  getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
 // Cards only need the fields the tests check
-const resolveCard = async (pending: Deferred<ScryfallCard>, card: { name: string }) => {
+const resolveCard = async (pending: Deferred<Card>, card: { name: string }) => {
   await act(async () => {
-    pending.resolve(card as ScryfallCard);
+    pending.resolve(card as Card);
     await pending.promise;
   });
 };
 
-const rejectCard = async (pending: Deferred<ScryfallCard>, error: Error) => {
+const rejectCard = async (pending: Deferred<Card>, error: Error) => {
   await act(async () => {
     pending.reject(error);
     await pending.promise.catch(() => {});
@@ -32,24 +33,24 @@ const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) 
 );
 
 beforeEach(() => {
-  vi.mocked(fetchCardData).mockReset();
+  vi.mocked(fetchCard).mockReset();
 });
 
 test('adds a loading placeholder that is replaced once the card loads', async () => {
-  const pending = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockReturnValue(pending.promise);
+  const pending = deferred<Card>();
+  vi.mocked(fetchCard).mockReturnValue(pending.promise);
   const collection = setupCollection();
 
   act(() => collection.current.addCardByName('Colossal Dreadmaw'));
-  expect(collection.current.cardCollection).toEqual([{ _loading: true, _loadingCardId: expect.any(Number) }]);
+  expect(collection.current.cardCollection).toEqual([{ loading: true, loadingCardId: expect.any(Number) }]);
 
   await resolveCard(pending, { name: 'Colossal Dreadmaw' });
   expect(collection.current.cardCollection).toEqual([{ name: 'Colossal Dreadmaw' }]);
 });
 
 test('keeps the order cards were added in, regardless of load order', async () => {
-  const a = deferred<ScryfallCard>(), b = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockImplementation(name => ({ A: a, B: b } as Record<string, Deferred<ScryfallCard>>)[name].promise);
+  const a = deferred<Card>(), b = deferred<Card>();
+  vi.mocked(fetchCard).mockImplementation(name => ({ A: a, B: b } as Record<string, Deferred<Card>>)[name].promise);
   const collection = setupCollection();
 
   act(() => {
@@ -65,8 +66,8 @@ test('keeps the order cards were added in, regardless of load order', async () =
 });
 
 test('removes the placeholder and reports the error when a card fails to load', async () => {
-  const pending = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockReturnValue(pending.promise);
+  const pending = deferred<Card>();
+  vi.mocked(fetchCard).mockReturnValue(pending.promise);
   const onCardLoadError = vi.fn();
   const collection = setupCollection({ onCardLoadError });
 
@@ -78,8 +79,8 @@ test('removes the placeholder and reports the error when a card fails to load', 
 });
 
 test('fetches each card name only once', async () => {
-  const pending = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockReturnValue(pending.promise);
+  const pending = deferred<Card>();
+  vi.mocked(fetchCard).mockReturnValue(pending.promise);
   const collection = setupCollection();
 
   act(() => {
@@ -90,13 +91,13 @@ test('fetches each card name only once', async () => {
   // Cached cards still arrive asynchronously, through the cached promise
   await act(async () => collection.current.addCardByName('A'));
 
-  expect(fetchCardData).toHaveBeenCalledTimes(1);
+  expect(fetchCard).toHaveBeenCalledTimes(1);
   expect(cardNames(collection.current.cardCollection)).toEqual(['A', 'A', 'A']);
 });
 
 test('fetches a failed card again when it is added again', async () => {
-  const failing = deferred<ScryfallCard>(), retry = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockReturnValueOnce(failing.promise).mockReturnValueOnce(retry.promise);
+  const failing = deferred<Card>(), retry = deferred<Card>();
+  vi.mocked(fetchCard).mockReturnValueOnce(failing.promise).mockReturnValueOnce(retry.promise);
   const collection = setupCollection();
 
   act(() => collection.current.addCardByName('A'));
@@ -105,13 +106,13 @@ test('fetches a failed card again when it is added again', async () => {
   act(() => collection.current.addCardByName('A'));
   await resolveCard(retry, { name: 'A' });
 
-  expect(fetchCardData).toHaveBeenCalledTimes(2);
+  expect(fetchCard).toHaveBeenCalledTimes(2);
   expect(cardNames(collection.current.cardCollection)).toEqual(['A']);
 });
 
 test('drops a card that loads after its placeholder was removed', async () => {
-  const pending = deferred<ScryfallCard>();
-  vi.mocked(fetchCardData).mockReturnValue(pending.promise);
+  const pending = deferred<Card>();
+  vi.mocked(fetchCard).mockReturnValue(pending.promise);
   const collection = setupCollection({ initialCards: [testCard({ name: 'B' })] });
 
   act(() => collection.current.addCardByName('A'));

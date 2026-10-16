@@ -1,8 +1,8 @@
 import '@fortawesome/fontawesome-free/js/all.min.js';
 import { lazy, Suspense } from 'react';
-import Press from './press/Press';
+import Press from './components/press/Press';
 
-import { SettingsContextProvider } from './settings';
+import { SettingsContextProvider } from './components/settings';
 
 const WORKBENCH_PATH = '/workbench';
 
@@ -10,7 +10,7 @@ const WORKBENCH_PATH = '/workbench';
 // import.meta.env.DEV is replaced with false, so this branch (and the
 // workbench chunk) is dropped.
 const Workbench = import.meta.env.DEV
-  ? lazy(() => import('./workbench/Workbench'))
+  ? lazy(() => import('./components/workbench/Workbench'))
   : null;
 
 const isWorkbenchPath = () => window.location.pathname.replace(/\/+$/, '') === WORKBENCH_PATH;

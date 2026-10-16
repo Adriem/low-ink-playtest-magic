@@ -1,4 +1,4 @@
-import type { ScryfallCard } from './types/cards';
+import type { Card, CardFace } from './domain/cards';
 
 export interface Deferred<T> {
   promise: Promise<T>;
@@ -14,10 +14,20 @@ export const deferred = <T = unknown>(): Deferred<T> => {
   return { promise, resolve, reject };
 };
 
-/** A Scryfall card for tests, with placeholders for the fields a test doesn't care about */
-export const testCard = (card: Partial<ScryfallCard> & { name: string }): ScryfallCard => ({
+/** A card face for tests, with placeholders for the fields a test doesn't care about */
+export const testFace = (face: Partial<CardFace> & { name: string }): CardFace => ({
+  faceLayout: 'regular',
+  typeLine: '',
+  colors: [],
+  art: { crop: 'full' },
+  ...face,
+});
+
+/** A card for tests, with a single face named like it unless given its faces */
+export const testCard = (card: Partial<Card> & { name: string }): Card => ({
   layout: 'normal',
   set: 'tst',
-  multiverse_ids: [],
+  multiverseIds: [],
+  mainFace: testFace({ name: card.name }),
   ...card,
 });

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import type { CollectionCard, LoadingCard } from '../types/cards';
+import { isLoadingCard, moveCard as moveCardInCollection, type CollectionCard, type LoadingCard } from '../domain/press';
 import { useFetchCard } from './useFetchCard';
 
 interface CardCollectionOptions {
@@ -22,8 +22,8 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
 
   const addCardByName = useCallback((cardName: string) => {
     const loadingCardId = nextLoadingCardIdRef.current++;
-    const isPlaceholder = (card: CollectionCard) => '_loading' in card && card._loadingCardId === loadingCardId;
-    const placeholder: LoadingCard = { _loading: true, _loadingCardId: loadingCardId };
+    const isPlaceholder = (card: CollectionCard) => isLoadingCard(card) && card.loadingCardId === loadingCardId;
+    const placeholder: LoadingCard = { loading: true, loadingCardId };
 
     setCardCollection(collection => [...collection, placeholder]);
 
@@ -46,15 +46,7 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
    * collection are ignored.
    */
   const moveCard = useCallback((fromIndex: number, toIndex: number) => {
-    setCardCollection((collection) => {
-      const isInCollection = (index: number) => index >= 0 && index < collection.length;
-      if (fromIndex === toIndex || !isInCollection(fromIndex) || !isInCollection(toIndex)) return collection;
-
-      const reordered = [...collection];
-      const [card] = reordered.splice(fromIndex, 1);
-      reordered.splice(toIndex, 0, card);
-      return reordered;
-    });
+    setCardCollection(collection => moveCardInCollection(collection, fromIndex, toIndex));
   }, []);
 
   const clearCollection = useCallback(() => {

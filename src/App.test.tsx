@@ -2,9 +2,9 @@ import { render, screen } from '@testing-library/react';
 import App from './App';
 
 vi.mock('jspdf', () => ({ jsPDF: vi.fn() }));
-vi.mock('./utils/scryfall', () => ({
-  fetchCardData: vi.fn(),
-  fetchSymbology: vi.fn(() => Promise.resolve({ data: [] })),
+vi.mock('./adapters/scryfall', () => ({
+  fetchCard: vi.fn(),
+  getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
 test('renders the card search form', () => {

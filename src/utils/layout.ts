@@ -18,7 +18,9 @@ export interface HeightItem {
  * @returns Height of each item, adding up to `totalHeight`
  */
 export const distributeHeight = (totalHeight: number, items: HeightItem[]): number[] => {
-  const sumOf = (heights: number[]) => heights.reduce((sum, height) => sum + height, 0);
+  const sumOf = (heights: number[]) => {
+    return heights.reduce((sum, height) => sum + height, 0);
+  };
   const minHeights = items.map(({ minHeight }) => minHeight);
   const requiredHeights = items.map(({ minHeight, requiredHeight = minHeight }) => requiredHeight);
 

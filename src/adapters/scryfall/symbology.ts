@@ -9,15 +9,6 @@ const symbolImageUrls = fetchSymbology().then(
 // Images of the symbols already used, so each one is loaded once
 const symbolImages = new Map<CardSymbol, Promise<HTMLImageElement>>();
 
-const loadImage = (src: string) =>
-  new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = 'Anonymous';
-    image.onload = () => resolve(image);
-    image.onerror = reject;
-    image.src = src;
-  });
-
 /**
  * Image of a symbol from Scryfall, loaded the first time it's used.
  *
@@ -33,4 +24,14 @@ export const getSymbolImage = async (symbol: CardSymbol): Promise<HTMLImageEleme
   // Another use of the symbol may have started loading it while waiting for the URLs
   if (!symbolImages.has(symbol)) symbolImages.set(symbol, loadImage(imageUrl));
   return symbolImages.get(symbol);
+};
+
+const loadImage = (src: string) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = 'Anonymous';
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.src = src;
+  });
 };

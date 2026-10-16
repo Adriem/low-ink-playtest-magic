@@ -7,12 +7,6 @@ beforeEach(() => {
   user = userEvent.setup();
 });
 
-const setupForm = () => {
-  const onAddCards = vi.fn();
-  render(<CardSearchForm onAddCards={onAddCards} />);
-  return onAddCards;
-};
-
 test('adds a single card by name', async () => {
   const onAddCards = setupForm();
 
@@ -166,3 +160,9 @@ describe('quantities', () => {
     expect(textarea.validationMessage).toBe('');
   });
 });
+
+const setupForm = () => {
+  const onAddCards = vi.fn();
+  render(<CardSearchForm onAddCards={onAddCards} />);
+  return onAddCards;
+};

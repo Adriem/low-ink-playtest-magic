@@ -66,8 +66,8 @@ export const finishRender = async (canvas: HTMLCanvasElement): Promise<boolean> 
  * @param timeout - Maximum time to wait, in milliseconds
  * @returns Whether it finished rendering before the timeout
  */
-export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) =>
-  new Promise<boolean>((resolve) => {
+export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) => {
+  return new Promise<boolean>((resolve) => {
     if (canvas.dataset.rendered !== 'false') {
       resolve(true);
       return;
@@ -89,19 +89,21 @@ export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) =>
 
     observer.observe(canvas, { attributes: true, attributeFilter: ['data-rendered'] });
   });
+};
 
 /**
  * Load an image that can be drawn on a canvas and read back (e.g. by filters
  * or the PDF export).
  */
-export const loadImage = (src: string) =>
-  new Promise<HTMLImageElement>((resolve, reject) => {
+export const loadImage = (src: string) => {
+  return new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.crossOrigin = 'Anonymous';
     image.onload = () => resolve(image);
     image.onerror = reject;
     image.src = src;
   });
+};
 
 /**
  * The 2D context of a canvas, which every supported browser provides.

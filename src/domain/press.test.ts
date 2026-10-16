@@ -1,14 +1,6 @@
 import { testCard, testFace } from '../testUtils';
 import { groupCardsIntoSheets, moveCard, type SheetItem } from './press';
 
-const names = (sheets: SheetItem[][]) =>
-  sheets.map((sheet) =>
-    sheet.map((item) => {
-      if (item.kind === 'loading') return 'loading';
-      return item.kind === 'face' ? item.face.name : item.card.name;
-    }),
-  );
-
 const doubleFacedCard = testCard({
   name: 'Front // Back',
   layout: 'double-faced',
@@ -95,6 +87,15 @@ describe('groupCardsIntoSheets', () => {
     expect(sheets.flat().map((item) => item.collectionIndex)).toEqual([0, 1, 1, 2]);
   });
 });
+
+const names = (sheets: SheetItem[][]) => {
+  return sheets.map((sheet) =>
+    sheet.map((item) => {
+      if (item.kind === 'loading') return 'loading';
+      return item.kind === 'face' ? item.face.name : item.card.name;
+    }),
+  );
+};
 
 describe('moveCard', () => {
   test('moves a card to another position', () => {

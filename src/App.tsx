@@ -11,8 +11,6 @@ const WORKBENCH_PATH = '/workbench';
 // workbench chunk) is dropped.
 const Workbench = import.meta.env.DEV ? lazy(() => import('./components/workbench/Workbench')) : null;
 
-const isWorkbenchPath = () => window.location.pathname.replace(/\/+$/, '') === WORKBENCH_PATH;
-
 function App() {
   return (
     <SettingsContextProvider>
@@ -28,5 +26,9 @@ function App() {
     </SettingsContextProvider>
   );
 }
+
+const isWorkbenchPath = () => {
+  return window.location.pathname.replace(/\/+$/, '') === WORKBENCH_PATH;
+};
 
 export default App;

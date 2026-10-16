@@ -5,16 +5,6 @@ interface FakeGradient {
   addColorStop: (offset: number, color: string) => void;
 }
 
-const createCtx = () => {
-  const gradient: FakeGradient = {
-    stops: [],
-    addColorStop: (offset, color) => {
-      gradient.stops.push([offset, color]);
-    },
-  };
-  return { canvas: { width: 500 }, createLinearGradient: vi.fn(() => gradient) } as unknown as CanvasRenderingContext2D;
-};
-
 test('fills with a single color as it is', () => {
   const ctx = createCtx();
 
@@ -33,3 +23,13 @@ test('fills with two colors as a horizontal gradient across the canvas, from the
     [0.6, 'white'],
   ]);
 });
+
+const createCtx = () => {
+  const gradient: FakeGradient = {
+    stops: [],
+    addColorStop: (offset, color) => {
+      gradient.stops.push([offset, color]);
+    },
+  };
+  return { canvas: { width: 500 }, createLinearGradient: vi.fn(() => gradient) } as unknown as CanvasRenderingContext2D;
+};

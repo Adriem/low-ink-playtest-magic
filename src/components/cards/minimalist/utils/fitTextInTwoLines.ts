@@ -1,27 +1,5 @@
 import { getLineHeight, reduceTextSize } from '../../common/canvasText';
 
-const wrapFirstLineOfText = (
-  ctx: CanvasRenderingContext2D,
-  { text, lineMaxWidth }: { text: string; lineMaxWidth: number },
-) => {
-  let line1 = '';
-  let line2 = '';
-  const pendingWords = text.split(/\s+/);
-
-  while (pendingWords.length) {
-    const currentWord = pendingWords.shift() ?? '';
-    const newLine1 = line1 ? `${line1} ${currentWord}` : currentWord;
-
-    if (ctx.measureText(newLine1).width <= lineMaxWidth) {
-      line1 = newLine1;
-    } else {
-      line2 = [currentWord, ...pendingWords.splice(0, pendingWords.length)].join(' ');
-    }
-  }
-
-  return [line1, line2];
-};
-
 export const fitTextInTwoLines = (
   ctx: CanvasRenderingContext2D,
   {
@@ -47,6 +25,28 @@ export const fitTextInTwoLines = (
 
     if (!textFitsVertically || !textFitsHorizontally) reduceTextSize(ctx);
   } while (!textFitsVertically || !textFitsHorizontally);
+
+  return [line1, line2];
+};
+
+const wrapFirstLineOfText = (
+  ctx: CanvasRenderingContext2D,
+  { text, lineMaxWidth }: { text: string; lineMaxWidth: number },
+) => {
+  let line1 = '';
+  let line2 = '';
+  const pendingWords = text.split(/\s+/);
+
+  while (pendingWords.length) {
+    const currentWord = pendingWords.shift() ?? '';
+    const newLine1 = line1 ? `${line1} ${currentWord}` : currentWord;
+
+    if (ctx.measureText(newLine1).width <= lineMaxWidth) {
+      line1 = newLine1;
+    } else {
+      line2 = [currentWord, ...pendingWords.splice(0, pendingWords.length)].join(' ');
+    }
+  }
 
   return [line1, line2];
 };

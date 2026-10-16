@@ -66,18 +66,6 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
 
 export const SETTING_NAMES = Object.keys(SETTINGS_DEFINITIONS) as SettingName[];
 
-const loadSetting = <Name extends SettingName>(name: Name): Settings[Name] => {
-  const definition = SETTINGS_DEFINITIONS[name];
-  return loadFromSessionStorage(definition.storageKey, definition.default);
-};
-
-const loadInitialSettings = (): Settings => ({
-  cardVariant: loadSetting('cardVariant'),
-  splitCardTreatment: loadSetting('splitCardTreatment'),
-  doubleFacedCardTreatment: loadSetting('doubleFacedCardTreatment'),
-  inkLevel: loadSetting('inkLevel'),
-});
-
 interface SettingsContextValue {
   settings: Settings;
   setSetting: <Name extends SettingName>(name: Name, value: Settings[Name]) => void;
@@ -99,6 +87,20 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
   }, [settings]);
 
   return <SettingsContext.Provider value={{ settings, setSetting }}>{children}</SettingsContext.Provider>;
+};
+
+const loadInitialSettings = (): Settings => {
+  return {
+    cardVariant: loadSetting('cardVariant'),
+    splitCardTreatment: loadSetting('splitCardTreatment'),
+    doubleFacedCardTreatment: loadSetting('doubleFacedCardTreatment'),
+    inkLevel: loadSetting('inkLevel'),
+  };
+};
+
+const loadSetting = <Name extends SettingName>(name: Name): Settings[Name] => {
+  const definition = SETTINGS_DEFINITIONS[name];
+  return loadFromSessionStorage(definition.storageKey, definition.default);
 };
 
 export const useSetting = <Name extends SettingName>(name: Name): [Settings[Name], (value: Settings[Name]) => void] => {

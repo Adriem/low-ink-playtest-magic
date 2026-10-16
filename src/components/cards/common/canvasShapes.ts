@@ -17,6 +17,69 @@ export interface Box {
   height: number;
 }
 
+// Loyalty cost shapes: an arrow pointing up (+), down (-) or a flat badge (0),
+// drawn as two arcs around the cost. Offsets are from the shape's anchor
+// (the arrow tip), angles are in multiples of PI.
+type LoyaltyCostArc = [side: 'left' | 'right', startAngle: number, endAngle: number];
+
+interface LoyaltyCostShape {
+  anchorOffsetY: number;
+  arcOffsetY: number;
+  innerTipOffsetY: number;
+  textOffsetY: number;
+  fitText: boolean;
+  outerArcs: LoyaltyCostArc[];
+  innerArcs: LoyaltyCostArc[];
+}
+
+const LOYALTY_COST_SHAPES: Record<'plus' | 'minus' | 'zero', LoyaltyCostShape> = {
+  plus: {
+    anchorOffsetY: -18,
+    arcOffsetY: 21,
+    innerTipOffsetY: 6,
+    textOffsetY: 28,
+    fitText: true,
+    outerArcs: [
+      ['right', 1.135, 0.795],
+      ['left', 0.205, 1.855],
+    ],
+    innerArcs: [
+      ['right', 1.09, 0.875],
+      ['left', 0.125, 1.91],
+    ],
+  },
+  minus: {
+    anchorOffsetY: 18,
+    arcOffsetY: -21,
+    innerTipOffsetY: -6,
+    textOffsetY: -14,
+    fitText: true,
+    outerArcs: [
+      ['left', 0.125, 1.775],
+      ['right', 1.215, 0.875],
+    ],
+    innerArcs: [
+      ['left', 0.085, 1.87],
+      ['right', 1.13, 0.915],
+    ],
+  },
+  zero: {
+    anchorOffsetY: 14,
+    arcOffsetY: -15,
+    innerTipOffsetY: -5,
+    textOffsetY: -7,
+    fitText: false,
+    outerArcs: [
+      ['left', 0.225, 1.775],
+      ['right', 1.215, 0.775],
+    ],
+    innerArcs: [
+      ['left', 0.125, 1.87],
+      ['right', 1.13, 0.875],
+    ],
+  },
+};
+
 export const drawRectangle = (
   ctx: CanvasRenderingContext2D,
   {
@@ -131,86 +194,6 @@ export const drawRoundedBox = (
   if (strokeStyle != null) ctx.stroke();
 };
 
-// Loyalty cost shapes: an arrow pointing up (+), down (-) or a flat badge (0),
-// drawn as two arcs around the cost. Offsets are from the shape's anchor
-// (the arrow tip), angles are in multiples of PI.
-type LoyaltyCostArc = [side: 'left' | 'right', startAngle: number, endAngle: number];
-
-interface LoyaltyCostShape {
-  anchorOffsetY: number;
-  arcOffsetY: number;
-  innerTipOffsetY: number;
-  textOffsetY: number;
-  fitText: boolean;
-  outerArcs: LoyaltyCostArc[];
-  innerArcs: LoyaltyCostArc[];
-}
-
-const LOYALTY_COST_SHAPES: Record<'plus' | 'minus' | 'zero', LoyaltyCostShape> = {
-  plus: {
-    anchorOffsetY: -18,
-    arcOffsetY: 21,
-    innerTipOffsetY: 6,
-    textOffsetY: 28,
-    fitText: true,
-    outerArcs: [
-      ['right', 1.135, 0.795],
-      ['left', 0.205, 1.855],
-    ],
-    innerArcs: [
-      ['right', 1.09, 0.875],
-      ['left', 0.125, 1.91],
-    ],
-  },
-  minus: {
-    anchorOffsetY: 18,
-    arcOffsetY: -21,
-    innerTipOffsetY: -6,
-    textOffsetY: -14,
-    fitText: true,
-    outerArcs: [
-      ['left', 0.125, 1.775],
-      ['right', 1.215, 0.875],
-    ],
-    innerArcs: [
-      ['left', 0.085, 1.87],
-      ['right', 1.13, 0.915],
-    ],
-  },
-  zero: {
-    anchorOffsetY: 14,
-    arcOffsetY: -15,
-    innerTipOffsetY: -5,
-    textOffsetY: -7,
-    fitText: false,
-    outerArcs: [
-      ['left', 0.225, 1.775],
-      ['right', 1.215, 0.775],
-    ],
-    innerArcs: [
-      ['left', 0.125, 1.87],
-      ['right', 1.13, 0.875],
-    ],
-  },
-};
-
-/**
- * Trace the arcs of a loyalty cost shape. The inner (white) arcs are 1px
- * closer to the center and 3px wider.
- */
-const traceLoyaltyCostArcs = (
-  ctx: CanvasRenderingContext2D,
-  arcs: LoyaltyCostArc[],
-  { x, arcY, scale, isInner }: { x: number; arcY: number; scale: number; isInner: boolean },
-) => {
-  for (const [side, startAngle, endAngle] of arcs) {
-    const centerX = side === 'left' ? x - 47 * scale + (isInner ? scale : 0) : x + 46 * scale - (isInner ? scale : 0);
-    const radius = 23 * scale + (isInner ? 3 * scale : 0);
-
-    ctx.arc(centerX, arcY, radius, startAngle * Math.PI, endAngle * Math.PI, true);
-  }
-};
-
 /**
  * Draw the cost of a planeswalker's loyalty ability, e.g. `+1`, `-3` or `0`.
  */
@@ -262,6 +245,23 @@ export const drawLoyaltyCost = (
   ctx.textAlign = 'center';
   if (shape.fitText) fitFontSizeInX(ctx, loyaltyCost, 30 * scale);
   ctx.fillText(loyaltyCost, x, anchorY + shape.textOffsetY * scale);
+};
+
+/**
+ * Trace the arcs of a loyalty cost shape. The inner (white) arcs are 1px
+ * closer to the center and 3px wider.
+ */
+const traceLoyaltyCostArcs = (
+  ctx: CanvasRenderingContext2D,
+  arcs: LoyaltyCostArc[],
+  { x, arcY, scale, isInner }: { x: number; arcY: number; scale: number; isInner: boolean },
+) => {
+  for (const [side, startAngle, endAngle] of arcs) {
+    const centerX = side === 'left' ? x - 47 * scale + (isInner ? scale : 0) : x + 46 * scale - (isInner ? scale : 0);
+    const radius = 23 * scale + (isInner ? 3 * scale : 0);
+
+    ctx.arc(centerX, arcY, radius, startAngle * Math.PI, endAngle * Math.PI, true);
+  }
 };
 
 export const drawLoyaltyBox = (
@@ -319,23 +319,6 @@ export const drawLoyaltyBox = (
   ctx.fillText(cardLoyalty, x, y - 12 * scale);
 };
 
-const traceHexagonPath = (
-  ctx: CanvasRenderingContext2D,
-  { x, y, radius }: { x: number; y: number; radius: number },
-) => {
-  const horizontalHalf = (radius * Math.sqrt(3)) / 2;
-  const verticalHalf = radius / 2;
-
-  ctx.beginPath();
-  ctx.moveTo(x, y - radius);
-  ctx.lineTo(x + horizontalHalf, y - verticalHalf);
-  ctx.lineTo(x + horizontalHalf, y + verticalHalf);
-  ctx.lineTo(x, y + radius);
-  ctx.lineTo(x - horizontalHalf, y + verticalHalf);
-  ctx.lineTo(x - horizontalHalf, y - verticalHalf);
-  ctx.closePath();
-};
-
 export const drawSagaChapter = (
   ctx: CanvasRenderingContext2D,
   {
@@ -380,4 +363,21 @@ export const drawSagaChapter = (
   ctx.textAlign = previousTextAlign;
   ctx.textBaseline = previousTextBaseline;
   ctx.font = previousFont;
+};
+
+const traceHexagonPath = (
+  ctx: CanvasRenderingContext2D,
+  { x, y, radius }: { x: number; y: number; radius: number },
+) => {
+  const horizontalHalf = (radius * Math.sqrt(3)) / 2;
+  const verticalHalf = radius / 2;
+
+  ctx.beginPath();
+  ctx.moveTo(x, y - radius);
+  ctx.lineTo(x + horizontalHalf, y - verticalHalf);
+  ctx.lineTo(x + horizontalHalf, y + verticalHalf);
+  ctx.lineTo(x, y + radius);
+  ctx.lineTo(x - horizontalHalf, y + verticalHalf);
+  ctx.lineTo(x - horizontalHalf, y - verticalHalf);
+  ctx.closePath();
 };

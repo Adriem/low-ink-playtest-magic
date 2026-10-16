@@ -3,6 +3,14 @@ import { fillMultilineText } from '../../common/oracleTextRenderer';
 import { FONT_FAMILY, ORACLE_FONT_SIZE } from '../config';
 import { REALISTIC_PALETTE } from '../palette';
 
+interface TextArea {
+  text: string;
+  width: number;
+  height: number;
+  padding?: number;
+  fontSize?: number;
+}
+
 /**
  * Draw the card's rules text in the given area, shrinking it until it fits.
  * `y` is the baseline of the first line.
@@ -23,14 +31,6 @@ export const drawOracleText = (
 
   fillMultilineText(ctx, fitFontSizeInXY(ctx, cardOracleText.split('\n'), width, height), x, y);
 };
-
-interface TextArea {
-  text: string;
-  width: number;
-  height: number;
-  padding?: number;
-  fontSize?: number;
-}
 
 /**
  * Font size at which rules text fits inside an area minus its padding.

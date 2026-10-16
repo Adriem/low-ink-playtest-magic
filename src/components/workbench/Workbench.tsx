@@ -48,13 +48,19 @@ const Workbench = () => {
     const input = e.currentTarget.elements.namedItem('cardName') as HTMLInputElement;
     setCardName(input.value);
   };
-  const handleStyleChange = (e: ChangeEvent<HTMLSelectElement>) => setCardVariant(e.target.value as CardStyle);
+  const handleStyleChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    return setCardVariant(e.target.value as CardStyle);
+  };
   const handleColorChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setCardColors(value === '' ? null : value === 'none' ? [] : value.split(',').filter(isColorSymbol));
   };
-  const handleBorderChange = (e: ChangeEvent<HTMLSelectElement>) => setBlackBordered(e.target.value === 'black');
-  const handleReferenceChange = (e: ChangeEvent<HTMLInputElement>) => setOpacity(parseFloat(e.target.value));
+  const handleBorderChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    return setBlackBordered(e.target.value === 'black');
+  };
+  const handleReferenceChange = (e: ChangeEvent<HTMLInputElement>) => {
+    return setOpacity(parseFloat(e.target.value));
+  };
 
   return (
     <>

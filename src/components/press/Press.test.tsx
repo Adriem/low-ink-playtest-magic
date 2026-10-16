@@ -14,6 +14,16 @@ vi.mock('../../adapters/scryfall', () => ({
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
+const singleCard = testCard({ name: 'Colossal Dreadmaw', set: 'm21', multiverseIds: ['1'] });
+const doubleFacedCard = testCard({
+  name: 'Front // Back',
+  layout: 'double-faced',
+  set: 'abc',
+  multiverseIds: ['2'],
+  mainFace: testFace({ name: 'Front' }),
+  secondaryFace: testFace({ name: 'Back' }),
+});
+
 // jsdom has no PointerEvent, which the overlay needs to tell mouse and touch apart
 beforeAll(() => {
   window.PointerEvent = class PointerEvent extends MouseEvent {
@@ -29,55 +39,6 @@ beforeAll(() => {
 afterAll(() => {
   delete (window as { PointerEvent?: unknown }).PointerEvent;
 });
-
-const singleCard = testCard({ name: 'Colossal Dreadmaw', set: 'm21', multiverseIds: ['1'] });
-const doubleFacedCard = testCard({
-  name: 'Front // Back',
-  layout: 'double-faced',
-  set: 'abc',
-  multiverseIds: ['2'],
-  mainFace: testFace({ name: 'Front' }),
-  secondaryFace: testFace({ name: 'Back' }),
-});
-
-const renderPress = () => {
-  // Double-faced cards are shown as separate faces by default
-  sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard, doubleFacedCard]));
-  const { container } = render(
-    <SettingsContextProvider>
-      <Press />
-    </SettingsContextProvider>,
-  );
-
-  // The overlay's open and danger states are only visible through its classes
-  /* eslint-disable testing-library/no-container, testing-library/no-node-access */
-  const slots = [...container.querySelectorAll<HTMLElement>('.sheet-slot')];
-  const overlays = [...container.querySelectorAll<HTMLElement>('.sheet-slot-overlay')];
-  /* eslint-enable testing-library/no-container, testing-library/no-node-access */
-  const openOverlays = () => overlays.map((overlay) => overlay.classList.contains('open'));
-  const dangerOverlays = () => overlays.map((overlay) => overlay.classList.contains('danger'));
-
-  return { slots, overlays, openOverlays, dangerOverlays };
-};
-
-const cardOrder = () => screen.getAllByText(/^(Colossal Dreadmaw|Front|Back)$/).map((element) => element.textContent);
-
-const cardButton = (cardName: string) => screen.getByRole('button', { name: `Actions for ${cardName}` });
-
-const hover = (slot: Element) => fireEvent.pointerEnter(slot, { pointerType: 'mouse' });
-const unhover = (slot: Element) => fireEvent.pointerLeave(slot, { pointerType: 'mouse' });
-// A tap fires pointer events with the touch pointer type, then a click
-const tap = (slot: Element, cardName: string) => {
-  fireEvent.pointerEnter(slot, { pointerType: 'touch' });
-  fireEvent.click(cardButton(cardName), { detail: 1 });
-};
-// Clicks triggered with Enter or Space have no click count
-const pressWithKeyboard = (button: Element) => fireEvent.click(button, { detail: 0 });
-
-const startMoving = (slot: Element, index: number) => {
-  hover(slot);
-  fireEvent.click(screen.getAllByRole('button', { name: /move\.\.\./i })[index], { detail: 1 });
-};
 
 afterEach(() => {
   sessionStorage.clear();
@@ -254,6 +215,15 @@ describe('hovering with a mouse', () => {
   });
 });
 
+const unhover = (slot: Element) => {
+  return fireEvent.pointerLeave(slot, { pointerType: 'mouse' });
+};
+
+const startMoving = (slot: Element, index: number) => {
+  hover(slot);
+  fireEvent.click(screen.getAllByRole('button', { name: /move\.\.\./i })[index], { detail: 1 });
+};
+
 describe('tapping', () => {
   test('opens the menu of all the faces of the card, with all the actions and "Dismiss"', () => {
     const { slots, overlays, openOverlays } = renderPress();
@@ -332,6 +302,12 @@ describe('tapping', () => {
   });
 });
 
+// A tap fires pointer events with the touch pointer type, then a click
+const tap = (slot: Element, cardName: string) => {
+  fireEvent.pointerEnter(slot, { pointerType: 'touch' });
+  fireEvent.click(cardButton(cardName), { detail: 1 });
+};
+
 describe('keyboard', () => {
   test('has one tab stop per card, and none for the controls of closed overlays', () => {
     renderPress();
@@ -384,3 +360,44 @@ describe('keyboard', () => {
     expect(screen.getByRole('button', { name: /move up/i })).toHaveFocus();
   });
 });
+
+// Clicks triggered with Enter or Space have no click count
+const pressWithKeyboard = (button: Element) => {
+  return fireEvent.click(button, { detail: 0 });
+};
+
+const renderPress = () => {
+  // Double-faced cards are shown as separate faces by default
+  sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard, doubleFacedCard]));
+  const { container } = render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
+
+  // The overlay's open and danger states are only visible through its classes
+  /* eslint-disable testing-library/no-container, testing-library/no-node-access */
+  const slots = [...container.querySelectorAll<HTMLElement>('.sheet-slot')];
+  const overlays = [...container.querySelectorAll<HTMLElement>('.sheet-slot-overlay')];
+  /* eslint-enable testing-library/no-container, testing-library/no-node-access */
+  const openOverlays = () => {
+    return overlays.map((overlay) => overlay.classList.contains('open'));
+  };
+  const dangerOverlays = () => {
+    return overlays.map((overlay) => overlay.classList.contains('danger'));
+  };
+
+  return { slots, overlays, openOverlays, dangerOverlays };
+};
+
+const cardOrder = () => {
+  return screen.getAllByText(/^(Colossal Dreadmaw|Front|Back)$/).map((element) => element.textContent);
+};
+
+const cardButton = (cardName: string) => {
+  return screen.getByRole('button', { name: `Actions for ${cardName}` });
+};
+
+const hover = (slot: Element) => {
+  return fireEvent.pointerEnter(slot, { pointerType: 'mouse' });
+};

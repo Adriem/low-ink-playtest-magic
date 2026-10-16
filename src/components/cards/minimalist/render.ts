@@ -16,26 +16,6 @@ import { MINIMALIST_PALETTE } from './palette';
 import type { CardRenderProps } from '../styles';
 import { get2dContext } from '../common/canvasRendering';
 
-const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position: SubCardPosition) => {
-  const subColorTreatment = getColorTreatment(subFace);
-
-  drawSubCardTitleBox(ctx, {
-    cardName: subFace.name,
-    cardManaCost: subFace.manaCost,
-    position,
-  });
-  drawSubCardTypeBox(ctx, {
-    cardType: subFace.typeLine,
-    cardColorTreatment: subColorTreatment,
-    position,
-  });
-  drawSubCardOracleBox(ctx, {
-    cardOracleText: subFace.oracleText,
-    cardColorTreatment: subColorTreatment,
-    position,
-  });
-};
-
 /**
  * Draw a card in the minimalist style on a canvas.
  *
@@ -104,4 +84,24 @@ export const renderMinimalistCard = (
       colors: MINIMALIST_PALETTE,
     });
   }
+};
+
+const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position: SubCardPosition) => {
+  const subColorTreatment = getColorTreatment(subFace);
+
+  drawSubCardTitleBox(ctx, {
+    cardName: subFace.name,
+    cardManaCost: subFace.manaCost,
+    position,
+  });
+  drawSubCardTypeBox(ctx, {
+    cardType: subFace.typeLine,
+    cardColorTreatment: subColorTreatment,
+    position,
+  });
+  drawSubCardOracleBox(ctx, {
+    cardOracleText: subFace.oracleText,
+    cardColorTreatment: subColorTreatment,
+    position,
+  });
 };

@@ -54,8 +54,10 @@ export const isLandType = (cardFace: CardFace) => {
   return /land/i.test(cardFace.typeLine);
 };
 
-export const getPowerAndToughness = (cardFace: CardFace) =>
-  cardFace.stats && 'power' in cardFace.stats ? cardFace.stats : undefined;
+export const getPowerAndToughness = (cardFace: CardFace) => {
+  return cardFace.stats && 'power' in cardFace.stats ? cardFace.stats : undefined;
+};
 
-export const getLoyalty = (cardFace: CardFace) =>
-  cardFace.stats && 'loyalty' in cardFace.stats ? cardFace.stats.loyalty : undefined;
+export const getLoyalty = (cardFace: CardFace) => {
+  return cardFace.stats && 'loyalty' in cardFace.stats ? cardFace.stats.loyalty : undefined;
+};

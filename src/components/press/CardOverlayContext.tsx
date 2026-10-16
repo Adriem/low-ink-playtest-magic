@@ -58,8 +58,6 @@ const CLOSED_OVERLAY: OverlayState = {
   focusRequestId: 0,
 };
 
-const isSticky = (overlay: OverlayState) => overlay.mode !== 'hover';
-
 const CardOverlayContext = createContext<CardOverlayContextValue | null>(null);
 
 /**
@@ -214,6 +212,10 @@ export const CardOverlayProvider = ({
   );
 
   return <CardOverlayContext.Provider value={value}>{children}</CardOverlayContext.Provider>;
+};
+
+const isSticky = (overlay: OverlayState) => {
+  return overlay.mode !== 'hover';
 };
 
 /**

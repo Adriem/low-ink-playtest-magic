@@ -9,10 +9,6 @@ const SCRYFALL_API_URL = 'https://api.scryfall.com';
 const REQUEST_SPACING_MS = 100;
 
 const sem = semaphore(1);
-const awaitIfNecessary = async () => {
-  await new Promise<void>((resolve) => sem.take(() => resolve()));
-  setTimeout(() => sem.leave(), REQUEST_SPACING_MS);
-};
 
 /**
  * Fetch the data of a card given its name in Scryfall.io
@@ -35,7 +31,9 @@ export const fetchCardData = async (cardName: string): Promise<ScryfallCard> => 
 /**
  * Fetch a card given its name in Scryfall.io
  */
-export const fetchCard = async (cardName: string): Promise<Card> => toCard(await fetchCardData(cardName));
+export const fetchCard = async (cardName: string): Promise<Card> => {
+  return toCard(await fetchCardData(cardName));
+};
 
 /**
  * Fetch the symbology data from Scryfall.io
@@ -53,4 +51,9 @@ export const fetchSymbology = async (): Promise<ScryfallSymbology> => {
   }
 
   return await response.json();
+};
+
+const awaitIfNecessary = async () => {
+  await new Promise<void>((resolve) => sem.take(() => resolve()));
+  setTimeout(() => sem.leave(), REQUEST_SPACING_MS);
 };

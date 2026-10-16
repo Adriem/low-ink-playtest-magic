@@ -18,36 +18,6 @@ import { getFillStyle } from '../../common/canvasStyles';
 
 const DIVIDER_TEXT_PADDING = 8;
 
-const drawSubCardDivider = (
-  ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, height }: { cardColorTreatment: ColorTreatment; height: number },
-) => {
-  drawRectangle(ctx, {
-    x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
-    y: ORACLE_Y,
-    width: PINLINE_THICKNESS,
-    height: height,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
-  });
-};
-
-const drawOracleBorder = (
-  ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, layout, y }: { cardColorTreatment: ColorTreatment; layout: OracleLayout; y: number },
-) => {
-  const x =
-    layout === 'right-half' ? ctx.canvas.width / 2 - PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
-  const width = layout === 'full-width' ? CONTENT_WIDTH : CONTENT_WIDTH / 2 + PINLINE_THICKNESS / 2;
-
-  drawRectangle(ctx, {
-    x,
-    y,
-    width,
-    height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
-  });
-};
-
 export const drawOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
@@ -101,4 +71,34 @@ export const drawOracleBox = (
     fillMultilineText(ctx, paragraph.lines, textX, currentY);
     currentY += paragraph.paragraphHeight;
   }
+};
+
+const drawSubCardDivider = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, height }: { cardColorTreatment: ColorTreatment; height: number },
+) => {
+  drawRectangle(ctx, {
+    x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
+    y: ORACLE_Y,
+    width: PINLINE_THICKNESS,
+    height: height,
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+  });
+};
+
+const drawOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, layout, y }: { cardColorTreatment: ColorTreatment; layout: OracleLayout; y: number },
+) => {
+  const x =
+    layout === 'right-half' ? ctx.canvas.width / 2 - PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const width = layout === 'full-width' ? CONTENT_WIDTH : CONTENT_WIDTH / 2 + PINLINE_THICKNESS / 2;
+
+  drawRectangle(ctx, {
+    x,
+    y,
+    width,
+    height: PINLINE_THICKNESS,
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+  });
 };

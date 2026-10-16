@@ -1,1 +1,3 @@
-export const millimetersToInches = (mm: number) => mm / 25.4;
+export const millimetersToInches = (mm: number) => {
+  return mm / 25.4;
+};

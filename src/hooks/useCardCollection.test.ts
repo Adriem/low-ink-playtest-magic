@@ -10,28 +10,6 @@ vi.mock('../adapters/scryfall', () => ({
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
-// Cards only need the fields the tests check
-const resolveCard = async (pending: Deferred<Card>, card: { name: string }) => {
-  await act(async () => {
-    pending.resolve(card as Card);
-    await pending.promise;
-  });
-};
-
-const rejectCard = async (pending: Deferred<Card>, error: Error) => {
-  await act(async () => {
-    pending.reject(error);
-    await pending.promise.catch(() => {});
-  });
-};
-
-const cardNames = (collection: CollectionCard[]) =>
-  collection.map((card) => (isLoadingCard(card) ? 'loading' : card.name));
-
-// The hook's latest result, as `collection.current`
-const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) =>
-  renderHook(() => useCardCollection(options)).result;
-
 beforeEach(() => {
   vi.mocked(fetchCard).mockReset();
 });
@@ -158,3 +136,27 @@ test('removes cards by index and clears the collection', () => {
   act(() => collection.current.clearCollection());
   expect(collection.current.cardCollection).toEqual([]);
 });
+
+// Cards only need the fields the tests check
+const resolveCard = async (pending: Deferred<Card>, card: { name: string }) => {
+  await act(async () => {
+    pending.resolve(card as Card);
+    await pending.promise;
+  });
+};
+
+const rejectCard = async (pending: Deferred<Card>, error: Error) => {
+  await act(async () => {
+    pending.reject(error);
+    await pending.promise.catch(() => {});
+  });
+};
+
+const cardNames = (collection: CollectionCard[]) => {
+  return collection.map((card) => (isLoadingCard(card) ? 'loading' : card.name));
+};
+
+// The hook's latest result, as `collection.current`
+const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) => {
+  return renderHook(() => useCardCollection(options)).result;
+};

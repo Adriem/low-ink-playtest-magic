@@ -3,16 +3,10 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import SettingsPanel from './SettingsPanel';
 import { SettingsContextProvider } from './SettingsContext';
 
-const renderPanel = () =>
-  render(
-    <SettingsContextProvider>
-      <SettingsPanel />
-    </SettingsContextProvider>,
-  );
+let user: UserEvent;
 
 afterEach(() => sessionStorage.clear());
 
-let user: UserEvent;
 beforeEach(() => {
   user = userEvent.setup();
 });
@@ -41,3 +35,11 @@ test('disables settings that are not available yet', () => {
 
   expect(screen.getByLabelText('Medium')).toBeDisabled();
 });
+
+const renderPanel = () => {
+  return render(
+    <SettingsContextProvider>
+      <SettingsPanel />
+    </SettingsContextProvider>,
+  );
+};

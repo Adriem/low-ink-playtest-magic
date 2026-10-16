@@ -7,6 +7,8 @@ export type CardSymbol = `{${string}}`;
 const SYMBOL_REGEX = /\{[^}]+\}/g;
 const SYMBOL_RUN_REGEX = /(?:\{[^}]+\})+/g;
 
+type TextChunk = { chunkType: 'text' | 'symbols'; value: string };
+
 /**
  * Symbols in a text, in order, e.g. `['{2}', '{W}', '{U}']` for `{2}{W}{U}`.
  */
@@ -21,8 +23,6 @@ export const splitSymbols = (str: string): CardSymbol[] => {
 export const getSymbolValue = (sym: CardSymbol): string => {
   return sym.slice(1, -1);
 };
-
-type TextChunk = { chunkType: 'text' | 'symbols'; value: string };
 
 /**
  * Split a text into runs of plain text and runs of symbols, in order, e.g.

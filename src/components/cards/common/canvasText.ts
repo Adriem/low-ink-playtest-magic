@@ -3,6 +3,13 @@ const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = 0.75;
 
+export interface FittedParagraph {
+  originalContent: string;
+  lineHeight: number;
+  paragraphHeight: number;
+  lines: string[];
+}
+
 /**
  * Automatically wrap a given text to fit inside an specified maximum width on
  * a canvas with a properly set font.
@@ -118,13 +125,6 @@ export const fitFontSizeInXY = (
 
   return textLines;
 };
-
-export interface FittedParagraph {
-  originalContent: string;
-  lineHeight: number;
-  paragraphHeight: number;
-  lines: string[];
-}
 
 /**
  * Automatically reduce the font size of the canvas until a given text

@@ -6,7 +6,9 @@ test('recognizes the symbols of the five colors', () => {
 });
 
 describe('normalizeColors', () => {
-  const normalized = (colors: string) => normalizeColors([...colors] as ColorSymbol[]).join('');
+  const normalized = (colors: string) => {
+    return normalizeColors([...colors] as ColorSymbol[]).join('');
+  };
 
   test('keeps no colors and single colors as they are', () => {
     expect(normalizeColors([])).toEqual([]);

@@ -5,34 +5,6 @@ import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderer } from './styl
 
 const HALF_HEIGHT = CARD_HEIGHT / 2;
 
-const drawRotatedCW = (
-  ctx: CanvasRenderingContext2D,
-  src: HTMLCanvasElement,
-  dx: number,
-  dy: number,
-  dw: number,
-  dh: number,
-) => {
-  ctx.save();
-  ctx.translate(dx + dw, dy);
-  ctx.rotate(Math.PI / 2);
-  ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, dh, dw);
-  ctx.restore();
-};
-
-/**
- * Draw a face on its own off-screen canvas.
- */
-const renderFace = (render: CardRenderer, face: CardFace): HTMLCanvasElement => {
-  const faceCanvas = document.createElement('canvas');
-  faceCanvas.width = CARD_WIDTH;
-  faceCanvas.height = CARD_HEIGHT;
-
-  beginRender(faceCanvas);
-  render(faceCanvas, { face });
-  return faceCanvas;
-};
-
 /**
  * Card with two faces drawn side by side, rotated, in a single card canvas.
  * Each face is drawn on an off-screen canvas, and they're combined once both
@@ -77,6 +49,34 @@ const DualCard = ({ cardStyle, faces }: { cardStyle: string; faces: [CardFace, C
       style={{ background: palette.PAPER }}
     />
   );
+};
+
+const drawRotatedCW = (
+  ctx: CanvasRenderingContext2D,
+  src: HTMLCanvasElement,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+) => {
+  ctx.save();
+  ctx.translate(dx + dw, dy);
+  ctx.rotate(Math.PI / 2);
+  ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, dh, dw);
+  ctx.restore();
+};
+
+/**
+ * Draw a face on its own off-screen canvas.
+ */
+const renderFace = (render: CardRenderer, face: CardFace): HTMLCanvasElement => {
+  const faceCanvas = document.createElement('canvas');
+  faceCanvas.width = CARD_WIDTH;
+  faceCanvas.height = CARD_HEIGHT;
+
+  beginRender(faceCanvas);
+  render(faceCanvas, { face });
+  return faceCanvas;
 };
 
 export default DualCard;

@@ -2,8 +2,6 @@ import { testFace } from '../testUtils';
 import type { ColorSymbol } from './colors';
 import { getColorTreatment, getPaletteColors, type Palette } from './colorTreatment';
 
-const face = (colors: ColorSymbol[], typeLine = 'Creature') => testFace({ name: 'Card', colors, typeLine });
-
 describe('getColorTreatment', () => {
   test.each([
     [['W'], 'white'],
@@ -46,6 +44,10 @@ describe('getColorTreatment', () => {
     expect(getColorTreatment(face([], 'Creature — Eldrazi'))).toBe('colorless');
   });
 });
+
+const face = (colors: ColorSymbol[], typeLine = 'Creature') => {
+  return testFace({ name: 'Card', colors, typeLine });
+};
 
 describe('getPaletteColors', () => {
   const palette: Palette = {

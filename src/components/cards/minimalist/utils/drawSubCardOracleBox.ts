@@ -17,23 +17,6 @@ import { getFillStyle } from '../../common/canvasStyles';
 const TEXT_PADDING_FROM_CENTER = 15;
 const TEXT_PADDING_FROM_OUTSIDE = 10;
 
-const drawOracleBorder = (
-  ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, position, y }: { cardColorTreatment: ColorTreatment; position: SubCardPosition; y: number },
-) => {
-  const x =
-    position === 'right' ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
-  const width = CONTENT_WIDTH / 2 - PINLINE_THICKNESS / 2;
-
-  drawRectangle(ctx, {
-    x,
-    y,
-    width,
-    height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
-  });
-};
-
 export const drawSubCardOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
@@ -67,4 +50,21 @@ export const drawSubCardOracleBox = (
     textX,
     SUBCARD_ORACLE_Y,
   );
+};
+
+const drawOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, position, y }: { cardColorTreatment: ColorTreatment; position: SubCardPosition; y: number },
+) => {
+  const x =
+    position === 'right' ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const width = CONTENT_WIDTH / 2 - PINLINE_THICKNESS / 2;
+
+  drawRectangle(ctx, {
+    x,
+    y,
+    width,
+    height: PINLINE_THICKNESS,
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+  });
 };

@@ -42,27 +42,6 @@ interface SagaSlot {
   isBottom?: boolean;
 }
 
-const drawSagaOracleBorder = (
-  ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
-) => {
-  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
-
-  const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
-  const tipX = (xOffsetL + xOffsetR) / 2;
-  const tipHeight = 16;
-
-  ctx.beginPath();
-  ctx.moveTo(xOffsetL, y);
-  ctx.lineTo(xOffsetR, y);
-  ctx.lineTo(xOffsetR, y + height - tipHeight);
-  ctx.lineTo(tipX, y + height);
-  ctx.lineTo(xOffsetL, y + height - tipHeight);
-  ctx.closePath();
-
-  ctx.fill();
-};
-
 export const drawSagaOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
@@ -211,4 +190,25 @@ export const drawSagaOracleBox = (
       fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
     });
   }
+};
+
+const drawSagaOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
+) => {
+  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
+
+  const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
+  const tipX = (xOffsetL + xOffsetR) / 2;
+  const tipHeight = 16;
+
+  ctx.beginPath();
+  ctx.moveTo(xOffsetL, y);
+  ctx.lineTo(xOffsetR, y);
+  ctx.lineTo(xOffsetR, y + height - tipHeight);
+  ctx.lineTo(tipX, y + height);
+  ctx.lineTo(xOffsetL, y + height - tipHeight);
+  ctx.closePath();
+
+  ctx.fill();
 };

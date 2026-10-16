@@ -39,6 +39,84 @@ interface SagaSlot {
 }
 
 /**
+ * Draw the body of a saga: a single framed box from below the title to the
+ * type line, split in half by a black line, with the oracle text on the left
+ * and the art on the right.
+ *
+ * @param options.typelineY - Where the type line below the box starts
+ */
+export const drawSagaOracleAndArtBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardOracleText = '',
+    cardArtUrl,
+    cropArt,
+    cardColorTreatment,
+    typelineY = SAGA_TYPELINE_Y,
+  }: {
+    cardOracleText?: string;
+    cardArtUrl?: string;
+    cropArt?: ArtCrop;
+    cardColorTreatment: ColorTreatment;
+    typelineY?: number;
+  },
+) => {
+  const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
+  const y = SAGA_COLUMNS_Y;
+  const width = CONTENT_WIDTH;
+  const height = typelineY - y + SAGA_COLUMNS_TYPELINE_OVERLAP;
+  const halfWidth = width / 2;
+
+  const inner = drawFramedBox(ctx, {
+    x,
+    y,
+    width,
+    height,
+    cardColorTreatment,
+    shape: 'rectangle',
+  });
+
+  // Separator between the text and the art, as thick as the frame's pinline
+  drawRectangle(ctx, {
+    x: x + halfWidth - PINLINE_THICKNESS / 2,
+    y: inner.y,
+    width: PINLINE_THICKNESS,
+    height: inner.height,
+    fillStyle: REALISTIC_PALETTE.LINE,
+  });
+
+  // Text column: from the frame's inner pinline to the separator
+  const textColumn = {
+    x: inner.x + PINLINE_THICKNESS,
+    y: inner.y + PINLINE_THICKNESS,
+    width: x + halfWidth - PINLINE_THICKNESS / 2 - (inner.x + PINLINE_THICKNESS),
+    height: inner.height - PINLINE_THICKNESS * 2,
+  };
+  const hasChapters = drawSagaChapters(ctx, cardOracleText, textColumn);
+
+  // Sagas without recognizable chapters get their text as a regular oracle box
+  if (!hasChapters) {
+    const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
+    drawOracleText(ctx, {
+      cardOracleText,
+      x: x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
+      y: y + PINLINE_THICKNESS + textPaddingTop,
+      width: halfWidth - PINLINE_THICKNESS * 2 - ORACLE_TEXT_PADDING_X * 2,
+      height: height - PINLINE_THICKNESS * 2 - textPaddingTop - ORACLE_TEXT_PADDING_Y,
+    });
+  }
+
+  drawArtImage(ctx, {
+    cardArtUrl,
+    cropArt,
+    x: x + halfWidth + PINLINE_THICKNESS + 2,
+    y: y + PINLINE_THICKNESS + 2,
+    width: halfWidth - PINLINE_THICKNESS * 2 - 4,
+    height: height - PINLINE_THICKNESS * 2 - 4,
+  });
+};
+
+/**
  * Draw the text of a saga in its column: the paragraphs before the chapters
  * (e.g. reminder text), each chapter and the paragraphs after them get a slot
  * as tall as their share of the text, like printed sagas, with a thin line
@@ -126,82 +204,4 @@ const drawSagaChapters = (
   });
 
   return true;
-};
-
-/**
- * Draw the body of a saga: a single framed box from below the title to the
- * type line, split in half by a black line, with the oracle text on the left
- * and the art on the right.
- *
- * @param options.typelineY - Where the type line below the box starts
- */
-export const drawSagaOracleAndArtBox = (
-  ctx: CanvasRenderingContext2D,
-  {
-    cardOracleText = '',
-    cardArtUrl,
-    cropArt,
-    cardColorTreatment,
-    typelineY = SAGA_TYPELINE_Y,
-  }: {
-    cardOracleText?: string;
-    cardArtUrl?: string;
-    cropArt?: ArtCrop;
-    cardColorTreatment: ColorTreatment;
-    typelineY?: number;
-  },
-) => {
-  const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
-  const y = SAGA_COLUMNS_Y;
-  const width = CONTENT_WIDTH;
-  const height = typelineY - y + SAGA_COLUMNS_TYPELINE_OVERLAP;
-  const halfWidth = width / 2;
-
-  const inner = drawFramedBox(ctx, {
-    x,
-    y,
-    width,
-    height,
-    cardColorTreatment,
-    shape: 'rectangle',
-  });
-
-  // Separator between the text and the art, as thick as the frame's pinline
-  drawRectangle(ctx, {
-    x: x + halfWidth - PINLINE_THICKNESS / 2,
-    y: inner.y,
-    width: PINLINE_THICKNESS,
-    height: inner.height,
-    fillStyle: REALISTIC_PALETTE.LINE,
-  });
-
-  // Text column: from the frame's inner pinline to the separator
-  const textColumn = {
-    x: inner.x + PINLINE_THICKNESS,
-    y: inner.y + PINLINE_THICKNESS,
-    width: x + halfWidth - PINLINE_THICKNESS / 2 - (inner.x + PINLINE_THICKNESS),
-    height: inner.height - PINLINE_THICKNESS * 2,
-  };
-  const hasChapters = drawSagaChapters(ctx, cardOracleText, textColumn);
-
-  // Sagas without recognizable chapters get their text as a regular oracle box
-  if (!hasChapters) {
-    const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
-    drawOracleText(ctx, {
-      cardOracleText,
-      x: x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
-      y: y + PINLINE_THICKNESS + textPaddingTop,
-      width: halfWidth - PINLINE_THICKNESS * 2 - ORACLE_TEXT_PADDING_X * 2,
-      height: height - PINLINE_THICKNESS * 2 - textPaddingTop - ORACLE_TEXT_PADDING_Y,
-    });
-  }
-
-  drawArtImage(ctx, {
-    cardArtUrl,
-    cropArt,
-    x: x + halfWidth + PINLINE_THICKNESS + 2,
-    y: y + PINLINE_THICKNESS + 2,
-    width: halfWidth - PINLINE_THICKNESS * 2 - 4,
-    height: height - PINLINE_THICKNESS * 2 - 4,
-  });
 };

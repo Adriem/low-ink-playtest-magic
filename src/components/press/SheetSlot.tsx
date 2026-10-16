@@ -79,9 +79,15 @@ const SheetSlot = ({
     openMenu(collectionIndex, { focusFirstControl: isKeyboardClick(event) });
   };
 
-  const handleMoveUp = (event: MouseEvent) => moveCardBy(collectionIndex, -1, event);
-  const handleMoveDown = (event: MouseEvent) => moveCardBy(collectionIndex, 1, event);
-  const handleDelete = () => deleteCard(collectionIndex);
+  const handleMoveUp = (event: MouseEvent) => {
+    return moveCardBy(collectionIndex, -1, event);
+  };
+  const handleMoveDown = (event: MouseEvent) => {
+    return moveCardBy(collectionIndex, 1, event);
+  };
+  const handleDelete = () => {
+    return deleteCard(collectionIndex);
+  };
   const handleDismiss = (event: MouseEvent) => {
     dismissMenu({ returnFocusTo: isKeyboardClick(event) ? collectionIndex : null });
   };

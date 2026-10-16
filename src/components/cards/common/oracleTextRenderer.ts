@@ -8,16 +8,6 @@ const SYMBOL_PLACEHOLDER = '‹::›';
 const SYMBOL_PADDING = 1;
 
 /**
- * A line as measured: its text, with a placeholder for each symbol.
- */
-const toMeasurableLine = (line: string) =>
-  parseTextWithSymbols(line)
-    .map((chunk) =>
-      chunk.chunkType === 'text' ? chunk.value : SYMBOL_PLACEHOLDER.repeat(splitSymbols(chunk.value).length),
-    )
-    .join('');
-
-/**
  * Draw lines of rules text, with their symbols as images. `originY` is the
  * baseline of the first line, and empty lines separate paragraphs.
  */
@@ -41,6 +31,17 @@ export const fillMultilineText = (ctx: CanvasRenderingContext2D, lines: string[]
 
     renderTextWithSymbols(ctx, line, originX, currentBaseLine);
   }
+};
+
+/**
+ * A line as measured: its text, with a placeholder for each symbol.
+ */
+const toMeasurableLine = (line: string) => {
+  return parseTextWithSymbols(line)
+    .map((chunk) =>
+      chunk.chunkType === 'text' ? chunk.value : SYMBOL_PLACEHOLDER.repeat(splitSymbols(chunk.value).length),
+    )
+    .join('');
 };
 
 /**

@@ -7,15 +7,6 @@ vi.mock('jspdf', () => ({
   }),
 }));
 
-const createdPdf = () =>
-  vi.mocked(jsPDF).mock.results.at(-1)?.value as {
-    addImage: ReturnType<typeof vi.fn>;
-    addPage: ReturnType<typeof vi.fn>;
-    save: ReturnType<typeof vi.fn>;
-  };
-
-const cardImages = (count: number) => Array.from({ length: count }, (_, i) => `card-${i}`);
-
 beforeEach(() => {
   vi.mocked(jsPDF).mockClear();
 });
@@ -50,3 +41,15 @@ test('adds the cards as JPEG images unless told otherwise', () => {
   exportToPDF(cardImages(1), 'PNG');
   expect(createdPdf().addImage.mock.calls[0].slice(0, 2)).toEqual(['card-0', 'PNG']);
 });
+
+const createdPdf = () => {
+  return vi.mocked(jsPDF).mock.results.at(-1)?.value as {
+    addImage: ReturnType<typeof vi.fn>;
+    addPage: ReturnType<typeof vi.fn>;
+    save: ReturnType<typeof vi.fn>;
+  };
+};
+
+const cardImages = (count: number) => {
+  return Array.from({ length: count }, (_, i) => `card-${i}`);
+};

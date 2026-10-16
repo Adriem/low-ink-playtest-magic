@@ -20,25 +20,6 @@ import { getFillStyle } from '../../common/canvasStyles';
 const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character here! D:
 const LOYALTY_ABILITY_OFFSET = 45;
 
-const drawPlaneswalkerOracleBorder = (
-  ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
-) => {
-  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
-
-  const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
-
-  ctx.beginPath();
-  ctx.moveTo(xOffsetL - 15, y);
-  ctx.ellipse(xOffsetL - 15, y + 20, 15, 20, 0, 1.5 * Math.PI, 0);
-  ctx.ellipse(xOffsetL + 100, y + height - 60, 100, 60, 0, Math.PI, 0.5 * Math.PI, true);
-  ctx.ellipse(xOffsetR + 100, y + height - 60, 100, 60, 0, 0.5 * Math.PI, Math.PI);
-  ctx.ellipse(xOffsetR + 35, y + 25, 35, 25, 0, Math.PI, 1.5 * Math.PI, false);
-  ctx.closePath();
-
-  ctx.fill();
-};
-
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
   { cardOracleText, cardColorTreatment }: { cardOracleText?: string; cardColorTreatment: ColorTreatment },
@@ -107,4 +88,23 @@ export const drawPlaneswalkerOracleBox = (
 
     currentY += paragraph.paragraphHeight;
   }
+};
+
+const drawPlaneswalkerOracleBorder = (
+  ctx: CanvasRenderingContext2D,
+  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
+) => {
+  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
+
+  const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
+
+  ctx.beginPath();
+  ctx.moveTo(xOffsetL - 15, y);
+  ctx.ellipse(xOffsetL - 15, y + 20, 15, 20, 0, 1.5 * Math.PI, 0);
+  ctx.ellipse(xOffsetL + 100, y + height - 60, 100, 60, 0, Math.PI, 0.5 * Math.PI, true);
+  ctx.ellipse(xOffsetR + 100, y + height - 60, 100, 60, 0, 0.5 * Math.PI, Math.PI);
+  ctx.ellipse(xOffsetR + 35, y + 25, 35, 25, 0, Math.PI, 1.5 * Math.PI, false);
+  ctx.closePath();
+
+  ctx.fill();
 };

@@ -4,12 +4,6 @@
 import { deferred } from '../../../testUtils';
 import { beginRender, drawWhenLoaded, finishRender, whenRendered } from './canvasRendering';
 
-// jsdom has no canvas contexts, and drawWhenLoaded only needs the canvas
-const setupCanvas = () => {
-  const canvas = document.createElement('canvas');
-  return { canvas, ctx: { canvas } as CanvasRenderingContext2D };
-};
-
 test('marks the canvas as rendered once its drawings finish', async () => {
   const { canvas, ctx } = setupCanvas();
   const image = deferred();
@@ -90,3 +84,9 @@ describe('whenRendered', () => {
     await expect(waiting).resolves.toBe(false);
   });
 });
+
+// jsdom has no canvas contexts, and drawWhenLoaded only needs the canvas
+const setupCanvas = () => {
+  const canvas = document.createElement('canvas');
+  return { canvas, ctx: { canvas } as CanvasRenderingContext2D };
+};

@@ -28,7 +28,9 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
   const addCardByName = useCallback(
     (cardName: string) => {
       const loadingCardId = nextLoadingCardIdRef.current++;
-      const isPlaceholder = (card: CollectionCard) => isLoadingCard(card) && card.loadingCardId === loadingCardId;
+      const isPlaceholder = (card: CollectionCard) => {
+        return isLoadingCard(card) && card.loadingCardId === loadingCardId;
+      };
       const placeholder: LoadingCard = { loading: true, loadingCardId };
 
       setCardCollection((collection) => [...collection, placeholder]);

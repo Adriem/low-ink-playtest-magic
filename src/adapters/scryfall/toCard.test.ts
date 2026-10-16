@@ -1,12 +1,6 @@
 import { toCard } from './toCard';
 import type { ScryfallCard } from './types';
 
-const scryfallCard = (card: Partial<ScryfallCard> & { name: string }): ScryfallCard => ({
-  layout: 'normal',
-  set: 'tst',
-  ...card,
-});
-
 test('maps a single-faced card to a card with its main face', () => {
   const card = toCard(
     scryfallCard({
@@ -163,3 +157,11 @@ describe('art of faces', () => {
     ]);
   });
 });
+
+const scryfallCard = (card: Partial<ScryfallCard> & { name: string }): ScryfallCard => {
+  return {
+    layout: 'normal',
+    set: 'tst',
+    ...card,
+  };
+};

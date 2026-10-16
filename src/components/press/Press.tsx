@@ -21,25 +21,6 @@ const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 // Maximum time to wait for cards to finish rendering (e.g. slow images)
 const RENDER_TIMEOUT_MS = 10000;
 
-/**
- * Export the cards to a PDF once they're completely drawn, so images still
- * loading aren't missing from it.
- */
-const exportCardsToPdf = async (canvases: HTMLCanvasElement[]) => {
-  const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
-  if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
-
-  exportToPDF(canvases);
-};
-
-const loadPersistedCards = () =>
-  loadFromSessionStorage<CollectionCard[]>(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
-
-// TODO: Replace alert with a toast notification
-const handleCardLoadError = (cardName: string, error: Error) => {
-  window.alert(`Could not load "${cardName}": ${error.message}`);
-};
-
 const Press = () => {
   const [cardVariant] = useSetting('cardVariant');
   const [splitCardTreatment] = useSetting('splitCardTreatment');
@@ -143,6 +124,26 @@ const Press = () => {
       </CardOverlayProvider>
     </>
   );
+};
+
+/**
+ * Export the cards to a PDF once they're completely drawn, so images still
+ * loading aren't missing from it.
+ */
+const exportCardsToPdf = async (canvases: HTMLCanvasElement[]) => {
+  const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
+  if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
+
+  exportToPDF(canvases);
+};
+
+const loadPersistedCards = () => {
+  return loadFromSessionStorage<CollectionCard[]>(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
+};
+
+// TODO: Replace alert with a toast notification
+const handleCardLoadError = (cardName: string, error: Error) => {
+  window.alert(`Could not load "${cardName}": ${error.message}`);
 };
 
 export default Press;

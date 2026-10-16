@@ -1,7 +1,5 @@
 import { distributeHeight } from './layout';
 
-const sum = (values: number[]) => values.reduce((total, value) => total + value, 0);
-
 test('splits the height proportionally to the weights', () => {
   const heights = distributeHeight(300, [
     { weight: 10, minHeight: 0 },
@@ -24,6 +22,10 @@ test('gives items at least their minimum height, splitting the rest between the 
   expect(heights[2]).toBeCloseTo(125);
   expect(sum(heights)).toBeCloseTo(300);
 });
+
+const sum = (values: number[]) => {
+  return values.reduce((total, value) => total + value, 0);
+};
 
 test('splits the height equally, but with the required heights, when the minimums do not fit', () => {
   const heights = distributeHeight(200, [

@@ -17,27 +17,6 @@ import { getColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps } from '../styles';
 import { get2dContext } from '../common/canvasRendering';
 
-const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position: SubCardPosition) => {
-  const subColorTreatment = getColorTreatment(subFace);
-
-  drawSubCardTitleBox(ctx, {
-    cardName: subFace.name,
-    cardManaCost: subFace.manaCost,
-    cardColorTreatment: subColorTreatment,
-    position,
-  });
-  drawSubCardTypeBox(ctx, {
-    cardType: subFace.typeLine,
-    cardColorTreatment: subColorTreatment,
-    position,
-  });
-  drawSubCardOracleBox(ctx, {
-    cardOracleText: subFace.oracleText,
-    cardColorTreatment: subColorTreatment,
-    position,
-  });
-};
-
 /**
  * Draw a card in the realistic style on a canvas.
  *
@@ -108,4 +87,25 @@ export const renderRealisticCard = (
       cardColorTreatment,
     });
   }
+};
+
+const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position: SubCardPosition) => {
+  const subColorTreatment = getColorTreatment(subFace);
+
+  drawSubCardTitleBox(ctx, {
+    cardName: subFace.name,
+    cardManaCost: subFace.manaCost,
+    cardColorTreatment: subColorTreatment,
+    position,
+  });
+  drawSubCardTypeBox(ctx, {
+    cardType: subFace.typeLine,
+    cardColorTreatment: subColorTreatment,
+    position,
+  });
+  drawSubCardOracleBox(ctx, {
+    cardOracleText: subFace.oracleText,
+    cardColorTreatment: subColorTreatment,
+    position,
+  });
 };

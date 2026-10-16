@@ -1,6 +1,21 @@
 import type { Ref } from 'react';
 import { SETTING_NAMES, SETTINGS_DEFINITIONS, useSetting, type SettingName } from './SettingsContext';
 
+const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
+  return (
+    <dialog ref={ref}>
+      <form method="dialog">
+        {SETTING_NAMES.map((name) => (
+          <SettingFieldset key={name} name={name} />
+        ))}
+        <menu>
+          <button type="submit">Close</button>
+        </menu>
+      </form>
+    </dialog>
+  );
+};
+
 /**
  * Radio buttons to pick the value of a setting.
  */
@@ -26,18 +41,5 @@ const SettingFieldset = <Name extends SettingName>({ name }: { name: Name }) => 
     </fieldset>
   );
 };
-
-const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => (
-  <dialog ref={ref}>
-    <form method="dialog">
-      {SETTING_NAMES.map((name) => (
-        <SettingFieldset key={name} name={name} />
-      ))}
-      <menu>
-        <button type="submit">Close</button>
-      </menu>
-    </form>
-  </dialog>
-);
 
 export default SettingsPanel;

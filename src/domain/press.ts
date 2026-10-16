@@ -11,8 +11,6 @@ export type LoadingCard = {
 /** A card in the press, or the placeholder of one being fetched */
 export type CollectionCard = Card | LoadingCard;
 
-export const isLoadingCard = (card: CollectionCard): card is LoadingCard => 'loading' in card;
-
 /** Whether split or double-faced cards are kept as a single card or split into one card per face */
 export type CardTreatment = 'unified' | 'separate';
 
@@ -51,10 +49,26 @@ export type SheetConfig = {
   doubleFacedCardTreatment?: CardTreatment;
 };
 
-const getTreatment = (card: Card, config: Required<SheetConfig>): CardTreatment => {
-  if (card.layout === 'split') return config.splitCardTreatment;
-  if (card.layout === 'double-faced') return config.doubleFacedCardTreatment;
-  return 'separate';
+export const isLoadingCard = (card: CollectionCard): card is LoadingCard => {
+  return 'loading' in card;
+};
+
+/**
+ * Group the cards of a collection into sheets. Depending on the settings,
+ * split and double-faced cards are kept as a single card or split into one
+ * card per face.
+ */
+export const groupCardsIntoSheets = (
+  cards: CollectionCard[],
+  {
+    sheetSize = CARDS_PER_SHEET,
+    splitCardTreatment = 'separate',
+    doubleFacedCardTreatment = 'separate',
+  }: SheetConfig = {},
+): SheetItem[][] => {
+  const config = { sheetSize, splitCardTreatment, doubleFacedCardTreatment };
+  const items = cards.flatMap((card, collectionIndex) => toSheetItems(card, collectionIndex, config));
+  return chunk(items, sheetSize);
 };
 
 const toSheetItems = (card: CollectionCard, collectionIndex: number, config: Required<SheetConfig>): SheetItem[] => {
@@ -88,22 +102,10 @@ const toSheetItems = (card: CollectionCard, collectionIndex: number, config: Req
   ];
 };
 
-/**
- * Group the cards of a collection into sheets. Depending on the settings,
- * split and double-faced cards are kept as a single card or split into one
- * card per face.
- */
-export const groupCardsIntoSheets = (
-  cards: CollectionCard[],
-  {
-    sheetSize = CARDS_PER_SHEET,
-    splitCardTreatment = 'separate',
-    doubleFacedCardTreatment = 'separate',
-  }: SheetConfig = {},
-): SheetItem[][] => {
-  const config = { sheetSize, splitCardTreatment, doubleFacedCardTreatment };
-  const items = cards.flatMap((card, collectionIndex) => toSheetItems(card, collectionIndex, config));
-  return chunk(items, sheetSize);
+const getTreatment = (card: Card, config: Required<SheetConfig>): CardTreatment => {
+  if (card.layout === 'split') return config.splitCardTreatment;
+  if (card.layout === 'double-faced') return config.doubleFacedCardTreatment;
+  return 'separate';
 };
 
 /**
@@ -111,7 +113,9 @@ export const groupCardsIntoSheets = (
  * collection leave it as it is.
  */
 export const moveCard = <T>(collection: T[], fromIndex: number, toIndex: number): T[] => {
-  const isInCollection = (index: number) => index >= 0 && index < collection.length;
+  const isInCollection = (index: number) => {
+    return index >= 0 && index < collection.length;
+  };
   if (fromIndex === toIndex || !isInCollection(fromIndex) || !isInCollection(toIndex)) return collection;
 
   const reordered = [...collection];

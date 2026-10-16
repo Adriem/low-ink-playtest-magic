@@ -1,0 +1,8 @@
+# Commits that only change formatting, which git blame skips with
+# git config blame.ignoreRevsFile .git-blame-ignore-revs (GitHub skips them already)
+
+# Format the project with Prettier
+5fefc0fc9179972277da8e7a33cbb7c42822a5af
+
+# Order code top-down and give named functions braces
+c0c760b29af6bf1f03eba13a1638d3dc6186b9cf

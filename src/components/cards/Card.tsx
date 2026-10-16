@@ -1,0 +1,40 @@
+import { useEffect, useState } from 'react';
+import { beginRender, finishRender } from './common/canvasRendering';
+import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './styles';
+
+/**
+ * Card face drawn on a canvas in the given style. The canvas is marked as
+ * rendered (`data-rendered`) once all its images have been drawn.
+ *
+ * @param props.cardStyle - e.g. `realistic` or `minimalist`
+ */
+const Card = ({
+  cardStyle,
+  face,
+  subFace,
+  subFacePosition,
+  blackBordered,
+}: CardRenderProps & { cardStyle: string }) => {
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const { render, palette } = getCardStyle(cardStyle);
+
+  useEffect(() => {
+    if (canvas == null) return;
+
+    beginRender(canvas);
+    render(canvas, { face, subFace, subFacePosition, blackBordered });
+    void finishRender(canvas);
+  }, [canvas, render, face, subFace, subFacePosition, blackBordered]);
+
+  return (
+    <canvas
+      className="card"
+      ref={setCanvas}
+      width={CARD_WIDTH}
+      height={CARD_HEIGHT}
+      style={{ background: palette.PAPER }}
+    />
+  );
+};
+
+export default Card;

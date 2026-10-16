@@ -1,0 +1,56 @@
+.sheet-slot-overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 100, 220, 0.45);
+  border-radius: 11px;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.3s,
+    background-color 0.2s;
+}
+.sheet-slot-overlay.main-face {
+  border-radius: 11px 0 0 11px;
+}
+.sheet-slot-overlay.secondary-face {
+  border-radius: 0 11px 11px 0;
+}
+.sheet-slot-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sheet-slot-overlay.danger {
+  background: rgba(220, 20, 20, 0.5);
+}
+
+.sheet-slot-overlay-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.sheet-slot-overlay-controls button {
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
+
+.sheet-slot-overlay-separator {
+  width: 100%;
+  margin: 0.5rem 0;
+  border: none;
+  border-top: 2px solid black;
+  /* Only used as spacing for now */
+  visibility: hidden;
+}
+
+.sheet-slot-overlay-delete {
+  color: #a03;
+}

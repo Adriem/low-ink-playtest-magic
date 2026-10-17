@@ -58,6 +58,7 @@ afterAll(() => {
 
 afterEach(() => {
   sessionStorage.clear();
+  localStorage.clear();
 });
 
 test('numbers the pages below each sheet', () => {

@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import LoadingCard from '../cards/LoadingCard';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
+import PressActions from './PressActions';
 import SheetSlot from './SheetSlot';
-import { SettingsPanel, useSetting } from '../settings';
+import { useSetting } from '../settings';
 
 import './Press.css';
 import { exportToPDF } from '../../adapters/jspdf';
@@ -33,16 +34,11 @@ const Press = () => {
     splitCardTreatment,
     doubleFacedCardTreatment,
   });
-  const settingsDialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
     const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
     saveToSessionStorage(CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
-
-  const openSettings = useCallback(() => {
-    settingsDialogRef.current?.showModal();
-  }, []);
 
   const handleAddCards = useCallback(
     (cardNames: string[]) => {
@@ -51,9 +47,11 @@ const Press = () => {
     [addCardByName],
   );
 
-  // While moving a card (mouse only), the overlay stays on it: hovering other
-  // cards or leaving it doesn't change it, only closing it does
-  const exportPress = useCallback(() => {
+  const handleClear = useCallback(() => {
+    clearCollection();
+  }, [clearCollection]);
+
+  const handleExport = useCallback(() => {
     const canvases = [...document.querySelectorAll<HTMLCanvasElement>('canvas.card')];
 
     void exportCardsToPdf(canvases);
@@ -74,20 +72,7 @@ const Press = () => {
   return (
     <>
       <CardSearchForm onAddCards={handleAddCards} />
-      {cardSheets.length > 0 && (
-        <div className="press-actions">
-          <button type="button" className="clear" onClick={clearCollection}>
-            Clear
-          </button>
-          <button type="button" onClick={openSettings}>
-            Settings
-          </button>
-          <button type="button" className="export" onClick={exportPress}>
-            EXPORT
-          </button>
-        </div>
-      )}
-      <SettingsPanel ref={settingsDialogRef} />
+      {cardSheets.length > 0 && <PressActions onClear={handleClear} onExport={handleExport} />}
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
         {cardSheets.map((sheet, sheetNumber) => (
           <section key={sheetNumber} className="press-page">

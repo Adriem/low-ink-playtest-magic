@@ -1,27 +1,3 @@
-.press-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.5rem;
-  max-width: 750px;
-  margin: 0 auto 1rem;
-}
-
-.press-actions .clear {
-  margin-right: auto;
-  font-weight: bold;
-  color: #a03;
-}
-
-.press-actions .export {
-  font-weight: bold;
-  padding: 0.5em 1em;
-}
-
-dialog:not([open]) {
-  display: none;
-}
-
 /* A sheet of cards and its footer. Three 250px slots per row. On narrower
    screens the page shrinks with the screen and the slots wrap, so the page
    never gets wider than the screen (which makes mobile browsers zoom out the

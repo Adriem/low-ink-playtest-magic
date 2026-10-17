@@ -1,0 +1,23 @@
+.press-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 750px;
+  margin: 0 auto 1rem;
+}
+
+.press-actions .clear {
+  margin-right: auto;
+  font-weight: bold;
+  color: #a03;
+}
+
+.press-actions .export {
+  font-weight: bold;
+  padding: 0.5em 1em;
+}
+
+dialog:not([open]) {
+  display: none;
+}

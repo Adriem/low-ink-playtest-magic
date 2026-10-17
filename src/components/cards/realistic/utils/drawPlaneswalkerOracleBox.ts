@@ -14,7 +14,7 @@ import {
   PINLINE_THICKNESS,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
-import type { OracleLayout } from '../../styles';
+import type { InkLevel, OracleLayout } from '../../styles';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
@@ -31,8 +31,15 @@ export const drawPlaneswalkerOracleBox = (
     cardOracleText = { lines: [] },
     cardLoyalty,
     cardColorTreatment,
+    inkLevel,
     layout,
-  }: { cardOracleText?: OracleText; cardLoyalty: string; cardColorTreatment: ColorTreatment; layout: OracleLayout },
+  }: {
+    cardOracleText?: OracleText;
+    cardLoyalty: string;
+    cardColorTreatment: ColorTreatment;
+    inkLevel?: InkLevel;
+    layout: OracleLayout;
+  },
 ) => {
   const x = layout === 'right-half' ? ctx.canvas.width / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
@@ -45,6 +52,8 @@ export const drawPlaneswalkerOracleBox = (
     width,
     height,
     cardColorTreatment,
+    inkLevel,
+    inkFillStrength: 'light',
     shape: 'rectangle',
   });
 

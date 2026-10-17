@@ -2,7 +2,8 @@ import { drawRectangle, drawRoundedBox, type Box } from '../../common/canvasShap
 import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
 import { REALISTIC_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
-import { getFillStyle } from '../../common/canvasStyles';
+import { drawInkFill, getFillStyle, getInkFill, type InkFillStrength } from '../../common/canvasStyles';
+import type { InkLevel } from '../../styles';
 
 /**
  * Draw a box in the card's colors with a white inner box and a pinline, the
@@ -15,6 +16,11 @@ import { getFillStyle } from '../../common/canvasStyles';
  *   border, for subcard boxes that take half the card
  * @param options.innerHeightAdjustment - Fine-tunes the inner box
  *   height
+ * @param options.inkLevel - Fills the inner box with the card's colors above
+ *   the low ink level
+ * @param options.inkFillStrength - How strongly the ink level fills the inner
+ *   box: regular for the title and type boxes, light for the text boxes (oracle
+ *   and stats)
  * @returns The inner box
  */
 export const drawFramedBox = (
@@ -28,6 +34,8 @@ export const drawFramedBox = (
     shape,
     flatSide = null,
     innerHeightAdjustment = 0,
+    inkLevel = 'low',
+    inkFillStrength = 'regular',
   }: {
     x: number;
     y: number;
@@ -37,6 +45,8 @@ export const drawFramedBox = (
     shape: 'capsule' | 'rectangle';
     flatSide?: 'left' | 'right' | null;
     innerHeightAdjustment?: number;
+    inkLevel?: InkLevel;
+    inkFillStrength?: InkFillStrength;
   },
 ): Box => {
   const drawShape = shape === 'capsule' ? drawRoundedBox : drawRectangle;
@@ -59,13 +69,19 @@ export const drawFramedBox = (
     fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE)),
     flatSide,
   });
-  drawShape(ctx, {
+  const innerLine = {
     ...inner,
     lineWidth: shape === 'capsule' ? CAPSULE_INNER_STROKE : PINLINE_THICKNESS,
     strokeStyle: REALISTIC_PALETTE.LINE,
-    fillStyle: REALISTIC_PALETTE.PAPER,
     flatSide,
-  });
+  };
+  drawShape(ctx, { ...innerLine, fillStyle: REALISTIC_PALETTE.PAPER });
+
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel, inkFillStrength);
+  if (inkFill) {
+    // Filled where the inner box is white, so the fill doesn't cover the inner line
+    drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
+  }
 
   return inner;
 };

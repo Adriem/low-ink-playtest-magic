@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import SettingsPanel from './SettingsPanel';
 import { SettingsContextProvider } from './SettingsContext';
@@ -18,7 +18,7 @@ test('shows a group of options for each setting, with the defaults selected', ()
   expect(screen.getByLabelText('Realistic')).toBeChecked();
   expect(screen.getByRole('group', { name: 'Split card treatment', hidden: true })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: 'Double-Faced card treatment', hidden: true })).toBeInTheDocument();
-  expect(screen.getByLabelText('Low')).toBeChecked();
+  expect(screen.getByLabelText('Medium')).toBeChecked();
 });
 
 test('changes and saves a setting', async () => {
@@ -30,10 +30,47 @@ test('changes and saves a setting', async () => {
   expect(sessionStorage.getItem('press:cardVariant')).toBe('"minimalist"');
 });
 
-test('disables settings that are not available yet', () => {
+test('picks the ink level', async () => {
   renderPanel();
 
-  expect(screen.getByLabelText('Medium')).toBeDisabled();
+  await user.click(screen.getByLabelText('High'));
+
+  expect(screen.getByLabelText('High')).toBeChecked();
+  expect(sessionStorage.getItem('press:inkLevel')).toBe('"high"');
+
+  await user.click(screen.getByLabelText('Splurge'));
+
+  expect(screen.getByLabelText('Splurge')).toBeChecked();
+  expect(sessionStorage.getItem('press:inkLevel')).toBe('"splurge"');
+});
+
+test('picks the art fidelity with a slider through its levels', () => {
+  renderPanel();
+  const slider = screen.getByRole('slider', { name: 'Art fidelity', hidden: true });
+
+  expect(slider).toHaveValue('2');
+  expect(slider).toHaveAttribute('aria-valuetext', '3');
+
+  fireEvent.change(slider, { target: { value: '3' } });
+
+  expect(slider).toHaveAttribute('aria-valuetext', '4');
+  expect(sessionStorage.getItem('press:artFidelity')).toBe('"black-and-white"');
+
+  fireEvent.change(slider, { target: { value: '0' } });
+
+  expect(sessionStorage.getItem('press:artFidelity')).toBe('"none"');
+});
+
+test('disables the art fidelity for the minimalist style, which has no art', async () => {
+  renderPanel();
+
+  await user.click(screen.getByLabelText('Minimalist'));
+
+  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toBeDisabled();
+
+  await user.click(screen.getByLabelText('Realistic'));
+
+  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toBeEnabled();
 });
 
 const renderPanel = () => {

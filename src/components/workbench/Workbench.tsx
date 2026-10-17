@@ -1,11 +1,11 @@
 import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import Card from '../cards/Card';
-import type { CardStyle } from '../cards/styles';
+import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
 import { getSubCardPosition } from '../../domain/cards';
 import { isColorSymbol, type ColorSymbol } from '../../domain/colors';
 import useCardData from './useCardData';
 import Reference from './Reference';
-import { SETTINGS_DEFINITIONS, useSetting } from '../settings';
+import { SETTINGS_DEFINITIONS, isSettingAvailable, useSetting } from '../settings';
 
 import './Workbench.css';
 
@@ -36,6 +36,8 @@ const Workbench = () => {
   const [cardColors, setCardColors] = useState<ColorSymbol[] | null>(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
   const [cardVariant, setCardVariant] = useSetting('cardVariant');
+  const [inkLevel, setInkLevel] = useSetting('inkLevel');
+  const [artFidelity, setArtFidelity] = useSetting('artFidelity');
 
   const { card, referenceImageUrl, loading, error } = useCardData(cardName);
   // The colors picked override the face's, to try the color treatments
@@ -50,6 +52,12 @@ const Workbench = () => {
   };
   const handleStyleChange = (e: ChangeEvent<HTMLSelectElement>) => {
     return setCardVariant(e.target.value as CardStyle);
+  };
+  const handleInkLevelChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setInkLevel(e.target.value as InkLevel);
+  };
+  const handleArtFidelityChange = (e: ChangeEvent<HTMLSelectElement>) => {
+    setArtFidelity(e.target.value as ArtFidelity);
   };
   const handleColorChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
@@ -85,6 +93,8 @@ const Workbench = () => {
               subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
               subFacePosition={getSubCardPosition(card)}
               blackBordered={blackBordered}
+              inkLevel={inkLevel}
+              artFidelity={artFidelity}
             />
           </div>
         )}
@@ -122,6 +132,31 @@ const Workbench = () => {
             <select id="cardBorder" value={blackBordered ? 'black' : 'white'} onChange={handleBorderChange}>
               <option value="white">White border</option>
               <option value="black">Black border</option>
+            </select>
+          </div>
+          <div className="workbench-field">
+            <label htmlFor="inkLevel">Ink</label>
+            <select id="inkLevel" value={inkLevel} onChange={handleInkLevelChange}>
+              {SETTINGS_DEFINITIONS.inkLevel.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="workbench-field">
+            <label htmlFor="artFidelity">Art</label>
+            <select
+              id="artFidelity"
+              value={artFidelity}
+              disabled={!isSettingAvailable('artFidelity', cardVariant)}
+              onChange={handleArtFidelityChange}
+            >
+              {SETTINGS_DEFINITIONS.artFidelity.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="workbench-field workbench-reference-slider">

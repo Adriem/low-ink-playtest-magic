@@ -19,6 +19,7 @@ import { drawOracleText, drawTextInArea, getFittingFontSize } from './drawOracle
 import type { ArtCrop } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { ArtFidelity } from '../../styles';
 
 const CHAPTER_SEPARATOR_THICKNESS = 1;
 // Chapter numbers are hexagons centered on the column's left pinline, stacked
@@ -52,12 +53,14 @@ export const drawSagaOracleAndArtBox = (
     cardOracleText = { lines: [] },
     cardArtUrl,
     cropArt,
+    artFidelity,
     cardColorTreatment,
     typelineY = SAGA_TYPELINE_Y,
   }: {
     cardOracleText?: OracleText;
     cardArtUrl?: string;
     cropArt?: ArtCrop;
+    artFidelity?: ArtFidelity;
     cardColorTreatment: ColorTreatment;
     typelineY?: number;
   },
@@ -110,6 +113,7 @@ export const drawSagaOracleAndArtBox = (
   drawArtImage(ctx, {
     cardArtUrl,
     cropArt,
+    artFidelity,
     x: x + halfWidth + PINLINE_THICKNESS + 2,
     y: y + PINLINE_THICKNESS + 2,
     width: halfWidth - PINLINE_THICKNESS * 2 - 4,

@@ -3,7 +3,8 @@ import { fitFontSizeInX, getFontSize } from '../../common/canvasText';
 import { PINLINE_THICKNESS, TEXT_FONT_FAMILY } from '../config';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
-import { getFillStyle } from '../../common/canvasStyles';
+import { drawInkFill, getFillStyle, getInkFill } from '../../common/canvasStyles';
+import type { InkLevel } from '../../styles';
 
 const TYPELINE_BOX_PADDING_X = 15;
 const TYPELINE_INNER_LINE_WIDTH = 3;
@@ -29,6 +30,7 @@ export const drawTypeLine = (
     height,
     fontSize,
     flatSide = null,
+    inkLevel = 'low',
   }: {
     cardType?: string;
     cardColorTreatment: ColorTreatment;
@@ -38,6 +40,7 @@ export const drawTypeLine = (
     height: number;
     fontSize: number;
     flatSide?: 'left' | 'right' | null;
+    inkLevel?: InkLevel;
   },
 ) => {
   drawRoundedBox(ctx, {
@@ -50,16 +53,21 @@ export const drawTypeLine = (
     flatSide,
   });
 
-  drawRoundedBox(ctx, {
+  const inner = {
     x: x + PINLINE_THICKNESS,
     y: y + PINLINE_THICKNESS,
     width: width - PINLINE_THICKNESS * 2,
     height: height - PINLINE_THICKNESS * 2 - TYPELINE_INNER_LINE_WIDTH,
-    lineWidth: TYPELINE_INNER_LINE_WIDTH,
-    strokeStyle: MINIMALIST_PALETTE.PAPER,
-    fillStyle: MINIMALIST_PALETTE.PAPER,
     flatSide,
-  });
+  };
+  const innerLine = { ...inner, lineWidth: TYPELINE_INNER_LINE_WIDTH, strokeStyle: MINIMALIST_PALETTE.PAPER };
+  drawRoundedBox(ctx, { ...innerLine, fillStyle: MINIMALIST_PALETTE.PAPER });
+
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE), inkLevel);
+  if (inkFill) {
+    // Filled where the box is white, so the fill doesn't cover the white line between the border and the box
+    drawInkFill(ctx, inkFill, () => drawRoundedBox(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
+  }
 
   ctx.font = `bold ${fontSize}px ${TEXT_FONT_FAMILY}`;
 

@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { CardStyle } from '../cards/styles';
+import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
 import { loadFromSessionStorage, saveToSessionStorage } from '../../utils/sessionStorage';
 
@@ -8,7 +8,8 @@ export interface Settings {
   cardVariant: CardStyle;
   splitCardTreatment: CardTreatment;
   doubleFacedCardTreatment: CardTreatment;
-  inkLevel: 'low' | 'medium' | 'splurge';
+  inkLevel: InkLevel;
+  artFidelity: ArtFidelity;
 }
 
 export type SettingName = keyof Settings;
@@ -22,6 +23,10 @@ export interface SettingDefinition<T extends string> {
   storageKey: string;
   /** Shown, but not available yet */
   disabled?: boolean;
+  /** How the options are picked: radio buttons (the default), or a slider through them in order */
+  control?: 'radio' | 'slider';
+  /** Card styles the setting applies to, and is enabled for: all of them, if not given */
+  cardStyles?: CardStyle[];
 }
 
 const TREATMENT_OPTIONS: SettingDefinition<CardTreatment>['options'] = [
@@ -56,15 +61,37 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     options: [
       { value: 'low', label: 'Low' },
       { value: 'medium', label: 'Medium' },
+      { value: 'high', label: 'High' },
       { value: 'splurge', label: 'Splurge' },
     ],
-    default: 'low',
+    default: 'medium',
     storageKey: 'press:inkLevel',
-    disabled: true,
+  },
+  artFidelity: {
+    label: 'Art fidelity',
+    options: [
+      { value: 'none', label: '1' },
+      { value: 'minimal', label: '2' },
+      { value: 'shaded', label: '3' },
+      { value: 'black-and-white', label: '4' },
+      { value: 'full', label: '5' },
+    ],
+    default: 'shaded',
+    storageKey: 'press:artFidelity',
+    control: 'slider',
+    // The minimalist style has no art
+    cardStyles: ['realistic'],
   },
 };
 
 export const SETTING_NAMES = Object.keys(SETTINGS_DEFINITIONS) as SettingName[];
+
+/**
+ * Whether a setting applies to a card style, so its controls are enabled.
+ */
+export const isSettingAvailable = (name: SettingName, cardStyle: CardStyle): boolean => {
+  return SETTINGS_DEFINITIONS[name].cardStyles?.includes(cardStyle) ?? true;
+};
 
 interface SettingsContextValue {
   settings: Settings;
@@ -95,6 +122,7 @@ const loadInitialSettings = (): Settings => {
     splitCardTreatment: loadSetting('splitCardTreatment'),
     doubleFacedCardTreatment: loadSetting('doubleFacedCardTreatment'),
     inkLevel: loadSetting('inkLevel'),
+    artFidelity: loadSetting('artFidelity'),
   };
 };
 

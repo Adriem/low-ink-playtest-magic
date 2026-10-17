@@ -14,6 +14,8 @@ const Card = ({
   subFace,
   subFacePosition,
   blackBordered,
+  inkLevel,
+  artFidelity,
 }: CardRenderProps & { cardStyle: string }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const { render, palette } = getCardStyle(cardStyle);
@@ -22,9 +24,9 @@ const Card = ({
     if (canvas == null) return;
 
     beginRender(canvas);
-    render(canvas, { face, subFace, subFacePosition, blackBordered });
+    render(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity });
     void finishRender(canvas);
-  }, [canvas, render, face, subFace, subFacePosition, blackBordered]);
+  }, [canvas, render, face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity]);
 
   return (
     <canvas

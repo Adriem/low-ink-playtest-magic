@@ -13,7 +13,8 @@ import { DISPLAY_FONT_FAMILY, LOYALTY_BOX_SCALE, LOYALTY_BOX_X, LOYALTY_BOX_Y, T
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
 import { getColorTreatment } from '../../../domain/colorTreatment';
 import { MINIMALIST_PALETTE } from './palette';
-import type { CardRenderProps } from '../styles';
+import type { CardRenderProps, InkLevel } from '../styles';
+import { hasBlackBorder } from '../common/canvasStyles';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
@@ -23,7 +24,7 @@ import { get2dContext } from '../common/canvasRendering';
  */
 export const renderMinimalistCard = (
   canvas: HTMLCanvasElement,
-  { face, subFace, subFacePosition, blackBordered }: CardRenderProps,
+  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium' }: CardRenderProps,
 ) => {
   const cardColorTreatment = getColorTreatment(face);
   const cardName = face.name;
@@ -36,11 +37,11 @@ export const renderMinimalistCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered });
+  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
   drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
 
   if (subFace && subFacePosition) {
-    drawSubCard(ctx, subFace, subFacePosition);
+    drawSubCard(ctx, subFace, subFacePosition, inkLevel);
   }
 
   const oracleLayout =
@@ -68,7 +69,7 @@ export const renderMinimalistCard = (
     });
   }
 
-  drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment });
+  drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel });
 
   if (powerAndToughness) {
     drawStatsBox(ctx, { cardPower: powerAndToughness.power, cardToughness: powerAndToughness.toughness });
@@ -86,7 +87,12 @@ export const renderMinimalistCard = (
   }
 };
 
-const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position: SubCardPosition) => {
+const drawSubCard = (
+  ctx: CanvasRenderingContext2D,
+  subFace: CardFace,
+  position: SubCardPosition,
+  inkLevel: InkLevel,
+) => {
   const subColorTreatment = getColorTreatment(subFace);
 
   drawSubCardTitleBox(ctx, {
@@ -97,6 +103,7 @@ const drawSubCard = (ctx: CanvasRenderingContext2D, subFace: CardFace, position:
   drawSubCardTypeBox(ctx, {
     cardType: subFace.typeLine,
     cardColorTreatment: subColorTreatment,
+    inkLevel,
     position,
   });
   drawSubCardOracleBox(ctx, {

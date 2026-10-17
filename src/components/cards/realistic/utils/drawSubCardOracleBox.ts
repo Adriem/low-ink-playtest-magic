@@ -12,14 +12,21 @@ import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
+import type { InkLevel } from '../../styles';
 
 export const drawSubCardOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
     cardOracleText,
     cardColorTreatment,
+    inkLevel,
     position,
-  }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+  }: {
+    cardOracleText?: OracleText;
+    cardColorTreatment: ColorTreatment;
+    inkLevel?: InkLevel;
+    position: SubCardPosition;
+  },
 ) => {
   const x = position === 'left' ? (ctx.canvas.width - CONTENT_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_ORACLE_Y;
@@ -38,6 +45,8 @@ export const drawSubCardOracleBox = (
     width,
     height,
     cardColorTreatment,
+    inkLevel,
+    inkFillStrength: 'light',
     shape: 'rectangle',
     flatSide,
   });

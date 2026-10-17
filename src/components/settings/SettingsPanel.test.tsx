@@ -33,6 +33,11 @@ test('changes and saves a setting', async () => {
 test('picks the ink level', async () => {
   renderPanel();
 
+  await user.click(screen.getByLabelText('High'));
+
+  expect(screen.getByLabelText('High')).toBeChecked();
+  expect(sessionStorage.getItem('press:inkLevel')).toBe('"high"');
+
   await user.click(screen.getByLabelText('Splurge'));
 
   expect(screen.getByLabelText('Splurge')).toBeChecked();

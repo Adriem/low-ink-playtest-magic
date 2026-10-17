@@ -1,10 +1,10 @@
-import type { InkLevel } from '../styles';
+import type { CardRenderProps, InkLevel } from '../styles';
 import { get2dContext } from './canvasRendering';
 import type { CanvasPaint } from './canvasShapes';
 
 /** Opacity of the ink fills of the boxes (e.g. title and type), by ink level */
-const INK_FILL_OPACITY = { medium: 0.5, splurge: 0.35 };
-/** Opacity of the light ink fill of the text boxes (e.g. oracle and stats), only on splurge */
+const INK_FILL_OPACITY = { medium: 0.5, high: 0.35 };
+/** Opacity of the light ink fill of the text boxes (e.g. oracle and stats), from the high ink level */
 const LIGHT_INK_FILL_OPACITY = 0.15;
 
 /** Space between the centers of the dots of the medium ink level, and their radius */
@@ -40,8 +40,8 @@ export const getFillStyle = (
 /**
  * Fill for a box at an ink level, to draw over the box's background. Regular
  * fills are nothing on `low`, a pattern of dots in the colors (or the
- * gradient between them) on `medium`, and the colors on `splurge`. Light fills
- * are only on `splurge`, as the colors at a lower opacity.
+ * gradient between them) on `medium`, and the colors from `high`. Light fills
+ * are only from `high`, as the colors at a lower opacity.
  */
 export const getInkFill = (
   ctx: CanvasRenderingContext2D,
@@ -50,13 +50,25 @@ export const getInkFill = (
   strength: InkFillStrength = 'regular',
 ): InkFill | null => {
   if (inkLevel === 'low') return null;
+  // Splurge only adds a black border to the high ink level
+  const isHigh = inkLevel === 'high' || inkLevel === 'splurge';
   if (strength === 'light') {
-    return inkLevel === 'splurge' ? { style: getFillStyle(ctx, colors), opacity: LIGHT_INK_FILL_OPACITY } : null;
+    return isHigh ? { style: getFillStyle(ctx, colors), opacity: LIGHT_INK_FILL_OPACITY } : null;
   }
-  if (inkLevel === 'splurge') return { style: getFillStyle(ctx, colors), opacity: INK_FILL_OPACITY.splurge };
+  if (isHigh) return { style: getFillStyle(ctx, colors), opacity: INK_FILL_OPACITY.high };
 
   const dots = ctx.createPattern(getColoredDots(ctx, colors), 'no-repeat');
   return dots && { style: dots, opacity: INK_FILL_OPACITY.medium };
+};
+
+/**
+ * Whether a card has a black border: when asked, or on the splurge ink level.
+ */
+export const hasBlackBorder = ({
+  blackBordered = false,
+  inkLevel,
+}: Pick<CardRenderProps, 'blackBordered' | 'inkLevel'>): boolean => {
+  return blackBordered || inkLevel === 'splurge';
 };
 
 /**

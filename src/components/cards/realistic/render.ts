@@ -15,6 +15,7 @@ import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
 import { getColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps, InkLevel } from '../styles';
+import { hasBlackBorder } from '../common/canvasStyles';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
@@ -39,7 +40,7 @@ export const renderRealisticCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered });
+  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
   drawTitleBox(ctx, { cardName, cardManaCost, cardColorTreatment, inkLevel });
 
   if (face.faceLayout === 'saga') {

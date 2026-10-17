@@ -14,6 +14,7 @@ import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition }
 import { getColorTreatment } from '../../../domain/colorTreatment';
 import { MINIMALIST_PALETTE } from './palette';
 import type { CardRenderProps, InkLevel } from '../styles';
+import { hasBlackBorder } from '../common/canvasStyles';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
@@ -36,7 +37,7 @@ export const renderMinimalistCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered });
+  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
   drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
 
   if (subFace && subFacePosition) {

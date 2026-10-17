@@ -59,6 +59,7 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     options: [
       { value: 'low', label: 'Low' },
       { value: 'medium', label: 'Medium' },
+      { value: 'high', label: 'High' },
       { value: 'splurge', label: 'Splurge' },
     ],
     default: 'low',

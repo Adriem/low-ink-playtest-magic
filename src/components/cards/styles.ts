@@ -22,11 +22,12 @@ export interface CardRenderProps {
 }
 
 /**
- * How much ink to spend on the boxes of a card: `low` leaves them blank,
- * `medium` fills the title and type boxes with a dot pattern in the colors
- * of the card, and `splurge` fills them with the colors of the card.
+ * How much ink to spend on a card: `low` leaves its boxes blank, `medium`
+ * fills the title and type boxes with a dot pattern in the colors of the card,
+ * `high` fills them with the colors of the card (and the text boxes lightly),
+ * and `splurge` also gives the card a black border.
  */
-export type InkLevel = 'low' | 'medium' | 'splurge';
+export type InkLevel = 'low' | 'medium' | 'high' | 'splurge';
 
 /**
  * How the art of a card is drawn: `none` leaves the art box blank, `minimal`

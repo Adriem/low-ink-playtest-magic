@@ -1,4 +1,4 @@
-import { getFillStyle, getInkFill } from './canvasStyles';
+import { getFillStyle, getInkFill, hasBlackBorder } from './canvasStyles';
 
 interface FakeGradient {
   stops: [number, string][];
@@ -11,20 +11,28 @@ describe('getInkFill', () => {
     expect(getInkFill(createCtx(), ['red'], 'low', 'light')).toBeNull();
   });
 
-  test('fills with the colors on the splurge ink level', () => {
+  test('fills with the colors on the high and splurge ink levels', () => {
     const ctx = createCtx();
 
+    expect(getInkFill(ctx, ['red'], 'high')).toEqual({ style: 'red', opacity: 0.35 });
     expect(getInkFill(ctx, ['red'], 'splurge')).toEqual({ style: 'red', opacity: 0.35 });
-    expect((getInkFill(ctx, ['green', 'white'], 'splurge')?.style as unknown as FakeGradient).stops).toEqual([
+    expect((getInkFill(ctx, ['green', 'white'], 'high')?.style as unknown as FakeGradient).stops).toEqual([
       [0.4, 'green'],
       [0.6, 'white'],
     ]);
   });
 
-  test('fills lightly with the colors only on the splurge ink level', () => {
+  test('fills lightly with the colors only from the high ink level', () => {
     expect(getInkFill(createCtx(), ['red'], 'medium', 'light')).toBeNull();
+    expect(getInkFill(createCtx(), ['red'], 'high', 'light')).toEqual({ style: 'red', opacity: 0.15 });
     expect(getInkFill(createCtx(), ['red'], 'splurge', 'light')).toEqual({ style: 'red', opacity: 0.15 });
   });
+});
+
+test('gives cards a black border when asked, or on the splurge ink level', () => {
+  expect(hasBlackBorder({ inkLevel: 'high' })).toBe(false);
+  expect(hasBlackBorder({ blackBordered: true, inkLevel: 'low' })).toBe(true);
+  expect(hasBlackBorder({ inkLevel: 'splurge' })).toBe(true);
 });
 
 test('fills with a single color as it is', () => {

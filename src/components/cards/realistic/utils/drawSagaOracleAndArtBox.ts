@@ -133,18 +133,18 @@ const drawSagaChapters = (
   cardOracleText: OracleText,
   { x, y, width, height }: Box,
 ): boolean => {
-  const { introduction, chapters, conclusion } = getSagaParts(cardOracleText);
+  const { sagaAbilities, chapters, creatureAbilities } = getSagaParts(cardOracleText);
   if (chapters.length === 0) return false;
 
   const slots: SagaSlot[] = [
-    ...introduction.map((line) => ({ line, align: 'top' as const })),
+    ...sagaAbilities.map((line) => ({ line, align: 'top' as const })),
     ...chapters.map((chapter) => ({
       line: chapter,
       labels: chapter.chapterNumbers,
       align: 'center' as const,
       isChapter: true,
     })),
-    ...conclusion.map((line) => ({ line, align: 'center' as const })),
+    ...creatureAbilities.map((line) => ({ line, align: 'center' as const })),
   ];
   // Slots are as tall as their share of the characters (including spaces), but
   // at least the minimum height, and tall enough for a chapter's icons

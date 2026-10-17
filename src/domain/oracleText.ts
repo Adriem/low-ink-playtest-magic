@@ -37,18 +37,18 @@ export const isLoyaltyAbility = (line: OracleLine): line is LoyaltyAbility => {
 };
 
 /**
- * The parts of a saga's text: the lines before its chapters (e.g. the
- * reminder about lore counters), its chapters, and the lines after them (e.g.
- * the abilities of saga creatures).
+ * The parts of a saga's text: the saga's abilities before its chapters (e.g.
+ * the reminder about lore counters), its chapters, and the creature's
+ * abilities after them, for saga creatures.
  */
 export const getSagaParts = (oracleText: OracleText) => {
   const firstChapter = oracleText.lines.findIndex(isSagaChapter);
   const lastChapter = oracleText.lines.findLastIndex(isSagaChapter);
-  if (firstChapter === -1) return { introduction: oracleText.lines, chapters: [], conclusion: [] };
+  if (firstChapter === -1) return { sagaAbilities: oracleText.lines, chapters: [], creatureAbilities: [] };
 
   return {
-    introduction: oracleText.lines.slice(0, firstChapter),
+    sagaAbilities: oracleText.lines.slice(0, firstChapter),
     chapters: oracleText.lines.slice(firstChapter, lastChapter + 1).filter(isSagaChapter),
-    conclusion: oracleText.lines.slice(lastChapter + 1),
+    creatureAbilities: oracleText.lines.slice(lastChapter + 1),
   };
 };

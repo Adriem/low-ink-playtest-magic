@@ -15,7 +15,7 @@ test('tells saga chapters and loyalty abilities apart from other lines', () => {
 
 describe('getSagaParts', () => {
   test('splits a saga into the lines before its chapters, its chapters and the lines after them', () => {
-    const { introduction, chapters, conclusion } = getSagaParts({
+    const { sagaAbilities, chapters, creatureAbilities } = getSagaParts({
       lines: [
         { text: '', reminderText: '(Lore counters.)' },
         { chapterNumbers: ['I'], text: 'Mill five cards.' },
@@ -24,14 +24,14 @@ describe('getSagaParts', () => {
       ],
     });
 
-    expect(introduction).toEqual([{ text: '', reminderText: '(Lore counters.)' }]);
+    expect(sagaAbilities).toEqual([{ text: '', reminderText: '(Lore counters.)' }]);
     expect(chapters.map((chapter) => chapter.chapterNumbers)).toEqual([['I'], ['II', 'III']]);
-    expect(conclusion).toEqual([{ text: 'Reach, trample' }]);
+    expect(creatureAbilities).toEqual([{ text: 'Reach, trample' }]);
   });
 
   test('has no chapters for text without them', () => {
     const oracleText = { lines: [{ text: 'Flying' }] };
 
-    expect(getSagaParts(oracleText)).toEqual({ introduction: oracleText.lines, chapters: [], conclusion: [] });
+    expect(getSagaParts(oracleText)).toEqual({ sagaAbilities: oracleText.lines, chapters: [], creatureAbilities: [] });
   });
 });

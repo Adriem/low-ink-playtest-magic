@@ -63,7 +63,7 @@ export const drawSagaOracleBox = (
   const textY = y + textPaddingTop;
   const textHeight = height - textPaddingTop;
 
-  const { introduction, chapters, conclusion } = getSagaParts(cardOracleText);
+  const { sagaAbilities, chapters, creatureAbilities } = getSagaParts(cardOracleText);
 
   const contentLeftX = textX + SIDE_BORDER_PADDING;
   const contentWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
@@ -73,7 +73,7 @@ export const drawSagaOracleBox = (
 
   const dividerLeftX = textX + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * 0.35 + 1;
   // Lines before the chapters start after the side border, so they don't overlap it
-  const introductionX = getSideBorderEdges(textX).right + SIDE_BORDER_TEXT_GAP;
+  const sagaAbilitiesX = getSideBorderEdges(textX).right + SIDE_BORDER_TEXT_GAP;
   const dividerWidth = contentLeftX + contentWidth - dividerLeftX;
 
   // The lines before the chapters (e.g. reminder text), each chapter and the
@@ -81,10 +81,10 @@ export const drawSagaOracleBox = (
   // characters (including spaces), but at least the minimum height and tall
   // enough for a chapter's icons, like printed sagas
   const slots: SagaSlot[] = [
-    ...introduction.map((line) => ({
+    ...sagaAbilities.map((line) => ({
       line,
-      leftX: introductionX,
-      width: contentLeftX + contentWidth - introductionX,
+      leftX: sagaAbilitiesX,
+      width: contentLeftX + contentWidth - sagaAbilitiesX,
       align: 'top' as const,
     })),
     ...chapters.map((chapter) => ({
@@ -94,7 +94,7 @@ export const drawSagaOracleBox = (
       width: chapterTextWidth,
       isChapter: true,
     })),
-    ...conclusion.map((line) => ({
+    ...creatureAbilities.map((line) => ({
       line,
       leftX: textX + textWidth / 2,
       width: contentWidth,
@@ -115,8 +115,8 @@ export const drawSagaOracleBox = (
   const borderTopY = y;
   const chaptersEndY =
     textY +
-    slotHeights.slice(0, introduction.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
-  const borderHeight = conclusion.length > 0 ? chaptersEndY - borderTopY : height + 10;
+    slotHeights.slice(0, sagaAbilities.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
+  const borderHeight = creatureAbilities.length > 0 ? chaptersEndY - borderTopY : height + 10;
   drawSagaOracleBorder(ctx, { cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
 
   // All the slots use the same font size: the largest at which every slot's text fits

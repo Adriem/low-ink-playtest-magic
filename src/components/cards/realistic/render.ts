@@ -45,9 +45,9 @@ export const renderRealisticCard = (
   if (face.faceLayout === 'saga') {
     if (powerAndToughness) {
       // The lines after the chapters are the creature's abilities, in their own box
-      const { introduction, chapters, conclusion } = getSagaParts(cardOracleText);
-      const sagaText = { lines: [...introduction, ...chapters] };
-      const creatureText = { lines: conclusion };
+      const { sagaAbilities, chapters, creatureAbilities } = getSagaParts(cardOracleText);
+      const sagaText = { lines: [...sagaAbilities, ...chapters] };
+      const creatureText = { lines: creatureAbilities };
       drawSagaOracleAndArtBox(ctx, {
         cardOracleText: sagaText,
         cardArtUrl,

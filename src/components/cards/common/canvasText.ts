@@ -1,3 +1,5 @@
+import { splitReminderText } from '../../../domain/reminderText';
+
 const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 /** Height of empty lines, which separate paragraphs, relative to other lines */
 export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
@@ -12,7 +14,8 @@ export interface FittedParagraph {
 
 /**
  * Automatically wrap a given text to fit inside an specified maximum width on
- * a canvas with a properly set font.
+ * a canvas with a properly set font. Reminder text is measured in italics, as
+ * it's drawn.
  *
  * @param text - Text to wrap within the given width
  * @param maxWidth - Maximum width where the text must be placed
@@ -22,14 +25,17 @@ export interface FittedParagraph {
 export const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
   const textWords = text.split(/\s+/);
   const lines: string[][] = [[]];
+  // Whether the current line continues a reminder text from the previous one
+  let lineStartsInReminder = false;
 
   for (const currentWord of textWords) {
     const currentLineWords = lines[lines.length - 1];
     const newLineText = [...currentLineWords, currentWord].join(' ');
 
-    if (ctx.measureText(newLineText).width < maxWidth) {
+    if (measureTextWidth(ctx, newLineText, lineStartsInReminder) < maxWidth) {
       currentLineWords.push(currentWord);
     } else {
+      lineStartsInReminder = splitReminderText(currentLineWords.join(' '), lineStartsInReminder).endsInReminder;
       lines.push([currentWord]);
     }
   }
@@ -191,4 +197,29 @@ export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: str
     if (index === 0) return lineHeight;
     return height + (line ? lineHeight : lineHeight * EMPTY_LINE_RELATIVE_SIZE);
   }, 0);
+};
+
+/**
+ * Width of a text with the current font, with its reminder text in italics.
+ *
+ * @param startsInReminder - Whether the text continues a reminder text
+ */
+export const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, startsInReminder = false): number => {
+  const { runs } = splitReminderText(text, startsInReminder);
+  if (runs.every((run) => !run.reminder)) return ctx.measureText(text).width;
+
+  const font = ctx.font;
+  const width = runs.reduce((total, run) => {
+    ctx.font = run.reminder ? getReminderFont(font) : font;
+    return total + ctx.measureText(run.text).width;
+  }, 0);
+  ctx.font = font;
+  return width;
+};
+
+/**
+ * Italic variant of a font, for reminder text.
+ */
+export const getReminderFont = (font: string): string => {
+  return `italic ${font}`;
 };

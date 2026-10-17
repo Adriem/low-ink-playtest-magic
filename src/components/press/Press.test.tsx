@@ -1,14 +1,30 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import type { RefCallback } from 'react';
 import Press from './Press';
 import { SettingsContextProvider } from '../settings';
+import { exportToPDF } from '../../adapters/jspdf';
 import { fetchCard } from '../../adapters/scryfall';
 import type { CardFace } from '../../domain/cards';
 import { testCard, testFace } from '../../testUtils';
 
-// jsdom has no canvas, so card components are replaced with plain elements
-vi.mock('../cards/Card', () => ({ default: ({ face }: { face: CardFace }) => <div>{face.name}</div> }));
-vi.mock('../cards/DualCard', () => ({ default: () => <div>Dual card</div> }));
-vi.mock('jspdf', () => ({ jsPDF: vi.fn() }));
+// jsdom has no canvas drawing, so card components are replaced with their name and a blank canvas
+vi.mock('../cards/Card', () => ({
+  default: ({ face, ref }: { face: CardFace; ref?: RefCallback<HTMLCanvasElement> }) => (
+    <div>
+      {face.name}
+      <canvas ref={ref} data-name={face.name} />
+    </div>
+  ),
+}));
+vi.mock('../cards/DualCard', () => ({
+  default: ({ ref }: { ref?: RefCallback<HTMLCanvasElement> }) => (
+    <div>
+      Dual card
+      <canvas ref={ref} data-name="Dual card" />
+    </div>
+  ),
+}));
+vi.mock('../../adapters/jspdf', () => ({ exportToPDF: vi.fn() }));
 vi.mock('../../adapters/scryfall', () => ({
   fetchCard: vi.fn(),
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
@@ -91,6 +107,42 @@ test('shows a card that loads while a card added before it is still loading', as
 
   expect(await screen.findByText('Colossal Dreadmaw')).toBeInTheDocument();
   expect(screen.getByRole('status')).toHaveTextContent('Loading card details');
+});
+
+describe('exporting', () => {
+  const exportedCardNames = () => {
+    const [canvases] = vi.mocked(exportToPDF).mock.calls[0];
+    return (canvases as HTMLCanvasElement[]).map((canvas) => canvas.dataset.name);
+  };
+
+  beforeEach(() => {
+    vi.mocked(exportToPDF).mockClear();
+  });
+
+  test('exports the canvases of the cards in the order of the sheets', async () => {
+    renderPress();
+
+    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+
+    await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
+    expect(exportedCardNames()).toEqual(['Colossal Dreadmaw', 'Front', 'Back']);
+  });
+
+  test('exports the cards of every sheet, including ones with the same key in different sheets', async () => {
+    // Without multiverse IDs, the cards of each sheet are keyed by their position in it
+    const cards = Array.from({ length: 10 }, (_, i) => testCard({ name: `Card ${i}` }));
+    sessionStorage.setItem('press:cardCollection', JSON.stringify(cards));
+    render(
+      <SettingsContextProvider>
+        <Press />
+      </SettingsContextProvider>,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+
+    await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
+    expect(exportedCardNames()).toEqual(cards.map((card) => card.name));
+  });
 });
 
 describe('hovering with a mouse', () => {

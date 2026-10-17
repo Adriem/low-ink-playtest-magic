@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, finishRender } from './common/canvasRendering';
 import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './styles';
 
@@ -7,6 +7,7 @@ import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './s
  * rendered (`data-rendered`) once all its images have been drawn.
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
+ * @param props.ref - Called with the canvas, e.g. to export it
  */
 const Card = ({
   cardStyle,
@@ -16,8 +17,16 @@ const Card = ({
   blackBordered,
   inkLevel,
   artFidelity,
-}: CardRenderProps & { cardStyle: string }) => {
+  ref,
+}: CardRenderProps & { cardStyle: string; ref?: RefCallback<HTMLCanvasElement> }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const handleCanvasRef = useCallback(
+    (element: HTMLCanvasElement | null) => {
+      setCanvas(element);
+      ref?.(element);
+    },
+    [ref],
+  );
   const { render, palette } = getCardStyle(cardStyle);
 
   useEffect(() => {
@@ -31,7 +40,7 @@ const Card = ({
   return (
     <canvas
       className="card"
-      ref={setCanvas}
+      ref={handleCanvasRef}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
       style={{ background: palette.PAPER }}

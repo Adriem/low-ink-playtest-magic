@@ -14,6 +14,7 @@ import { exportToPDF } from '../../adapters/jspdf';
 import { whenRendered } from '../cards/common/canvasRendering';
 import { useCardCollection } from '../../hooks/useCardCollection';
 import { useCardSheet } from '../../hooks/useCardSheet';
+import { useKeyedRefs } from '../../hooks/useKeyedRefs';
 import { loadFromSessionStorage, saveToSessionStorage } from '../../utils/sessionStorage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
 
@@ -36,6 +37,11 @@ const Press = () => {
     splitCardTreatment,
     doubleFacedCardTreatment,
   });
+  // Keys of the items of each sheet, by sheet
+  const sheetKeys = cardSheets.map((sheet, sheetNumber) =>
+    sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),
+  );
+  const cardCanvases = useKeyedRefs<HTMLCanvasElement>();
 
   useEffect(() => {
     const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
@@ -53,22 +59,11 @@ const Press = () => {
     clearCollection();
   }, [clearCollection]);
 
-  const handleExport = useCallback(() => {
-    const canvases = [...document.querySelectorAll<HTMLCanvasElement>('canvas.card')];
+  // The canvases of the cards in the sheets, in order (loading cards have none)
+  const handleExport = () => {
+    const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
 
     void exportCardsToPdf(canvases);
-  }, []);
-
-  // Cards keep their key while moved around, so their canvases aren't drawn again
-  const calculateItemKey = (sheet: SheetItem[], item: SheetItem, position: number) => {
-    if (item.kind === 'loading') return `loading_${item.loadingCardId}`;
-
-    const cardId = item.card.multiverseIds[0];
-    const cardOccurrenceInSheet = sheet
-      .slice(0, position)
-      .filter((previous) => previous.kind !== 'loading' && previous.card.multiverseIds[0] === cardId).length;
-
-    return `${cardId}__${cardOccurrenceInSheet}`;
   };
 
   return (
@@ -81,7 +76,7 @@ const Press = () => {
             <div className="press-sheet">
               {sheet.map((item, position) => (
                 <SheetSlot
-                  key={calculateItemKey(sheet, item, position)}
+                  key={sheetKeys[sheetNumber][position]}
                   collectionIndex={item.collectionIndex}
                   face={item.kind === 'face' ? item.sheetFace : 'single'}
                   cardName={
@@ -96,6 +91,7 @@ const Press = () => {
                       faces={item.faces}
                       inkLevel={inkLevel}
                       artFidelity={artFidelity}
+                      ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                     />
                   ) : (
                     <Card
@@ -105,6 +101,7 @@ const Press = () => {
                       subFacePosition={item.subFacePosition}
                       inkLevel={inkLevel}
                       artFidelity={artFidelity}
+                      ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                     />
                   )}
                 </SheetSlot>
@@ -138,6 +135,18 @@ const loadPersistedCards = () => {
 // TODO: Replace alert with a toast notification
 const handleCardLoadError = (cardName: string, error: Error) => {
   window.alert(`Could not load "${cardName}": ${error.message}`);
+};
+
+// Cards keep their key while moved around, so their canvases aren't drawn again
+const calculateItemKey = (sheet: SheetItem[], item: SheetItem, position: number) => {
+  if (item.kind === 'loading') return `loading_${item.loadingCardId}`;
+
+  const cardId = item.card.multiverseIds[0];
+  const cardOccurrenceInSheet = sheet
+    .slice(0, position)
+    .filter((previous) => previous.kind !== 'loading' && previous.card.multiverseIds[0] === cardId).length;
+
+  return `${cardId}__${cardOccurrenceInSheet}`;
 };
 
 export default Press;

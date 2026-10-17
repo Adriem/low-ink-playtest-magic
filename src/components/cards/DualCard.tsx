@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, drawWhenLoaded, finishRender, get2dContext } from './common/canvasRendering';
 import type { CardFace } from '../../domain/cards';
 import {
@@ -19,19 +19,29 @@ const HALF_HEIGHT = CARD_HEIGHT / 2;
  * have finished drawing their images.
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
+ * @param props.ref - Called with the canvas, e.g. to export it
  */
 const DualCard = ({
   cardStyle,
   faces,
   inkLevel,
   artFidelity,
+  ref,
 }: {
   cardStyle: string;
   faces: [CardFace, CardFace];
   inkLevel?: InkLevel;
   artFidelity?: ArtFidelity;
+  ref?: RefCallback<HTMLCanvasElement>;
 }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
+  const handleCanvasRef = useCallback(
+    (element: HTMLCanvasElement | null) => {
+      setCanvas(element);
+      ref?.(element);
+    },
+    [ref],
+  );
   const { render, palette } = getCardStyle(cardStyle);
   const [face1, face2] = faces;
 
@@ -61,7 +71,7 @@ const DualCard = ({
   return (
     <canvas
       className="card"
-      ref={setCanvas}
+      ref={handleCanvasRef}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
       style={{ background: palette.PAPER }}

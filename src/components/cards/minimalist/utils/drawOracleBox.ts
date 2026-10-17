@@ -64,7 +64,7 @@ export const drawOracleBox = (
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    toTextParagraphs(cardOracleText?.paragraphs ?? []).map((content) => ({ content, width: textWidth })),
+    toTextParagraphs(cardOracleText?.lines ?? []).map((content) => ({ content, width: textWidth })),
     textHeight,
   );
 

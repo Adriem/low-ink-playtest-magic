@@ -17,7 +17,7 @@ import type { OracleText } from '../../../../domain/oracleText';
 export const drawOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = { paragraphs: [] },
+    cardOracleText = { lines: [] },
     cardPower,
     cardToughness,
     cardColorTreatment,

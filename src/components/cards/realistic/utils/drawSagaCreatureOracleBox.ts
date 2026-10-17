@@ -32,7 +32,7 @@ export const drawSagaCreatureOracleBox = (
 
   const textTop = inner.y + PINLINE_THICKNESS;
   drawTextInArea(ctx, {
-    paragraphs: toTextParagraphs(cardOracleText.paragraphs),
+    paragraphs: toTextParagraphs(cardOracleText.lines),
     x: inner.x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
     y: textTop,
     width: inner.width - PINLINE_THICKNESS * 2 - ORACLE_TEXT_PADDING_X * 2,

@@ -1,6 +1,6 @@
 import { computeCardColors, type ArtCrop, type Card, type CardFace } from '../../domain/cards';
 import { isColorSymbol } from '../../domain/colors';
-import type { LoyaltyAbility, OracleParagraph, OracleText, SagaChapter } from '../../domain/oracleText';
+import type { CardAbility, OracleLine, OracleText } from '../../domain/oracleText';
 import type { ScryfallCard, ScryfallCardFace } from './types';
 
 const SUBCARD_LAYOUTS: Record<string, Card['layout']> = {
@@ -87,47 +87,51 @@ const getStats = ({ power, toughness, loyalty }: ScryfallCardFace): CardFace['st
 };
 
 /**
- * Parse the rules text of a card face, as Scryfall writes it: one paragraph
- * per line, with "•" lines being modes of the paragraph above.
+ * Parse the rules text of a card face, as Scryfall writes it, by line: "•"
+ * lines are modes of the line above.
  */
 const toOracleText = (oracleText = ''): OracleText => {
-  const paragraphs: OracleText['paragraphs'] = [];
+  const lines: OracleLine[] = [];
 
   for (const rawLine of oracleText.split('\n')) {
     const line = rawLine.trim();
     if (!line) continue;
 
-    const previous = paragraphs.at(-1);
+    const previous = lines.at(-1);
     if (line.startsWith(MODE_PREFIX) && previous) {
-      previous.modes = [...(previous.modes ?? []), parseParagraph(line.slice(MODE_PREFIX.length))];
+      previous.modes = [...(previous.modes ?? []), parseOracleTextLine(line.slice(MODE_PREFIX.length))];
       continue;
     }
 
-    paragraphs.push(parseLine(line));
+    lines.push(toOracleLine(line));
   }
 
-  return { paragraphs };
-};
-
-const parseLine = (line: string): OracleParagraph | SagaChapter | LoyaltyAbility => {
-  const chapter = line.match(SAGA_CHAPTER_REGEX);
-  if (chapter) {
-    const chapterNumbers = chapter[1].split(',').map((number) => number.trim());
-    return { chapterNumbers, ...parseParagraph(chapter[2]) };
-  }
-
-  const loyaltyAbility = line.match(LOYALTY_ABILITY_REGEX);
-  if (loyaltyAbility) return { loyaltyCost: loyaltyAbility[1], ...parseParagraph(loyaltyAbility[2]) };
-
-  return parseParagraph(line);
+  return { lines };
 };
 
 /**
- * A paragraph, with its name and reminder text apart from its rules text.
- * Only a parenthetical at the end of the paragraph is reminder text: ones in
+ * A line of oracle text: a saga chapter, a loyalty ability, or any other
+ * ability.
+ */
+const toOracleLine = (line: string): OracleLine => {
+  const chapter = line.match(SAGA_CHAPTER_REGEX);
+  if (chapter) {
+    const chapterNumbers = chapter[1].split(',').map((number) => number.trim());
+    return { chapterNumbers, ...parseOracleTextLine(chapter[2]) };
+  }
+
+  const loyaltyAbility = line.match(LOYALTY_ABILITY_REGEX);
+  if (loyaltyAbility) return { loyaltyCost: loyaltyAbility[1], ...parseOracleTextLine(loyaltyAbility[2]) };
+
+  return parseOracleTextLine(line);
+};
+
+/**
+ * The ability in a line, with its name and reminder text apart from its rules
+ * text. Only a parenthetical at the end of the line is reminder text: ones in
  * the middle of it are part of the rules (e.g. "costs {U} (or {1}) less").
  */
-const parseParagraph = (line: string): OracleParagraph => {
+const parseOracleTextLine = (line: string): CardAbility => {
   const named = line.match(NAME_REGEX);
   const name = named?.[1];
   const body = named ? named[2] : line;

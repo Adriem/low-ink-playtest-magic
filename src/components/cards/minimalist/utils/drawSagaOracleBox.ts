@@ -18,21 +18,21 @@ import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { getSagaParts, type OracleText } from '../../../../domain/oracleText';
-import { getRunsText, toParagraphWithModes, type TextRun } from '../../common/textRuns';
+import { getRunsText, toAbilityParagraphs, type TextRun } from '../../common/textRuns';
 
 const SAGA_CHAPTER_ICON_SPACING = 50;
 const SAGA_TEXT_LEFT_OFFSET = 36;
 const SAGA_CHAPTER_DIVIDER_HEIGHT = 1;
 // Space between the side border and the text next to it
 const SIDE_BORDER_TEXT_GAP = 8;
-// Minimum height of each paragraph and chapter of the saga's text
+// Minimum height of each line and chapter of the saga's text
 const MIN_SLOT_HEIGHT = 75;
 // Height of a hexagon chapter icon (at scale 1)
 const CHAPTER_ICON_HEIGHT = 45;
 
-/** A paragraph or chapter of a saga's text, and where it's drawn */
+/** A line or chapter of a saga's text, and where it's drawn */
 interface SagaSlot {
-  /** The paragraph, followed by its modes */
+  /** Paragraphs to draw: the line, followed by its modes */
   paragraphs: TextRun[][];
   leftX: number;
   width: number;
@@ -40,14 +40,14 @@ interface SagaSlot {
   /** The chapter's numbers */
   labels?: string[];
   isChapter?: boolean;
-  /** Paragraphs after the chapters are centered */
+  /** Lines after the chapters are centered */
   isBottom?: boolean;
 }
 
 export const drawSagaOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = { paragraphs: [] },
+    cardOracleText = { lines: [] },
     cardColorTreatment,
     cardPower,
     cardToughness,
@@ -74,30 +74,30 @@ export const drawSagaOracleBox = (
   const borderCenterX = textX + SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 0.15;
 
   const dividerLeftX = textX + SIDE_BORDER_PADDING + SIDE_BORDER_WIDTH * 0.35 + 1;
-  // Paragraphs before the chapters start after the side border, so they don't overlap it
-  const topParagraphX = getSideBorderEdges(textX).right + SIDE_BORDER_TEXT_GAP;
+  // Lines before the chapters start after the side border, so they don't overlap it
+  const introductionX = getSideBorderEdges(textX).right + SIDE_BORDER_TEXT_GAP;
   const dividerWidth = contentLeftX + contentWidth - dividerLeftX;
 
-  // The paragraphs before the chapters (e.g. reminder text), each chapter and
-  // the paragraphs after them get a slot as tall as their share of the
+  // The lines before the chapters (e.g. reminder text), each chapter and the
+  // lines after them get a slot as tall as their share of the
   // characters (including spaces), but at least the minimum height and tall
   // enough for a chapter's icons, like printed sagas
   const slots: SagaSlot[] = [
-    ...introduction.map((paragraph) => ({
-      paragraphs: toParagraphWithModes(paragraph),
-      leftX: topParagraphX,
-      width: contentLeftX + contentWidth - topParagraphX,
+    ...introduction.map((line) => ({
+      paragraphs: toAbilityParagraphs(line),
+      leftX: introductionX,
+      width: contentLeftX + contentWidth - introductionX,
       align: 'top' as const,
     })),
     ...chapters.map((chapter) => ({
-      paragraphs: toParagraphWithModes(chapter),
+      paragraphs: toAbilityParagraphs(chapter),
       labels: chapter.chapterNumbers,
       leftX: chapterTextX,
       width: chapterTextWidth,
       isChapter: true,
     })),
-    ...conclusion.map((paragraph) => ({
-      paragraphs: toParagraphWithModes(paragraph),
+    ...conclusion.map((line) => ({
+      paragraphs: toAbilityParagraphs(line),
       leftX: textX + textWidth / 2,
       width: contentWidth,
       isBottom: true,

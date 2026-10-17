@@ -1,4 +1,4 @@
-import { isLoyaltyAbility, isSagaChapter, type OracleParagraph, type OracleText } from '../../../domain/oracleText';
+import { isLoyaltyAbility, isSagaChapter, type CardAbility, type OracleLine } from '../../../domain/oracleText';
 
 /** Text in a single style: italic for names and reminder text */
 export type TextRun = { text: string; italic?: boolean };
@@ -10,38 +10,36 @@ const MODE_PREFIX = '• ';
 const NAME_SEPARATOR = ' — ';
 
 /**
- * Paragraphs to draw for oracle text: each paragraph, followed by its modes
- * as "• " paragraphs. Chapter numbers and loyalty costs go before the text,
- * for boxes that don't draw them apart.
+ * Paragraphs to draw for the lines of oracle text: each line, followed by its
+ * modes as "• " paragraphs. Chapter numbers and loyalty costs go before the
+ * text, for boxes that don't draw them apart.
  */
-export const toTextParagraphs = (paragraphs: OracleText['paragraphs']): TextRun[][] => {
-  return paragraphs.flatMap((paragraph) => {
-    const prefix = isSagaChapter(paragraph)
-      ? `${paragraph.chapterNumbers.join(', ')}${NAME_SEPARATOR}`
-      : isLoyaltyAbility(paragraph)
-        ? `${paragraph.loyaltyCost}: `
+export const toTextParagraphs = (lines: OracleLine[]): TextRun[][] => {
+  return lines.flatMap((line) => {
+    const prefix = isSagaChapter(line)
+      ? `${line.chapterNumbers.join(', ')}${NAME_SEPARATOR}`
+      : isLoyaltyAbility(line)
+        ? `${line.loyaltyCost}: `
         : '';
 
-    const [text, ...modes] = toParagraphWithModes(paragraph);
+    const [text, ...modes] = toAbilityParagraphs(line);
     return [prefix ? [{ text: prefix }, ...text] : text, ...modes];
   });
 };
 
 /**
- * Runs of a paragraph, followed by a "• " paragraph for each of its modes.
+ * Paragraphs to draw for an ability: its runs, followed by a "• " paragraph
+ * for each of its modes.
  */
-export const toParagraphWithModes = (paragraph: OracleParagraph): TextRun[][] => {
-  return [
-    toTextRuns(paragraph),
-    ...(paragraph.modes ?? []).map((mode) => [{ text: MODE_PREFIX }, ...toTextRuns(mode)]),
-  ];
+export const toAbilityParagraphs = (ability: CardAbility): TextRun[][] => {
+  return [toTextRuns(ability), ...(ability.modes ?? []).map((mode) => [{ text: MODE_PREFIX }, ...toTextRuns(mode)])];
 };
 
 /**
- * Runs of a paragraph: its name in italics, its rules text, then its
- * reminder text in italics.
+ * Runs of an ability: its name in italics, its rules text, then its reminder
+ * text in italics.
  */
-export const toTextRuns = ({ name, text, reminderText }: OracleParagraph): TextRun[] => {
+export const toTextRuns = ({ name, text, reminderText }: CardAbility): TextRun[] => {
   const runs: TextRun[] = [];
   if (name) runs.push({ text: name, italic: true }, { text: NAME_SEPARATOR });
   if (text) runs.push({ text });

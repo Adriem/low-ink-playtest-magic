@@ -30,7 +30,7 @@ import { toTextParagraphs } from '../../common/textRuns';
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = { paragraphs: [] },
+    cardOracleText = { lines: [] },
     cardLoyalty,
     cardColorTreatment,
     layout,
@@ -65,7 +65,7 @@ export const drawPlaneswalkerOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.paragraphs), textWidth, textHeight),
+    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.lines), textWidth, textHeight),
     textX,
     textY,
   );

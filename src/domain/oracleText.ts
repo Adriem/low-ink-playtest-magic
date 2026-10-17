@@ -1,51 +1,54 @@
 /**
- * The rules text of a card face, by paragraph: regular paragraphs, saga
- * chapters and loyalty abilities, in order.
+ * The rules text of a card face, by line: abilities, saga chapters and
+ * loyalty abilities, in order.
  */
-export type OracleText = { paragraphs: (OracleParagraph | SagaChapter | LoyaltyAbility)[] };
+export type OracleText = { lines: OracleLine[] };
 
-export type OracleParagraph = {
+/** A line of oracle text */
+export type OracleLine = CardAbility | SagaChapter | LoyaltyAbility;
+
+export type CardAbility = {
   /** Ability word or name of the ability, e.g. "Landfall" or "Mega Flare" */
   name?: string;
   /** Rules text, without the name and the reminder text */
   text: string;
-  /** The explanation in parentheses at the end of the paragraph, e.g. "(This creature can't be blocked.)" */
+  /** The explanation in parentheses at the end of the line, e.g. "(This creature can't be blocked.)" */
   reminderText?: string;
   /** Options to choose from, e.g. after "Choose one —" */
-  modes?: OracleParagraph[];
+  modes?: CardAbility[];
 };
 
-export type SagaChapter = OracleParagraph & {
+export type SagaChapter = CardAbility & {
   /** Chapters the text is for, e.g. ["I", "II"] for "I, II — …" */
   chapterNumbers: string[];
 };
 
-export type LoyaltyAbility = OracleParagraph & {
+export type LoyaltyAbility = CardAbility & {
   /** Loyalty added or removed to activate it, e.g. "+1", "0", "−3" or "−X" */
   loyaltyCost: string;
 };
 
-export const isSagaChapter = (paragraph: OracleParagraph): paragraph is SagaChapter => {
-  return 'chapterNumbers' in paragraph;
+export const isSagaChapter = (line: OracleLine): line is SagaChapter => {
+  return 'chapterNumbers' in line;
 };
 
-export const isLoyaltyAbility = (paragraph: OracleParagraph): paragraph is LoyaltyAbility => {
-  return 'loyaltyCost' in paragraph;
+export const isLoyaltyAbility = (line: OracleLine): line is LoyaltyAbility => {
+  return 'loyaltyCost' in line;
 };
 
 /**
- * The parts of a saga's text: the paragraphs before its chapters (e.g. the
- * reminder about lore counters), its chapters, and the paragraphs after them
- * (e.g. the abilities of saga creatures).
+ * The parts of a saga's text: the lines before its chapters (e.g. the
+ * reminder about lore counters), its chapters, and the lines after them (e.g.
+ * the abilities of saga creatures).
  */
 export const getSagaParts = (oracleText: OracleText) => {
-  const firstChapter = oracleText.paragraphs.findIndex(isSagaChapter);
-  const lastChapter = oracleText.paragraphs.findLastIndex(isSagaChapter);
-  if (firstChapter === -1) return { introduction: oracleText.paragraphs, chapters: [], conclusion: [] };
+  const firstChapter = oracleText.lines.findIndex(isSagaChapter);
+  const lastChapter = oracleText.lines.findLastIndex(isSagaChapter);
+  if (firstChapter === -1) return { introduction: oracleText.lines, chapters: [], conclusion: [] };
 
   return {
-    introduction: oracleText.paragraphs.slice(0, firstChapter),
-    chapters: oracleText.paragraphs.slice(firstChapter, lastChapter + 1).filter(isSagaChapter),
-    conclusion: oracleText.paragraphs.slice(lastChapter + 1),
+    introduction: oracleText.lines.slice(0, firstChapter),
+    chapters: oracleText.lines.slice(firstChapter, lastChapter + 1).filter(isSagaChapter),
+    conclusion: oracleText.lines.slice(lastChapter + 1),
   };
 };

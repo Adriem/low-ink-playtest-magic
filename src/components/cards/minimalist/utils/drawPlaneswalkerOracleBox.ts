@@ -17,7 +17,7 @@ import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
-import { toParagraphWithModes } from '../../common/textRuns';
+import { toAbilityParagraphs } from '../../common/textRuns';
 
 const LOYALTY_ABILITY_OFFSET = 45;
 
@@ -51,9 +51,9 @@ export const drawPlaneswalkerOracleBox = (
   ctx.textAlign = 'start';
 
   // Loyalty abilities, and their modes, go after the loyalty costs
-  const textParagraphs = (cardOracleText?.paragraphs ?? []).flatMap((paragraph) => {
-    const loyaltyCost = isLoyaltyAbility(paragraph) ? paragraph.loyaltyCost : undefined;
-    return toParagraphWithModes(paragraph).map((content, index) => {
+  const textParagraphs = (cardOracleText?.lines ?? []).flatMap((line) => {
+    const loyaltyCost = isLoyaltyAbility(line) ? line.loyaltyCost : undefined;
+    return toAbilityParagraphs(line).map((content, index) => {
       return { content, loyaltyCost: index === 0 ? loyaltyCost : undefined, isAbility: loyaltyCost != null };
     });
   });

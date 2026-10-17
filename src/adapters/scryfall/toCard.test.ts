@@ -27,7 +27,7 @@ test('maps a single-faced card to a card with its main face', () => {
       manaCost: '{4}{G}{G}',
       faceLayout: 'regular',
       typeLine: 'Creature — Dinosaur',
-      oracleText: { paragraphs: [{ text: 'Trample' }] },
+      oracleText: { lines: [{ text: 'Trample' }] },
       colors: ['G'],
       stats: { power: '6', toughness: '6' },
       art: { assetUrl: 'dreadmaw.jpg', crop: 'full' },
@@ -159,38 +159,38 @@ describe('art of faces', () => {
 });
 
 describe('oracle text', () => {
-  test('makes a paragraph of each line', () => {
+  test('makes an oracle line of each line', () => {
     expect(toOracleText('Flying\nWhen this creature enters, draw a card.')).toEqual({
-      paragraphs: [{ text: 'Flying' }, { text: 'When this creature enters, draw a card.' }],
+      lines: [{ text: 'Flying' }, { text: 'When this creature enters, draw a card.' }],
     });
   });
 
-  test('has no paragraphs without oracle text', () => {
-    expect(toOracleText('')).toEqual({ paragraphs: [] });
-    expect(toOracleText(undefined)).toEqual({ paragraphs: [] });
+  test('has no lines without oracle text', () => {
+    expect(toOracleText('')).toEqual({ lines: [] });
+    expect(toOracleText(undefined)).toEqual({ lines: [] });
   });
 
   describe('reminder text', () => {
-    test('takes the parenthetical that ends a paragraph as its reminder text', () => {
-      expect(toOracleText('Trample (This creature can deal excess combat damage.)').paragraphs).toEqual([
+    test('takes the parenthetical that ends a line as its reminder text', () => {
+      expect(toOracleText('Trample (This creature can deal excess combat damage.)').lines).toEqual([
         { text: 'Trample', reminderText: '(This creature can deal excess combat damage.)' },
       ]);
     });
 
-    test('takes a paragraph that is only a parenthetical as reminder text', () => {
-      expect(toOracleText('({U/P} can be paid with either {U} or 2 life.)').paragraphs).toEqual([
+    test('takes a line that is only a parenthetical as reminder text', () => {
+      expect(toOracleText('({U/P} can be paid with either {U} or 2 life.)').lines).toEqual([
         { text: '', reminderText: '({U/P} can be paid with either {U} or 2 life.)' },
       ]);
     });
 
-    test('keeps parentheticals in the middle of a paragraph in its rules text', () => {
+    test('keeps parentheticals in the middle of a line in its rules text', () => {
       const text = 'The first instant or sorcery spell you cast each turn costs {U} (or {1}) less to cast.';
 
-      expect(toOracleText(text).paragraphs).toEqual([{ text }]);
+      expect(toOracleText(text).lines).toEqual([{ text }]);
     });
 
     test('keeps the parentheses nested in the reminder text', () => {
-      expect(toOracleText('Morph {2} (Exile it (face down).)').paragraphs).toEqual([
+      expect(toOracleText('Morph {2} (Exile it (face down).)').lines).toEqual([
         { text: 'Morph {2}', reminderText: '(Exile it (face down).)' },
       ]);
     });
@@ -198,19 +198,19 @@ describe('oracle text', () => {
 
   describe('names', () => {
     test('takes ability words and names of abilities before " — " as the name', () => {
-      expect(toOracleText('Landfall — Whenever a land you control enters, draw a card.').paragraphs).toEqual([
+      expect(toOracleText('Landfall — Whenever a land you control enters, draw a card.').lines).toEqual([
         { name: 'Landfall', text: 'Whenever a land you control enters, draw a card.' },
       ]);
     });
 
     test('has no name for text that only looks like one', () => {
-      expect(toOracleText('Choose one —').paragraphs).toEqual([{ text: 'Choose one —' }]);
-      expect(toOracleText('+ {1} — Draw a card.').paragraphs).toEqual([{ text: '+ {1} — Draw a card.' }]);
+      expect(toOracleText('Choose one —').lines).toEqual([{ text: 'Choose one —' }]);
+      expect(toOracleText('+ {1} — Draw a card.').lines).toEqual([{ text: '+ {1} — Draw a card.' }]);
     });
   });
 
-  test('makes the "•" lines modes of the paragraph above', () => {
-    expect(toOracleText('Choose one —\n• Draw a card.\n• Gain 3 life (You get 3 life.)').paragraphs).toEqual([
+  test('makes the "•" lines modes of the line above', () => {
+    expect(toOracleText('Choose one —\n• Draw a card.\n• Gain 3 life (You get 3 life.)').lines).toEqual([
       {
         text: 'Choose one —',
         modes: [{ text: 'Draw a card.' }, { text: 'Gain 3 life', reminderText: '(You get 3 life.)' }],
@@ -227,7 +227,7 @@ describe('oracle text', () => {
       'Flying',
     ].join('\n');
 
-    expect(toOracleText(text).paragraphs).toEqual([
+    expect(toOracleText(text).lines).toEqual([
       {
         text: '',
         reminderText: '(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)',
@@ -242,7 +242,7 @@ describe('oracle text', () => {
   test('takes loyalty abilities, with their costs', () => {
     const text = '+1: Draw a card.\n0: Untap target land.\n−3: Destroy target creature.\n−X: Deal X damage.';
 
-    expect(toOracleText(text).paragraphs).toEqual([
+    expect(toOracleText(text).lines).toEqual([
       { loyaltyCost: '+1', text: 'Draw a card.' },
       { loyaltyCost: '0', text: 'Untap target land.' },
       { loyaltyCost: '−3', text: 'Destroy target creature.' },

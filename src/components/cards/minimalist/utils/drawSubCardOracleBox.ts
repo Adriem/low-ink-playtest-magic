@@ -48,7 +48,7 @@ export const drawSubCardOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText?.paragraphs ?? []), textWidth, SUBCARD_ORACLE_HEIGHT),
+    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText?.lines ?? []), textWidth, SUBCARD_ORACLE_HEIGHT),
     textX,
     SUBCARD_ORACLE_Y,
   );

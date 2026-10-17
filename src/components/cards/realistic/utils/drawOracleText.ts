@@ -31,7 +31,7 @@ export const drawOracleText = (
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.paragraphs), width, height), x, y);
+  fillMultilineText(ctx, fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.lines), width, height), x, y);
 };
 
 /**

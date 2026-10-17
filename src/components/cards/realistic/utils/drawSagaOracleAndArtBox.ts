@@ -1,7 +1,7 @@
 import { drawRectangle, drawSagaChapter, type Box } from '../../common/canvasShapes';
 import { distributeHeight } from '../../../../utils/layout';
 import { getSagaParts, type OracleText } from '../../../../domain/oracleText';
-import { getRunsText, toParagraphWithModes, type TextRun } from '../../common/textRuns';
+import { getRunsText, toAbilityParagraphs, type TextRun } from '../../common/textRuns';
 import {
   CONTENT_WIDTH,
   FONT_FAMILY,
@@ -25,14 +25,14 @@ const CHAPTER_SEPARATOR_THICKNESS = 1;
 // when a chapter has several numbers
 const CHAPTER_ICON_SPACING = 50;
 const CHAPTER_ICON_HALF_WIDTH = (22.5 * Math.sqrt(3)) / 2;
-// Minimum height of each paragraph and chapter of the saga's text
+// Minimum height of each line and chapter of the saga's text
 const MIN_SLOT_HEIGHT = 75;
 // Height of a hexagon chapter icon (at scale 1)
 const CHAPTER_ICON_HEIGHT = 45;
 
-/** A paragraph or chapter of a saga's text, and how it's laid out */
+/** A line or chapter of a saga's text, and how it's laid out */
 interface SagaSlot {
-  /** The paragraph, followed by its modes */
+  /** Paragraphs to draw: the line, followed by its modes */
   paragraphs: TextRun[][];
   align: 'top' | 'center';
   /** The chapter's numbers */
@@ -50,7 +50,7 @@ interface SagaSlot {
 export const drawSagaOracleAndArtBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = { paragraphs: [] },
+    cardOracleText = { lines: [] },
     cardArtUrl,
     cropArt,
     cardColorTreatment,
@@ -119,8 +119,8 @@ export const drawSagaOracleAndArtBox = (
 };
 
 /**
- * Draw the text of a saga in its column: the paragraphs before the chapters
- * (e.g. reminder text), each chapter and the paragraphs after them get a slot
+ * Draw the text of a saga in its column: the lines before the chapters (e.g.
+ * reminder text), each chapter and the lines after them get a slot
  * as tall as their share of the text, like printed sagas, with a thin line
  * above and below each chapter, and its numbers as icons on the pinline to
  * its left. All the slots use the same font size: the largest at which every
@@ -138,14 +138,14 @@ const drawSagaChapters = (
   if (chapters.length === 0) return false;
 
   const slots: SagaSlot[] = [
-    ...introduction.map((paragraph) => ({ paragraphs: toParagraphWithModes(paragraph), align: 'top' as const })),
+    ...introduction.map((line) => ({ paragraphs: toAbilityParagraphs(line), align: 'top' as const })),
     ...chapters.map((chapter) => ({
-      paragraphs: toParagraphWithModes(chapter),
+      paragraphs: toAbilityParagraphs(chapter),
       labels: chapter.chapterNumbers,
       align: 'center' as const,
       isChapter: true,
     })),
-    ...conclusion.map((paragraph) => ({ paragraphs: toParagraphWithModes(paragraph), align: 'center' as const })),
+    ...conclusion.map((line) => ({ paragraphs: toAbilityParagraphs(line), align: 'center' as const })),
   ];
   // Slots are as tall as their share of the characters (including spaces), but
   // at least the minimum height, and tall enough for a chapter's icons

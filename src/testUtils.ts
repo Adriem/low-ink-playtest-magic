@@ -23,6 +23,7 @@ export const testFace = (face: Partial<CardFace> & { name: string }): CardFace =
     faceLayout: 'regular',
     typeLine: '',
     colors: [],
+    oracleText: { lines: [] },
     art: { crop: 'full' },
     ...face,
   };

@@ -1,6 +1,5 @@
 import { drawRectangle } from '../../common/canvasShapes';
-import { fitTextIntoBox } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   ORACLE_EXTENDED_EXTRA,
@@ -15,6 +14,7 @@ import type { OracleLayout } from '../../styles';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
+import type { OracleText } from '../../../../domain/oracleText';
 
 const DIVIDER_TEXT_PADDING = 8;
 
@@ -27,7 +27,7 @@ export const drawOracleBox = (
     cardToughness,
     layout,
   }: {
-    cardOracleText?: string;
+    cardOracleText?: OracleText;
     cardColorTreatment: ColorTreatment;
     cardPower?: string;
     cardToughness?: string;
@@ -60,11 +60,7 @@ export const drawOracleBox = (
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  const paragraphs = fitTextIntoBox(
-    ctx,
-    (cardOracleText ?? '').split('\n').map((content) => ({ content, width: textWidth })),
-    textHeight,
-  );
+  const paragraphs = fitOracleLinesIntoBox(ctx, cardOracleText?.lines ?? [], textWidth, textHeight);
 
   let currentY = textY;
   for (const paragraph of paragraphs) {

@@ -40,5 +40,10 @@ export const drawTitleText = (
 
   const currentFontSize = getFontSize(ctx);
   const compensatedY = Math.max(y, y - (TITLE_REFERENCE_FONT_SIZE - currentFontSize));
-  fillMultilineText(ctx, titleLines, x, compensatedY);
+  fillMultilineText(
+    ctx,
+    titleLines.map((text) => [{ text, format: 'regular' as const }]),
+    x,
+    compensatedY,
+  );
 };

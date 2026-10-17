@@ -1,5 +1,4 @@
-import { fitFontSizeInXY } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   FONT_FAMILY,
@@ -12,6 +11,7 @@ import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { OracleText } from '../../../../domain/oracleText';
 
 export const drawSubCardOracleBox = (
   ctx: CanvasRenderingContext2D,
@@ -19,7 +19,7 @@ export const drawSubCardOracleBox = (
     cardOracleText,
     cardColorTreatment,
     position,
-  }: { cardOracleText?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+  }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment; position: SubCardPosition },
 ) => {
   const x = position === 'left' ? (ctx.canvas.width - CONTENT_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_ORACLE_Y;
@@ -54,7 +54,7 @@ export const drawSubCardOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, (cardOracleText ?? '').split('\n'), textRight - textX, textBottomY - textTopY),
+    fitOracleLines(ctx, cardOracleText?.lines ?? [], textRight - textX, textBottomY - textTopY),
     textX,
     textTopY,
   );

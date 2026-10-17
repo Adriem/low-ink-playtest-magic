@@ -1,6 +1,7 @@
 import { drawRectangle, drawSagaChapter, type Box } from '../../common/canvasShapes';
 import { distributeHeight } from '../../../../utils/layout';
-import { parseSagaOracleText } from '../../../../domain/sagaOracle';
+import { getSagaParts, type OracleLine, type OracleText } from '../../../../domain/oracleText';
+import { getOracleTextLength } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   FONT_FAMILY,
@@ -24,14 +25,14 @@ const CHAPTER_SEPARATOR_THICKNESS = 1;
 // when a chapter has several numbers
 const CHAPTER_ICON_SPACING = 50;
 const CHAPTER_ICON_HALF_WIDTH = (22.5 * Math.sqrt(3)) / 2;
-// Minimum height of each paragraph and chapter of the saga's text
+// Minimum height of each line and chapter of the saga's text
 const MIN_SLOT_HEIGHT = 75;
 // Height of a hexagon chapter icon (at scale 1)
 const CHAPTER_ICON_HEIGHT = 45;
 
-/** A paragraph or chapter of a saga's text, and how it's laid out */
+/** A line or chapter of a saga's text, and how it's laid out */
 interface SagaSlot {
-  content: string;
+  line: OracleLine;
   align: 'top' | 'center';
   /** The chapter's numbers */
   labels?: string[];
@@ -48,13 +49,13 @@ interface SagaSlot {
 export const drawSagaOracleAndArtBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = '',
+    cardOracleText = { lines: [] },
     cardArtUrl,
     cropArt,
     cardColorTreatment,
     typelineY = SAGA_TYPELINE_Y,
   }: {
-    cardOracleText?: string;
+    cardOracleText?: OracleText;
     cardArtUrl?: string;
     cropArt?: ArtCrop;
     cardColorTreatment: ColorTreatment;
@@ -117,8 +118,8 @@ export const drawSagaOracleAndArtBox = (
 };
 
 /**
- * Draw the text of a saga in its column: the paragraphs before the chapters
- * (e.g. reminder text), each chapter and the paragraphs after them get a slot
+ * Draw the text of a saga in its column: the lines before the chapters (e.g.
+ * reminder text), each chapter and the lines after them get a slot
  * as tall as their share of the text, like printed sagas, with a thin line
  * above and below each chapter, and its numbers as icons on the pinline to
  * its left. All the slots use the same font size: the largest at which every
@@ -129,23 +130,28 @@ export const drawSagaOracleAndArtBox = (
  */
 const drawSagaChapters = (
   ctx: CanvasRenderingContext2D,
-  cardOracleText: string,
+  cardOracleText: OracleText,
   { x, y, width, height }: Box,
 ): boolean => {
-  const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(cardOracleText);
+  const { sagaAbilities, chapters, creatureAbilities } = getSagaParts(cardOracleText);
   if (chapters.length === 0) return false;
 
   const slots: SagaSlot[] = [
-    ...topParagraphs.map((content) => ({ content, align: 'top' as const })),
-    ...chapters.map(({ labels, text }) => ({ content: text, labels, align: 'center' as const, isChapter: true })),
-    ...bottomParagraphs.map((content) => ({ content, align: 'center' as const })),
+    ...sagaAbilities.map((line) => ({ line, align: 'top' as const })),
+    ...chapters.map((chapter) => ({
+      line: chapter,
+      labels: chapter.chapterNumbers,
+      align: 'center' as const,
+      isChapter: true,
+    })),
+    ...creatureAbilities.map((line) => ({ line, align: 'center' as const })),
   ];
   // Slots are as tall as their share of the characters (including spaces), but
   // at least the minimum height, and tall enough for a chapter's icons
   const slotHeights = distributeHeight(
     height,
-    slots.map(({ content, labels }) => ({
-      weight: content.length,
+    slots.map(({ line, labels }) => ({
+      weight: getOracleTextLength([line]),
       minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * CHAPTER_ICON_SPACING),
       // When the minimums don't fit, slots get the same height, except that a
       // chapter still needs room for its icons
@@ -157,10 +163,10 @@ const drawSagaChapters = (
   // Chapter text starts after the chapter icons
   const chapterTextX = iconX + CHAPTER_ICON_HALF_WIDTH + ORACLE_TEXT_PADDING_X;
 
-  const textAreas = slots.map(({ content, isChapter }, index) => {
+  const textAreas = slots.map(({ line, isChapter }, index) => {
     const textX = isChapter ? chapterTextX : x + ORACLE_TEXT_PADDING_X;
     return {
-      text: content,
+      lines: [line],
       x: textX,
       width: textRight - textX,
       height: slotHeights[index],

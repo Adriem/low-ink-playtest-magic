@@ -1,6 +1,5 @@
 import { drawLoyaltyBox } from '../../common/canvasShapes';
-import { fitFontSizeInXY } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   FONT_FAMILY,
@@ -18,6 +17,7 @@ import { drawFramedBox } from './drawFramedBox';
 import type { OracleLayout } from '../../styles';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { OracleText } from '../../../../domain/oracleText';
 
 // TODO: Change the way planeswalker oracle boxes are rendered. For now they're
 // drawn like the regular oracle box (plain rules text) plus the loyalty box.
@@ -28,11 +28,11 @@ import type { ColorTreatment } from '../../../../domain/colorTreatment';
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = '',
+    cardOracleText = { lines: [] },
     cardLoyalty,
     cardColorTreatment,
     layout,
-  }: { cardOracleText?: string; cardLoyalty: string; cardColorTreatment: ColorTreatment; layout: OracleLayout },
+  }: { cardOracleText?: OracleText; cardLoyalty: string; cardColorTreatment: ColorTreatment; layout: OracleLayout },
 ) => {
   const x = layout === 'right-half' ? ctx.canvas.width / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
@@ -61,7 +61,12 @@ export const drawPlaneswalkerOracleBox = (
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitFontSizeInXY(ctx, cardOracleText.split('\n'), textWidth, textHeight), textX, textY);
+  fillMultilineText(
+    ctx,
+    fitOracleLines(ctx, cardOracleText.lines, textWidth, textHeight, { inlineLoyaltyCost: true }),
+    textX,
+    textY,
+  );
 
   drawLoyaltyBox(ctx, {
     cardLoyalty,

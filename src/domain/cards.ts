@@ -1,4 +1,5 @@
 import { ColorSymbol, isColorSymbol } from './colors';
+import type { OracleText } from './oracleText';
 import { getSymbolValue, splitSymbols } from './symbols';
 
 /** Part of the art image a face shows: split cards have both arts side by side in a single image */
@@ -9,7 +10,7 @@ export type CardFace = {
   manaCost?: string;
   faceLayout: 'regular' | 'planeswalker' | 'saga'; // TODO: Support battles (#46)
   typeLine: string;
-  oracleText?: string;
+  oracleText: OracleText;
   colors: ColorSymbol[];
   stats?: { power: string; toughness: string } | { loyalty: string };
   art: { assetUrl?: string; crop: ArtCrop };

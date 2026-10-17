@@ -27,7 +27,7 @@ test('maps a single-faced card to a card with its main face', () => {
       manaCost: '{4}{G}{G}',
       faceLayout: 'regular',
       typeLine: 'Creature — Dinosaur',
-      oracleText: 'Trample',
+      oracleText: { lines: [{ text: 'Trample' }] },
       colors: ['G'],
       stats: { power: '6', toughness: '6' },
       art: { assetUrl: 'dreadmaw.jpg', crop: 'full' },
@@ -157,6 +157,104 @@ describe('art of faces', () => {
     ]);
   });
 });
+
+describe('oracle text', () => {
+  test('makes an oracle line of each line', () => {
+    expect(toOracleText('Flying\nWhen this creature enters, draw a card.')).toEqual({
+      lines: [{ text: 'Flying' }, { text: 'When this creature enters, draw a card.' }],
+    });
+  });
+
+  test('has no lines without oracle text', () => {
+    expect(toOracleText('')).toEqual({ lines: [] });
+    expect(toOracleText(undefined)).toEqual({ lines: [] });
+  });
+
+  describe('reminder text', () => {
+    test('takes the parenthetical that ends a line as its reminder text', () => {
+      expect(toOracleText('Trample (This creature can deal excess combat damage.)').lines).toEqual([
+        { text: 'Trample', reminderText: '(This creature can deal excess combat damage.)' },
+      ]);
+    });
+
+    test('takes a line that is only a parenthetical as reminder text', () => {
+      expect(toOracleText('({U/P} can be paid with either {U} or 2 life.)').lines).toEqual([
+        { text: '', reminderText: '({U/P} can be paid with either {U} or 2 life.)' },
+      ]);
+    });
+
+    test('keeps parentheticals in the middle of a line in its rules text', () => {
+      const text = 'The first instant or sorcery spell you cast each turn costs {U} (or {1}) less to cast.';
+
+      expect(toOracleText(text).lines).toEqual([{ text }]);
+    });
+
+    test('keeps the parentheses nested in the reminder text', () => {
+      expect(toOracleText('Morph {2} (Exile it (face down).)').lines).toEqual([
+        { text: 'Morph {2}', reminderText: '(Exile it (face down).)' },
+      ]);
+    });
+  });
+
+  describe('names', () => {
+    test('takes ability words and names of abilities before " — " as the name', () => {
+      expect(toOracleText('Landfall — Whenever a land you control enters, draw a card.').lines).toEqual([
+        { name: 'Landfall', text: 'Whenever a land you control enters, draw a card.' },
+      ]);
+    });
+
+    test('has no name for text that only looks like one', () => {
+      expect(toOracleText('Choose one —').lines).toEqual([{ text: 'Choose one —' }]);
+      expect(toOracleText('+ {1} — Draw a card.').lines).toEqual([{ text: '+ {1} — Draw a card.' }]);
+    });
+  });
+
+  test('makes the "•" lines modes of the line above', () => {
+    expect(toOracleText('Choose one —\n• Draw a card.\n• Gain 3 life (You get 3 life.)').lines).toEqual([
+      {
+        text: 'Choose one —',
+        modes: [{ text: 'Draw a card.' }, { text: 'Gain 3 life', reminderText: '(You get 3 life.)' }],
+      },
+    ]);
+  });
+
+  test('takes saga chapters, with their numbers and names', () => {
+    const text = [
+      '(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)',
+      'I, II — Destroy up to one target nonland permanent.',
+      'III — Draw two cards.',
+      'IV — Mega Flare — This creature deals damage to each opponent.',
+      'Flying',
+    ].join('\n');
+
+    expect(toOracleText(text).lines).toEqual([
+      {
+        text: '',
+        reminderText: '(As this Saga enters and after your draw step, add a lore counter. Sacrifice after IV.)',
+      },
+      { chapterNumbers: ['I', 'II'], text: 'Destroy up to one target nonland permanent.' },
+      { chapterNumbers: ['III'], text: 'Draw two cards.' },
+      { chapterNumbers: ['IV'], name: 'Mega Flare', text: 'This creature deals damage to each opponent.' },
+      { text: 'Flying' },
+    ]);
+  });
+
+  test('takes loyalty abilities, with their costs', () => {
+    const text = '+1: Draw a card.\n0: Untap target land.\n−3: Destroy target creature.\n−X: Deal X damage.';
+
+    expect(toOracleText(text).lines).toEqual([
+      { loyaltyCost: '+1', text: 'Draw a card.' },
+      { loyaltyCost: '0', text: 'Untap target land.' },
+      { loyaltyCost: '−3', text: 'Destroy target creature.' },
+      { loyaltyCost: '−X', text: 'Deal X damage.' },
+    ]);
+  });
+});
+
+// The oracle text of a card with the given Scryfall oracle text
+const toOracleText = (oracleText?: string) => {
+  return toCard(scryfallCard({ name: 'Card', oracle_text: oracleText })).mainFace.oracleText;
+};
 
 const scryfallCard = (card: Partial<ScryfallCard> & { name: string }): ScryfallCard => {
   return {

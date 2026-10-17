@@ -63,7 +63,7 @@ export const drawPlaneswalkerOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitOracleLines(ctx, cardOracleText.lines, textWidth, textHeight, { loyaltyCostsAsText: true }),
+    fitOracleLines(ctx, cardOracleText.lines, textWidth, textHeight, { inlineLoyaltyCost: true }),
     textX,
     textY,
   );

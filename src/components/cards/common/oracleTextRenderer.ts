@@ -1,5 +1,5 @@
 import { getSymbolImage } from '../../../adapters/scryfall';
-import { isLoyaltyAbility, type CardAbility, type OracleLine } from '../../../domain/oracleText';
+import { isLoyaltyAbility, isSagaChapter, type CardAbility, type OracleLine } from '../../../domain/oracleText';
 import { parseTextWithSymbols, splitSymbols, type CardSymbol } from '../../../domain/symbols';
 import { drawWhenLoaded } from './canvasRendering';
 import {
@@ -20,7 +20,9 @@ const NAME_SEPARATOR = ' — ';
 
 interface OracleTextOptions {
   /** Whether to write the loyalty cost before the text of loyalty abilities, e.g. "+1: Draw a card." */
-  loyaltyCostsAsText?: boolean;
+  inlineLoyaltyCost?: boolean;
+  /** Whether to write the chapter numbers before the text of saga chapters, e.g. "I, II — Draw a card." */
+  inlineChapterNumbers?: boolean;
 }
 
 /** A paragraph of oracle text fitted into a box: a line, or one of its modes */
@@ -225,14 +227,26 @@ const toParagraphs = (lines: OracleLine[], options: OracleTextOptions = {}): Ric
  * Paragraphs for a line of oracle text: the line, followed by a "• "
  * paragraph for each of its modes.
  */
-const toLineParagraphs = (line: OracleLine, { loyaltyCostsAsText = false }: OracleTextOptions): RichText[] => {
-  const prefix: RichText =
-    loyaltyCostsAsText && isLoyaltyAbility(line) ? [{ text: `${line.loyaltyCost}: `, format: 'regular' }] : [];
-
+const toLineParagraphs = (line: OracleLine, options: OracleTextOptions): RichText[] => {
   return [
-    [...prefix, ...toRichText(line)],
+    [...toInlinePrefix(line, options), ...toRichText(line)],
     ...(line.modes ?? []).map((mode): RichText => [{ text: MODE_PREFIX, format: 'regular' }, ...toRichText(mode)]),
   ];
+};
+
+/**
+ * What goes before the text of a line, for boxes that don't draw it apart:
+ * its loyalty cost or its chapter numbers, when asked.
+ */
+const toInlinePrefix = (
+  line: OracleLine,
+  { inlineLoyaltyCost = false, inlineChapterNumbers = false }: OracleTextOptions,
+): RichText => {
+  if (inlineLoyaltyCost && isLoyaltyAbility(line)) return [{ text: `${line.loyaltyCost}: `, format: 'regular' }];
+  if (inlineChapterNumbers && isSagaChapter(line)) {
+    return [{ text: `${line.chapterNumbers.join(', ')}${NAME_SEPARATOR}`, format: 'regular' }];
+  }
+  return [];
 };
 
 /**

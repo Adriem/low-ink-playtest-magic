@@ -83,10 +83,28 @@ describe('oracle lines', () => {
       '',
       'Destroy target creature.',
     ]);
-    expect(fitOracleLines(createCtx(), lines, 1000, 1000, { loyaltyCostsAsText: true }).map(toPlainText)).toEqual([
+    expect(fitOracleLines(createCtx(), lines, 1000, 1000, { inlineLoyaltyCost: true }).map(toPlainText)).toEqual([
       'Flying',
       '',
       '−3: Destroy target creature.',
+    ]);
+  });
+
+  test('writes chapter numbers before the text when asked, for boxes that draw them as text', () => {
+    const lines = [
+      { text: '', reminderText: '(Lore counters.)' },
+      { chapterNumbers: ['I', 'II'], text: 'Draw a card.' },
+    ];
+
+    expect(fitOracleLines(createCtx(), lines, 1000, 1000).map(toPlainText)).toEqual([
+      '(Lore counters.)',
+      '',
+      'Draw a card.',
+    ]);
+    expect(fitOracleLines(createCtx(), lines, 1000, 1000, { inlineChapterNumbers: true }).map(toPlainText)).toEqual([
+      '(Lore counters.)',
+      '',
+      'I, II — Draw a card.',
     ]);
   });
 

@@ -8,7 +8,6 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { drawTextInArea } from './drawOracleText';
-import { toTextParagraphs } from '../../common/textRuns';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 
@@ -32,7 +31,7 @@ export const drawSagaCreatureOracleBox = (
 
   const textTop = inner.y + PINLINE_THICKNESS;
   drawTextInArea(ctx, {
-    paragraphs: toTextParagraphs(cardOracleText.lines),
+    lines: cardOracleText.lines,
     x: inner.x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
     y: textTop,
     width: inner.width - PINLINE_THICKNESS * 2 - ORACLE_TEXT_PADDING_X * 2,

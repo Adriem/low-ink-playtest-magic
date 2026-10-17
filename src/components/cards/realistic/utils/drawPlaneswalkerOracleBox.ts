@@ -1,6 +1,5 @@
 import { drawLoyaltyBox } from '../../common/canvasShapes';
-import { fitFontSizeInXY } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   FONT_FAMILY,
@@ -19,7 +18,6 @@ import type { OracleLayout } from '../../styles';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
-import { toTextParagraphs } from '../../common/textRuns';
 
 // TODO: Change the way planeswalker oracle boxes are rendered. For now they're
 // drawn like the regular oracle box (plain rules text) plus the loyalty box.
@@ -65,7 +63,7 @@ export const drawPlaneswalkerOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.lines), textWidth, textHeight),
+    fitOracleLines(ctx, cardOracleText.lines, textWidth, textHeight, { loyaltyCostsAsText: true }),
     textX,
     textY,
   );

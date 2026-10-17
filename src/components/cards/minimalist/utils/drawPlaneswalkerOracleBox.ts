@@ -1,6 +1,5 @@
 import { drawLoyaltyCost } from '../../common/canvasShapes';
-import { fitTextIntoBox } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   DISPLAY_FONT_FAMILY,
@@ -17,7 +16,6 @@ import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
-import { toAbilityParagraphs } from '../../common/textRuns';
 
 const LOYALTY_ABILITY_OFFSET = 45;
 
@@ -51,24 +49,17 @@ export const drawPlaneswalkerOracleBox = (
   ctx.textAlign = 'start';
 
   // Loyalty abilities, and their modes, go after the loyalty costs
-  const textParagraphs = (cardOracleText?.lines ?? []).flatMap((line) => {
-    const loyaltyCost = isLoyaltyAbility(line) ? line.loyaltyCost : undefined;
-    return toAbilityParagraphs(line).map((content, index) => {
-      return { content, loyaltyCost: index === 0 ? loyaltyCost : undefined, isAbility: loyaltyCost != null };
-    });
-  });
-
-  const paragraphs = fitTextIntoBox(
+  const paragraphs = fitOracleLinesIntoBox(
     ctx,
-    textParagraphs.map(({ content, isAbility }) => {
-      return { content, width: isAbility ? loyaltyAbilityWidth : regularOracleWidth };
-    }),
+    cardOracleText?.lines ?? [],
+    (line) => (isLoyaltyAbility(line) ? loyaltyAbilityWidth : regularOracleWidth),
     textHeight,
   );
 
   let currentY = textY;
-  for (const [index, paragraph] of paragraphs.entries()) {
-    const { loyaltyCost, isAbility } = textParagraphs[index];
+  for (const paragraph of paragraphs) {
+    const isAbility = isLoyaltyAbility(paragraph.line);
+    const loyaltyCost = isLoyaltyAbility(paragraph.line) && !paragraph.isMode ? paragraph.line.loyaltyCost : undefined;
 
     if (isAbility) {
       fillMultilineText(ctx, paragraph.lines, paddedX + LOYALTY_ABILITY_OFFSET, currentY);

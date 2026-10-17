@@ -1,6 +1,6 @@
 import { drawRectangle, drawSagaChapter } from '../../common/canvasShapes';
-import { fitTextIntoBox, getFontSize } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { getFontSize } from '../../common/canvasText';
+import { fillMultilineText, fitOracleLinesIntoBox, getOracleTextLength } from '../../common/oracleTextRenderer';
 import { distributeHeight } from '../../../../utils/layout';
 import {
   CONTENT_WIDTH,
@@ -17,8 +17,7 @@ import { getSideBorderEdges } from './sideBorder';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
-import { getSagaParts, type OracleText } from '../../../../domain/oracleText';
-import { getRunsText, toAbilityParagraphs, type TextRun } from '../../common/textRuns';
+import { getSagaParts, type OracleLine, type OracleText } from '../../../../domain/oracleText';
 
 const SAGA_CHAPTER_ICON_SPACING = 50;
 const SAGA_TEXT_LEFT_OFFSET = 36;
@@ -32,8 +31,7 @@ const CHAPTER_ICON_HEIGHT = 45;
 
 /** A line or chapter of a saga's text, and where it's drawn */
 interface SagaSlot {
-  /** Paragraphs to draw: the line, followed by its modes */
-  paragraphs: TextRun[][];
+  line: OracleLine;
   leftX: number;
   width: number;
   align?: 'top' | 'center';
@@ -84,20 +82,20 @@ export const drawSagaOracleBox = (
   // enough for a chapter's icons, like printed sagas
   const slots: SagaSlot[] = [
     ...introduction.map((line) => ({
-      paragraphs: toAbilityParagraphs(line),
+      line,
       leftX: introductionX,
       width: contentLeftX + contentWidth - introductionX,
       align: 'top' as const,
     })),
     ...chapters.map((chapter) => ({
-      paragraphs: toAbilityParagraphs(chapter),
+      line: chapter,
       labels: chapter.chapterNumbers,
       leftX: chapterTextX,
       width: chapterTextWidth,
       isChapter: true,
     })),
     ...conclusion.map((line) => ({
-      paragraphs: toAbilityParagraphs(line),
+      line,
       leftX: textX + textWidth / 2,
       width: contentWidth,
       isBottom: true,
@@ -105,8 +103,8 @@ export const drawSagaOracleBox = (
   ];
   const slotHeights = distributeHeight(
     textHeight,
-    slots.map(({ paragraphs, labels }) => ({
-      weight: paragraphs.reduce((length, paragraph) => length + getRunsText(paragraph).length, 0),
+    slots.map(({ line, labels }) => ({
+      weight: getOracleTextLength([line]),
       minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * SAGA_CHAPTER_ICON_SPACING),
       // When the minimums don't fit, slots get the same height, except that a
       // chapter still needs room for its icons
@@ -122,17 +120,13 @@ export const drawSagaOracleBox = (
   drawSagaOracleBorder(ctx, { cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
 
   // All the slots use the same font size: the largest at which every slot's text fits
-  const fitParagraph = (paragraphs: TextRun[][], width: number, slotHeight: number, fontSize: number) => {
+  const fitParagraph = (line: OracleLine, width: number, slotHeight: number, fontSize: number) => {
     ctx.font = `${fontSize}px ${DISPLAY_FONT_FAMILY}`;
-    return fitTextIntoBox(
-      ctx,
-      paragraphs.map((content) => ({ content, width })),
-      slotHeight,
-    );
+    return fitOracleLinesIntoBox(ctx, [line], width, slotHeight);
   };
   const fontSize = Math.min(
-    ...slots.map(({ paragraphs, width }, index) => {
-      fitParagraph(paragraphs, width, slotHeights[index], ORACLE_FONT_SIZE);
+    ...slots.map(({ line, width }, index) => {
+      fitParagraph(line, width, slotHeights[index], ORACLE_FONT_SIZE);
       return getFontSize(ctx);
     }),
   );
@@ -140,12 +134,12 @@ export const drawSagaOracleBox = (
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
 
   let currentY = textY;
-  slots.forEach(({ paragraphs, labels, leftX, width, align = 'center', isChapter, isBottom }, index) => {
+  slots.forEach(({ line, labels, leftX, width, align = 'center', isChapter, isBottom }, index) => {
     const slotY = currentY;
     const slotHeight = slotHeights[index];
 
     ctx.textAlign = isBottom ? 'center' : 'start';
-    const fitted = fitParagraph(paragraphs, width, slotHeight, fontSize);
+    const fitted = fitParagraph(line, width, slotHeight, fontSize);
     const totalTextHeight = fitted.reduce((sum, p) => sum + p.paragraphHeight, 0);
     let paragraphY =
       align === 'top'

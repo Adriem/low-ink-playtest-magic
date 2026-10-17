@@ -42,7 +42,7 @@ export const drawTitleText = (
   const compensatedY = Math.max(y, y - (TITLE_REFERENCE_FONT_SIZE - currentFontSize));
   fillMultilineText(
     ctx,
-    titleLines.map((text) => [{ text }]),
+    titleLines.map((text) => [{ text, format: 'regular' as const }]),
     x,
     compensatedY,
   );

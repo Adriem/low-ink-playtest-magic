@@ -1,38 +1,42 @@
-import { getRunsText, type TextLine, type TextRun } from './textRuns';
-
 const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 /** Height of empty lines, which separate paragraphs, relative to other lines */
 export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = 0.75;
 
+/** Text in a single format */
+export type FormattedText = { text: string; format: 'regular' | 'italic' };
+
+/** Text in several formats, e.g. a paragraph or a line, as pieces in order */
+export type RichText = FormattedText[];
+
 export interface FittedParagraph {
-  originalContent: TextRun[];
+  originalContent: RichText;
   lineHeight: number;
   paragraphHeight: number;
-  lines: TextLine[];
+  lines: RichText[];
 }
 
 /**
  * Automatically wrap a paragraph to fit inside a maximum width on a canvas
- * with a properly set font. Each run is measured in its own style.
+ * with a properly set font. Each piece is measured in its own format.
  *
- * @param paragraph - Runs of text to wrap within the given width
+ * @param paragraph - Rich text to wrap within the given width
  * @param maxWidth - Maximum width where the text must be placed
  * @returns Lines of text wrapped to fit in the given width
  */
-export const wrapText = (ctx: CanvasRenderingContext2D, paragraph: TextRun[], maxWidth: number): TextLine[] => {
-  const words = paragraph.flatMap(({ text, italic }) => {
+export const wrapText = (ctx: CanvasRenderingContext2D, paragraph: RichText, maxWidth: number): RichText[] => {
+  const words = paragraph.flatMap(({ text, format }) => {
     return text
       .split(/\s+/)
       .filter(Boolean)
-      .map((word) => ({ text: word, italic }));
+      .map((word): FormattedText => ({ text: word, format }));
   });
-  const lines: TextRun[][] = [[]];
+  const lines: RichText[] = [[]];
 
   for (const word of words) {
     const currentLineWords = lines[lines.length - 1];
 
-    if (measureRunsWidth(ctx, toLine([...currentLineWords, word])) < maxWidth) {
+    if (measureRichTextWidth(ctx, toLine([...currentLineWords, word])) < maxWidth) {
       currentLineWords.push(word);
     } else {
       lines.push([word]);
@@ -43,13 +47,13 @@ export const wrapText = (ctx: CanvasRenderingContext2D, paragraph: TextRun[], ma
 };
 
 /**
- * A line from its words: consecutive words in the same style make a single
- * run, and the space between runs ends the first of them.
+ * A line from its words: consecutive words in the same format make a single
+ * piece, and the space between pieces ends the first of them.
  */
-const toLine = (words: TextRun[]): TextLine => {
-  return words.reduce<TextLine>((line, word) => {
+const toLine = (words: RichText): RichText => {
+  return words.reduce<RichText>((line, word) => {
     const last = line.at(-1);
-    if (last && Boolean(last.italic) === Boolean(word.italic)) {
+    if (last && last.format === word.format) {
       last.text = `${last.text} ${word.text}`;
     } else {
       if (last) last.text += ' ';
@@ -120,10 +124,10 @@ export const fitFontSizeInX = (ctx: CanvasRenderingContext2D, text: string, maxW
  */
 export const fitFontSizeInXY = (
   ctx: CanvasRenderingContext2D,
-  paragraphs: TextRun[][],
+  paragraphs: RichText[],
   maxWidth: number,
   maxHeight: number,
-): TextLine[] => {
+): RichText[] => {
   if (paragraphs.length === 0) return [];
 
   let textHeight;
@@ -139,7 +143,7 @@ export const fitFontSizeInXY = (
     });
 
     textHeight = textLines.reduce((height, line) => {
-      const lineHeight = getLineHeight(ctx.measureText(getRunsText(line)));
+      const lineHeight = getLineHeight(ctx.measureText(toPlainText(line)));
 
       return line.length ? height + lineHeight : height + lineHeight * EMPTY_LINE_RELATIVE_SIZE;
     }, 0);
@@ -162,7 +166,7 @@ export const fitFontSizeInXY = (
  */
 export const fitTextIntoBox = (
   ctx: CanvasRenderingContext2D,
-  paragraphs: { content: TextRun[]; width: number }[],
+  paragraphs: { content: RichText; width: number }[],
   maxHeight: number,
 ): FittedParagraph[] => {
   let textHeight;
@@ -175,7 +179,7 @@ export const fitTextIntoBox = (
       const lines = wrapText(ctx, content, width);
 
       const paragraphHeight = lines.reduce((totalHeight, line) => {
-        return totalHeight + getLineHeight(ctx.measureText(getRunsText(line)));
+        return totalHeight + getLineHeight(ctx.measureText(toPlainText(line)));
       }, 0);
 
       const paragraphHeightWithMargin =
@@ -207,7 +211,7 @@ export const fitTextIntoBox = (
  *
  * @param lines - Empty lines separate paragraphs
  */
-export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: TextLine[]): number => {
+export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: RichText[]): number => {
   const { fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = ctx.measureText('');
   const lineHeight = ascent + descent;
 
@@ -218,23 +222,30 @@ export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: Tex
 };
 
 /**
- * Width of some runs of text with the current font, each in its style.
+ * Width of some rich text with the current font, each piece in its format.
  */
-export const measureRunsWidth = (ctx: CanvasRenderingContext2D, runs: TextRun[]): number => {
-  if (runs.every((run) => !run.italic)) return ctx.measureText(getRunsText(runs)).width;
+export const measureRichTextWidth = (ctx: CanvasRenderingContext2D, richText: RichText): number => {
+  if (richText.every(({ format }) => format === 'regular')) return ctx.measureText(toPlainText(richText)).width;
 
   const font = ctx.font;
-  const width = runs.reduce((total, run) => {
-    ctx.font = run.italic ? getItalicFont(font) : font;
-    return total + ctx.measureText(run.text).width;
+  const width = richText.reduce((total, { text, format }) => {
+    ctx.font = getFormattedFont(font, format);
+    return total + ctx.measureText(text).width;
   }, 0);
   ctx.font = font;
   return width;
 };
 
 /**
- * Italic variant of a font.
+ * A font in a format: italic text uses the font's italic variant.
  */
-export const getItalicFont = (font: string): string => {
-  return `italic ${font}`;
+export const getFormattedFont = (font: string, format: FormattedText['format']): string => {
+  return format === 'italic' ? `italic ${font}` : font;
+};
+
+/**
+ * The text of some rich text, without its formats.
+ */
+export const toPlainText = (richText: RichText): string => {
+  return richText.map(({ text }) => text).join('');
 };

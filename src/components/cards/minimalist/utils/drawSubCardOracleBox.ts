@@ -1,6 +1,5 @@
 import { drawRectangle } from '../../common/canvasShapes';
-import { fitFontSizeInXY } from '../../common/canvasText';
-import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
   PINLINE_THICKNESS,
@@ -14,7 +13,6 @@ import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import type { OracleText } from '../../../../domain/oracleText';
-import { toTextParagraphs } from '../../common/textRuns';
 
 const TEXT_PADDING_FROM_CENTER = 15;
 const TEXT_PADDING_FROM_OUTSIDE = 10;
@@ -48,7 +46,7 @@ export const drawSubCardOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText?.lines ?? []), textWidth, SUBCARD_ORACLE_HEIGHT),
+    fitOracleLines(ctx, cardOracleText?.lines ?? [], textWidth, SUBCARD_ORACLE_HEIGHT),
     textX,
     SUBCARD_ORACLE_Y,
   );

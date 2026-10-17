@@ -1,4 +1,11 @@
-import { fillMultilineText, renderTextWithSymbols } from './oracleTextRenderer';
+import { toPlainText } from './canvasText';
+import {
+  fillMultilineText,
+  fitOracleLines,
+  fitOracleLinesIntoBox,
+  getOracleTextLength,
+  renderTextWithSymbols,
+} from './oracleTextRenderer';
 
 vi.mock('../../../adapters/scryfall', () => ({
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
@@ -7,7 +14,7 @@ vi.mock('../../../adapters/scryfall', () => ({
 test('draws the text between symbols after them, leaving room for symbols as wide as the font is tall', () => {
   const ctx = createCtx();
 
-  renderTextWithSymbols(ctx, [{ text: '{T}: Add {G}{G}.' }], 0, 20);
+  renderTextWithSymbols(ctx, [{ text: '{T}: Add {G}{G}.', format: 'regular' }], 0, 20);
 
   // {T} takes 8px; {G}{G} takes 8px each, with 1px between them
   expect(ctx.fillText.mock.calls).toEqual([
@@ -19,7 +26,7 @@ test('draws the text between symbols after them, leaving room for symbols as wid
 test('draws text without symbols as it is, without the spaces around it', () => {
   const ctx = createCtx();
 
-  renderTextWithSymbols(ctx, [{ text: '  Flying ' }], 5, 20);
+  renderTextWithSymbols(ctx, [{ text: '  Flying ', format: 'regular' }], 5, 20);
 
   expect(ctx.fillText.mock.calls).toEqual([['Flying', 5, 20]]);
 });
@@ -27,16 +34,98 @@ test('draws text without symbols as it is, without the spaces around it', () => 
 test('measures lines with a placeholder for each symbol', () => {
   const ctx = createCtx();
 
-  fillMultilineText(ctx, [[{ text: '{T}: Add {G}{G}.' }]], 0, 20);
+  fillMultilineText(ctx, [[{ text: '{T}: Add {G}{G}.', format: 'regular' }]], 0, 20);
 
   expect(ctx.measureText).toHaveBeenCalledWith('‹::›: Add ‹::›‹::›.');
 });
 
+describe('oracle lines', () => {
+  test('formats the name and the reminder text of a line in italics, around its rules text', () => {
+    const lines = fitOracleLines(
+      createCtx(),
+      [{ name: 'Landfall', text: 'Draw a card.', reminderText: '(Then discard.)' }],
+      1000,
+      1000,
+    );
+
+    expect(lines).toEqual([
+      [
+        { text: 'Landfall ', format: 'italic' },
+        { text: '— Draw a card. ', format: 'regular' },
+        { text: '(Then discard.)', format: 'italic' },
+      ],
+    ]);
+  });
+
+  test('has only the reminder text for lines without rules text', () => {
+    expect(fitOracleLines(createCtx(), [{ text: '', reminderText: '(Lore counters.)' }], 1000, 1000)).toEqual([
+      [{ text: '(Lore counters.)', format: 'italic' }],
+    ]);
+  });
+
+  test('follows a line with a "• " paragraph for each of its modes', () => {
+    const line = { text: 'Choose one —', modes: [{ text: 'Draw a card.' }, { text: 'Gain 3 life.' }] };
+
+    expect(fitOracleLines(createCtx(), [line], 1000, 1000).map(toPlainText)).toEqual([
+      'Choose one —',
+      '',
+      '• Draw a card.',
+      '',
+      '• Gain 3 life.',
+    ]);
+  });
+
+  test('writes loyalty costs before the text when asked, for boxes that draw them as text', () => {
+    const lines = [{ text: 'Flying' }, { loyaltyCost: '−3', text: 'Destroy target creature.' }];
+
+    expect(fitOracleLines(createCtx(), lines, 1000, 1000).map(toPlainText)).toEqual([
+      'Flying',
+      '',
+      'Destroy target creature.',
+    ]);
+    expect(fitOracleLines(createCtx(), lines, 1000, 1000, { loyaltyCostsAsText: true }).map(toPlainText)).toEqual([
+      'Flying',
+      '',
+      '−3: Destroy target creature.',
+    ]);
+  });
+
+  test('fits each line and each of its modes into a box, telling which line they come from', () => {
+    const ability = { loyaltyCost: '+1', text: 'Choose one —', modes: [{ text: 'Draw a card.' }] };
+
+    const paragraphs = fitOracleLinesIntoBox(
+      createCtx(),
+      [ability],
+      (line) => ('loyaltyCost' in line ? 500 : 1000),
+      1000,
+    );
+
+    expect(paragraphs.map(({ lines, line, isMode }) => [lines.map(toPlainText), line, isMode])).toEqual([
+      [['Choose one —'], ability, false],
+      [['• Draw a card.'], ability, true],
+    ]);
+  });
+
+  test('measures the length of the text of lines, with their modes', () => {
+    expect(getOracleTextLength([{ text: 'Choose one —', modes: [{ text: 'Draw.' }] }])).toBe(
+      'Choose one —• Draw.'.length,
+    );
+  });
+});
+
 describe('italics', () => {
-  test('draws italic runs in italics, after the regular ones', () => {
+  test('draws italic pieces in italics, after the regular ones', () => {
     const ctx = createCtx();
 
-    renderTextWithSymbols(ctx, [{ text: 'Trample ' }, { text: '(Excess damage.)', italic: true }], 0, 20);
+    renderTextWithSymbols(
+      ctx,
+      [
+        { text: 'Trample ', format: 'regular' },
+        { text: '(Excess damage.)', format: 'italic' },
+      ],
+      0,
+      20,
+    );
 
     expect(ctx.drawn).toEqual([
       ['Trample ', 0, 20, '10px Serif'],
@@ -45,10 +134,10 @@ describe('italics', () => {
     expect(ctx.font).toBe('10px Serif');
   });
 
-  test('keeps symbols inside italic runs', () => {
+  test('keeps symbols inside italic pieces', () => {
     const ctx = createCtx();
 
-    renderTextWithSymbols(ctx, [{ text: '({U} or 2 life.)', italic: true }], 0, 20);
+    renderTextWithSymbols(ctx, [{ text: '({U} or 2 life.)', format: 'italic' }], 0, 20);
 
     // "(" is 5px wide in italics, and the symbol 8px
     expect(ctx.drawn).toEqual([
@@ -57,12 +146,18 @@ describe('italics', () => {
     ]);
   });
 
-  test('draws each line in the styles of its runs', () => {
+  test('draws each line in the formats of its pieces', () => {
     const ctx = createCtx();
 
     fillMultilineText(
       ctx,
-      [[{ text: 'Persist ' }, { text: '(When it', italic: true }], [{ text: 'dies.)', italic: true }]],
+      [
+        [
+          { text: 'Persist ', format: 'regular' },
+          { text: '(When it', format: 'italic' },
+        ],
+        [{ text: 'dies.)', format: 'italic' }],
+      ],
       0,
       20,
     );
@@ -78,7 +173,15 @@ describe('italics', () => {
     const ctx = createCtx();
     ctx.textAlign = 'center';
 
-    renderTextWithSymbols(ctx, [{ text: 'Ab ' }, { text: '(cd)', italic: true }], 100, 20);
+    renderTextWithSymbols(
+      ctx,
+      [
+        { text: 'Ab ', format: 'regular' },
+        { text: '(cd)', format: 'italic' },
+      ],
+      100,
+      20,
+    );
 
     // 30px of regular text and 20px of italic text
     expect(ctx.drawn.map(([text, x]) => [text, x])).toEqual([

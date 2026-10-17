@@ -1,14 +1,22 @@
-import { fitFontSizeInXY, measureRunsWidth, wrapText } from './canvasText';
+import { fitFontSizeInXY, measureRichTextWidth, wrapText } from './canvasText';
 
-describe('measureRunsWidth', () => {
-  test('measures each run in its style', () => {
-    expect(measureRunsWidth(createCtx(), [{ text: 'ab ' }, { text: '(cd)', italic: true }])).toBe(3 * 10 + 4 * 5);
+describe('measureRichTextWidth', () => {
+  test('measures each piece in its format', () => {
+    expect(
+      measureRichTextWidth(createCtx(), [
+        { text: 'ab ', format: 'regular' },
+        { text: '(cd)', format: 'italic' },
+      ]),
+    ).toBe(3 * 10 + 4 * 5);
   });
 
   test('keeps the font of the context', () => {
     const ctx = createCtx();
 
-    measureRunsWidth(ctx, [{ text: 'ab ' }, { text: '(cd)', italic: true }]);
+    measureRichTextWidth(ctx, [
+      { text: 'ab ', format: 'regular' },
+      { text: '(cd)', format: 'italic' },
+    ]);
 
     expect(ctx.font).toBe('10px Serif');
   });
@@ -17,27 +25,42 @@ describe('measureRunsWidth', () => {
 describe('wrapText', () => {
   test('fits more italic text in a line, as it is narrower', () => {
     // Lines fit up to 9 characters of regular text, or 19 of italic text
-    expect(wrapText(createCtx(), [{ text: 'aaaaa bbbbb' }], 100)).toEqual([[{ text: 'aaaaa' }], [{ text: 'bbbbb' }]]);
-    expect(wrapText(createCtx(), [{ text: '(aaaa bbbbb)', italic: true }], 100)).toEqual([
-      [{ text: '(aaaa bbbbb)', italic: true }],
+    expect(wrapText(createCtx(), [{ text: 'aaaaa bbbbb', format: 'regular' }], 100)).toEqual([
+      [{ text: 'aaaaa', format: 'regular' }],
+      [{ text: 'bbbbb', format: 'regular' }],
+    ]);
+    expect(wrapText(createCtx(), [{ text: '(aaaa bbbbb)', format: 'italic' }], 100)).toEqual([
+      [{ text: '(aaaa bbbbb)', format: 'italic' }],
     ]);
   });
 
-  test('keeps the style of each word across lines, with the space between runs ending the first', () => {
+  test('keeps the format of each word across lines, with the space between pieces ending the first', () => {
     // The first line is 75px wide: 30px of regular text and 45px of italic text
     expect(
-      wrapText(createCtx(), [{ text: 'Ab' }, { text: ' ' }, { text: '(aaaaaaaa bbbbbbbb)', italic: true }], 100),
-    ).toEqual([[{ text: 'Ab ' }, { text: '(aaaaaaaa', italic: true }], [{ text: 'bbbbbbbb)', italic: true }]]);
+      wrapText(
+        createCtx(),
+        [
+          { text: 'Ab', format: 'regular' },
+          { text: ' ', format: 'regular' },
+          { text: '(aaaaaaaa bbbbbbbb)', format: 'italic' },
+        ],
+        100,
+      ),
+    ).toEqual([
+      [
+        { text: 'Ab ', format: 'regular' },
+        { text: '(aaaaaaaa', format: 'italic' },
+      ],
+      [{ text: 'bbbbbbbb)', format: 'italic' }],
+    ]);
   });
 });
 
 describe('fitFontSizeInXY', () => {
   test('separates the lines of each paragraph with an empty line', () => {
-    expect(fitFontSizeInXY(createCtx(), [[{ text: 'a' }], [{ text: 'b' }]], 100, 100)).toEqual([
-      [{ text: 'a' }],
-      [],
-      [{ text: 'b' }],
-    ]);
+    expect(
+      fitFontSizeInXY(createCtx(), [[{ text: 'a', format: 'regular' }], [{ text: 'b', format: 'regular' }]], 100, 100),
+    ).toEqual([[{ text: 'a', format: 'regular' }], [], [{ text: 'b', format: 'regular' }]]);
   });
 
   test('has no lines without paragraphs', () => {

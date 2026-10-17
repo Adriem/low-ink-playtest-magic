@@ -1,4 +1,4 @@
-import { isLoyaltyAbility, isSagaChapter, type CardAbility, type OracleLine } from '../../../domain/oracleText';
+import { isLoyaltyAbility, type CardAbility, type OracleLine } from '../../../domain/oracleText';
 
 /** Text in a single style: italic for names and reminder text */
 export type TextRun = { text: string; italic?: boolean };
@@ -11,16 +11,12 @@ const NAME_SEPARATOR = ' — ';
 
 /**
  * Paragraphs to draw for the lines of oracle text: each line, followed by its
- * modes as "• " paragraphs. Chapter numbers and loyalty costs go before the
- * text, for boxes that don't draw them apart.
+ * modes as "• " paragraphs. Loyalty costs go before the text, for boxes that
+ * don't draw them apart.
  */
 export const toTextParagraphs = (lines: OracleLine[]): TextRun[][] => {
   return lines.flatMap((line) => {
-    const prefix = isSagaChapter(line)
-      ? `${line.chapterNumbers.join(', ')}${NAME_SEPARATOR}`
-      : isLoyaltyAbility(line)
-        ? `${line.loyaltyCost}: `
-        : '';
+    const prefix = isLoyaltyAbility(line) ? `${line.loyaltyCost}: ` : '';
 
     const [text, ...modes] = toAbilityParagraphs(line);
     return [prefix ? [{ text: prefix }, ...text] : text, ...modes];

@@ -24,11 +24,8 @@ test('follows an ability with a "• " paragraph for each of its modes', () => {
   expect(toAbilityParagraphs(ability).map(getRunsText)).toEqual(['Choose one —', '• Draw a card.', '• Gain 3 life.']);
 });
 
-test('puts chapter numbers and loyalty costs before the text, for boxes that draw them as text', () => {
-  const lines = [
-    { chapterNumbers: ['II', 'III'], text: 'Draw a card.' },
-    { loyaltyCost: '−3', text: 'Destroy target creature.' },
-  ];
+test('puts loyalty costs before the text, for boxes that draw them as text', () => {
+  const lines = [{ text: 'Flying' }, { loyaltyCost: '−3', text: 'Destroy target creature.' }];
 
-  expect(toTextParagraphs(lines).map(getRunsText)).toEqual(['II, III — Draw a card.', '−3: Destroy target creature.']);
+  expect(toTextParagraphs(lines).map(getRunsText)).toEqual(['Flying', '−3: Destroy target creature.']);
 });

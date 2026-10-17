@@ -17,14 +17,16 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { InkLevel } from '../../styles';
 
 export const drawTitleBox = (
   ctx: CanvasRenderingContext2D,
   {
     cardName,
     cardColorTreatment,
+    inkLevel,
     cardManaCost,
-  }: { cardName: string; cardColorTreatment: ColorTreatment; cardManaCost?: string },
+  }: { cardName: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel; cardManaCost?: string },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const y = TITLE_Y;
@@ -45,6 +47,7 @@ export const drawTitleBox = (
     height,
     cardColorTreatment,
     shape: 'capsule',
+    inkLevel,
     innerHeightAdjustment: -2,
   });
 

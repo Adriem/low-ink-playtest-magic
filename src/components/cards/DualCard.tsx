@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { beginRender, drawWhenLoaded, finishRender, get2dContext } from './common/canvasRendering';
 import type { CardFace } from '../../domain/cards';
-import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderer } from './styles';
+import {
+  CARD_HEIGHT,
+  CARD_WIDTH,
+  getCardStyle,
+  type ArtFidelity,
+  type CardRenderer,
+  type CardRenderProps,
+  type InkLevel,
+} from './styles';
 
 const HALF_HEIGHT = CARD_HEIGHT / 2;
 
@@ -12,7 +20,17 @@ const HALF_HEIGHT = CARD_HEIGHT / 2;
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
  */
-const DualCard = ({ cardStyle, faces }: { cardStyle: string; faces: [CardFace, CardFace] }) => {
+const DualCard = ({
+  cardStyle,
+  faces,
+  inkLevel,
+  artFidelity,
+}: {
+  cardStyle: string;
+  faces: [CardFace, CardFace];
+  inkLevel?: InkLevel;
+  artFidelity?: ArtFidelity;
+}) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const { render, palette } = getCardStyle(cardStyle);
   const [face1, face2] = faces;
@@ -23,7 +41,7 @@ const DualCard = ({ cardStyle, faces }: { cardStyle: string; faces: [CardFace, C
     const ctx = get2dContext(canvas);
 
     beginRender(canvas);
-    const faceCanvases = [renderFace(render, face1), renderFace(render, face2)];
+    const faceCanvases = [face1, face2].map((face) => renderFace(render, { face, inkLevel, artFidelity }));
 
     // Combining the faces is part of this render, so it's skipped if a newer
     // render starts before the faces finish
@@ -38,7 +56,7 @@ const DualCard = ({ cardStyle, faces }: { cardStyle: string; faces: [CardFace, C
       drawRotatedCW(ctx, faceCanvas2, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
     });
     void finishRender(canvas);
-  }, [canvas, render, palette, face1, face2]);
+  }, [canvas, render, palette, face1, face2, inkLevel, artFidelity]);
 
   return (
     <canvas
@@ -69,13 +87,13 @@ const drawRotatedCW = (
 /**
  * Draw a face on its own off-screen canvas.
  */
-const renderFace = (render: CardRenderer, face: CardFace): HTMLCanvasElement => {
+const renderFace = (render: CardRenderer, props: CardRenderProps): HTMLCanvasElement => {
   const faceCanvas = document.createElement('canvas');
   faceCanvas.width = CARD_WIDTH;
   faceCanvas.height = CARD_HEIGHT;
 
   beginRender(faceCanvas);
-  render(faceCanvas, { face });
+  render(faceCanvas, props);
   return faceCanvas;
 };
 

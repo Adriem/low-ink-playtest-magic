@@ -3,6 +3,7 @@ import { drawArtImage } from './drawArtImage';
 import { drawFramedBox } from './drawFramedBox';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { ArtCrop } from '../../../../domain/cards';
+import type { ArtFidelity } from '../../styles';
 
 export const drawArtBox = (
   ctx: CanvasRenderingContext2D,
@@ -10,7 +11,8 @@ export const drawArtBox = (
     cardColorTreatment,
     cardArtUrl,
     cropArt,
-  }: { cardColorTreatment: ColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop },
+    artFidelity,
+  }: { cardColorTreatment: ColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop; artFidelity?: ArtFidelity },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;
@@ -30,6 +32,7 @@ export const drawArtBox = (
   drawArtImage(ctx, {
     cardArtUrl,
     cropArt,
+    artFidelity,
     x: x + PINLINE_THICKNESS + 2,
     y: y + PINLINE_THICKNESS + 2,
     width: width - PINLINE_THICKNESS * 2 - 4,

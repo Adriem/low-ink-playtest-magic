@@ -26,6 +26,8 @@ const Press = () => {
   const [cardVariant] = useSetting('cardVariant');
   const [splitCardTreatment] = useSetting('splitCardTreatment');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
+  const [inkLevel] = useSetting('inkLevel');
+  const [artFidelity] = useSetting('artFidelity');
   const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,
@@ -89,13 +91,20 @@ const Press = () => {
                   {item.kind === 'loading' ? (
                     <LoadingCard />
                   ) : item.kind === 'faces' ? (
-                    <DualCard cardStyle={cardVariant} faces={item.faces} />
+                    <DualCard
+                      cardStyle={cardVariant}
+                      faces={item.faces}
+                      inkLevel={inkLevel}
+                      artFidelity={artFidelity}
+                    />
                   ) : (
                     <Card
                       cardStyle={cardVariant}
                       face={item.face}
                       subFace={item.subFace}
                       subFacePosition={item.subFacePosition}
+                      inkLevel={inkLevel}
+                      artFidelity={artFidelity}
                     />
                   )}
                 </SheetSlot>

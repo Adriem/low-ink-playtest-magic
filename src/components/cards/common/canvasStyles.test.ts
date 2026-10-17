@@ -1,9 +1,25 @@
-import { getFillStyle } from './canvasStyles';
+import { getFillStyle, getInkFillStyle } from './canvasStyles';
 
 interface FakeGradient {
   stops: [number, string][];
   addColorStop: (offset: number, color: string) => void;
 }
+
+describe('getInkFillStyle', () => {
+  test('has no fill on the low ink level', () => {
+    expect(getInkFillStyle(createCtx(), ['red'], 'low')).toBeNull();
+  });
+
+  test('fills with the colors on the splurge ink level', () => {
+    const ctx = createCtx();
+
+    expect(getInkFillStyle(ctx, ['red'], 'splurge')).toBe('red');
+    expect((getInkFillStyle(ctx, ['green', 'white'], 'splurge') as unknown as FakeGradient).stops).toEqual([
+      [0.4, 'green'],
+      [0.6, 'white'],
+    ]);
+  });
+});
 
 test('fills with a single color as it is', () => {
   const ctx = createCtx();

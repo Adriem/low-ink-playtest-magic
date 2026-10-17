@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { CardStyle } from '../cards/styles';
+import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
 import { loadFromSessionStorage, saveToSessionStorage } from '../../utils/sessionStorage';
 
@@ -8,7 +8,8 @@ export interface Settings {
   cardVariant: CardStyle;
   splitCardTreatment: CardTreatment;
   doubleFacedCardTreatment: CardTreatment;
-  inkLevel: 'low' | 'medium' | 'splurge';
+  inkLevel: InkLevel;
+  artFidelity: ArtFidelity;
 }
 
 export type SettingName = keyof Settings;
@@ -22,6 +23,8 @@ export interface SettingDefinition<T extends string> {
   storageKey: string;
   /** Shown, but not available yet */
   disabled?: boolean;
+  /** How the options are picked: radio buttons (the default), or a slider through them in order */
+  control?: 'radio' | 'slider';
 }
 
 const TREATMENT_OPTIONS: SettingDefinition<CardTreatment>['options'] = [
@@ -60,7 +63,18 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     ],
     default: 'low',
     storageKey: 'press:inkLevel',
-    disabled: true,
+  },
+  artFidelity: {
+    label: 'Art fidelity',
+    options: [
+      { value: 'none', label: 'No art' },
+      { value: 'minimal', label: 'Minimal' },
+      { value: 'black-and-white', label: 'Black & white' },
+      { value: 'full', label: 'Full' },
+    ],
+    default: 'minimal',
+    storageKey: 'press:artFidelity',
+    control: 'slider',
   },
 };
 
@@ -95,6 +109,7 @@ const loadInitialSettings = (): Settings => {
     splitCardTreatment: loadSetting('splitCardTreatment'),
     doubleFacedCardTreatment: loadSetting('doubleFacedCardTreatment'),
     inkLevel: loadSetting('inkLevel'),
+    artFidelity: loadSetting('artFidelity'),
   };
 };
 

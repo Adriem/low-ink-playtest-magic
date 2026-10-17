@@ -17,6 +17,7 @@ import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { InkLevel } from '../../styles';
 
 export const drawSubCardTitleBox = (
   ctx: CanvasRenderingContext2D,
@@ -24,8 +25,15 @@ export const drawSubCardTitleBox = (
     cardName,
     cardManaCost,
     cardColorTreatment,
+    inkLevel,
     position,
-  }: { cardName: string; cardManaCost?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+  }: {
+    cardName: string;
+    cardManaCost?: string;
+    cardColorTreatment: ColorTreatment;
+    inkLevel?: InkLevel;
+    position: SubCardPosition;
+  },
 ) => {
   const x = position === 'left' ? (ctx.canvas.width - TITLE_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_TITLE_Y;
@@ -47,6 +55,7 @@ export const drawSubCardTitleBox = (
     height,
     cardColorTreatment,
     shape: 'capsule',
+    inkLevel,
     flatSide,
   });
 

@@ -25,6 +25,8 @@ export interface SettingDefinition<T extends string> {
   disabled?: boolean;
   /** How the options are picked: radio buttons (the default), or a slider through them in order */
   control?: 'radio' | 'slider';
+  /** Card styles the setting applies to, and is shown for: all of them, if not given */
+  cardStyles?: CardStyle[];
 }
 
 const TREATMENT_OPTIONS: SettingDefinition<CardTreatment>['options'] = [
@@ -76,10 +78,19 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     default: 'minimal',
     storageKey: 'press:artFidelity',
     control: 'slider',
+    // The minimalist style has no art
+    cardStyles: ['realistic'],
   },
 };
 
 export const SETTING_NAMES = Object.keys(SETTINGS_DEFINITIONS) as SettingName[];
+
+/**
+ * Whether a setting applies to a card style, so its controls are shown.
+ */
+export const isSettingShown = (name: SettingName, cardStyle: CardStyle): boolean => {
+  return SETTINGS_DEFINITIONS[name].cardStyles?.includes(cardStyle) ?? true;
+};
 
 interface SettingsContextValue {
   settings: Settings;

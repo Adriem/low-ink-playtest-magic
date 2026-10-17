@@ -62,6 +62,18 @@ test('picks the art fidelity with a slider through its options, showing the one 
   expect(sessionStorage.getItem('press:artFidelity')).toBe('"none"');
 });
 
+test('hides the art fidelity for the minimalist style, which has no art', async () => {
+  renderPanel();
+
+  await user.click(screen.getByLabelText('Minimalist'));
+
+  expect(screen.queryByRole('slider', { name: 'Art fidelity', hidden: true })).not.toBeInTheDocument();
+
+  await user.click(screen.getByLabelText('Realistic'));
+
+  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toBeInTheDocument();
+});
+
 const renderPanel = () => {
   return render(
     <SettingsContextProvider>

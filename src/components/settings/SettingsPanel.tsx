@@ -1,13 +1,15 @@
 import type { ChangeEvent, Ref } from 'react';
-import { SETTING_NAMES, SETTINGS_DEFINITIONS, useSetting, type SettingName } from './SettingsContext';
+import { SETTING_NAMES, SETTINGS_DEFINITIONS, isSettingShown, useSetting, type SettingName } from './SettingsContext';
 
 import './SettingsPanel.css';
 
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
+  const [cardStyle] = useSetting('cardVariant');
+
   return (
     <dialog ref={ref}>
       <form method="dialog">
-        {SETTING_NAMES.map((name) => (
+        {SETTING_NAMES.filter((name) => isSettingShown(name, cardStyle)).map((name) => (
           <SettingFieldset key={name} name={name} />
         ))}
         <menu>

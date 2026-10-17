@@ -16,13 +16,14 @@ import { getSideBorderEdges } from './sideBorder';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
+import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
+import { toParagraphWithModes } from '../../common/textRuns';
 
-const LOYALTY_COST_REGEX = /^[+−-]?(\d+|X):/; // There is a weird character here! D:
 const LOYALTY_ABILITY_OFFSET = 45;
 
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
-  { cardOracleText, cardColorTreatment }: { cardOracleText?: string; cardColorTreatment: ColorTreatment },
+  { cardOracleText, cardColorTreatment }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
@@ -49,32 +50,35 @@ export const drawPlaneswalkerOracleBox = (
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  const originalParagraphs = (cardOracleText ?? '').split('\n');
+  // Loyalty abilities, and their modes, go after the loyalty costs
+  const textParagraphs = (cardOracleText?.paragraphs ?? []).flatMap((paragraph) => {
+    const loyaltyCost = isLoyaltyAbility(paragraph) ? paragraph.loyaltyCost : undefined;
+    return toParagraphWithModes(paragraph).map((content, index) => {
+      return { content, loyaltyCost: index === 0 ? loyaltyCost : undefined, isAbility: loyaltyCost != null };
+    });
+  });
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    originalParagraphs.map((content) => {
-      const isLoyaltyAbility = LOYALTY_COST_REGEX.test(content);
-
-      return {
-        content: isLoyaltyAbility ? content.replace(LOYALTY_COST_REGEX, '').trim() : content,
-        width: isLoyaltyAbility ? loyaltyAbilityWidth : regularOracleWidth,
-      };
+    textParagraphs.map(({ content, isAbility }) => {
+      return { content, width: isAbility ? loyaltyAbilityWidth : regularOracleWidth };
     }),
     textHeight,
   );
 
   let currentY = textY;
   for (const [index, paragraph] of paragraphs.entries()) {
-    const [loyaltyCostLabel] = originalParagraphs[index].match(LOYALTY_COST_REGEX) ?? [];
+    const { loyaltyCost, isAbility } = textParagraphs[index];
 
-    if (loyaltyCostLabel) {
+    if (isAbility) {
       fillMultilineText(ctx, paragraph.lines, paddedX + LOYALTY_ABILITY_OFFSET, currentY);
+    }
 
+    if (loyaltyCost) {
       // The loyalty cost changes the font and alignment, which the next paragraphs need
       ctx.save();
       drawLoyaltyCost(ctx, {
-        loyaltyCost: loyaltyCostLabel.replace(':', ''),
+        loyaltyCost,
         x: paddedX,
         y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1)) / 2,
         scale: 1.1,
@@ -82,7 +86,9 @@ export const drawPlaneswalkerOracleBox = (
         colors: MINIMALIST_PALETTE,
       });
       ctx.restore();
-    } else {
+    }
+
+    if (!isAbility) {
       fillMultilineText(ctx, paragraph.lines, paddedX + SIDE_BORDER_WIDTH * 1.5, currentY);
     }
 

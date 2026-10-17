@@ -8,7 +8,9 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { drawTextInArea } from './drawOracleText';
+import { toTextParagraphs } from '../../common/textRuns';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { OracleText } from '../../../../domain/oracleText';
 
 /**
  * Draw the extra oracle box of saga creatures, below their type line, with
@@ -17,7 +19,7 @@ import type { ColorTreatment } from '../../../../domain/colorTreatment';
  */
 export const drawSagaCreatureOracleBox = (
   ctx: CanvasRenderingContext2D,
-  { cardOracleText, cardColorTreatment }: { cardOracleText: string; cardColorTreatment: ColorTreatment },
+  { cardOracleText, cardColorTreatment }: { cardOracleText: OracleText; cardColorTreatment: ColorTreatment },
 ) => {
   const inner = drawFramedBox(ctx, {
     x: (ctx.canvas.width - CONTENT_WIDTH) / 2,
@@ -30,7 +32,7 @@ export const drawSagaCreatureOracleBox = (
 
   const textTop = inner.y + PINLINE_THICKNESS;
   drawTextInArea(ctx, {
-    text: cardOracleText,
+    paragraphs: toTextParagraphs(cardOracleText.paragraphs),
     x: inner.x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
     y: textTop,
     width: inner.width - PINLINE_THICKNESS * 2 - ORACLE_TEXT_PADDING_X * 2,

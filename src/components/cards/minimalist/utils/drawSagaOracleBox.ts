@@ -2,7 +2,6 @@ import { drawRectangle, drawSagaChapter } from '../../common/canvasShapes';
 import { fitTextIntoBox, getFontSize } from '../../common/canvasText';
 import { fillMultilineText } from '../../common/oracleTextRenderer';
 import { distributeHeight } from '../../../../utils/layout';
-import { parseSagaOracleText } from '../../../../domain/sagaOracle';
 import {
   CONTENT_WIDTH,
   DISPLAY_FONT_FAMILY,
@@ -18,6 +17,8 @@ import { getSideBorderEdges } from './sideBorder';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
+import { getSagaParts, type OracleText } from '../../../../domain/oracleText';
+import { getRunsText, toParagraphWithModes, type TextRun } from '../../common/textRuns';
 
 const SAGA_CHAPTER_ICON_SPACING = 50;
 const SAGA_TEXT_LEFT_OFFSET = 36;
@@ -31,7 +32,8 @@ const CHAPTER_ICON_HEIGHT = 45;
 
 /** A paragraph or chapter of a saga's text, and where it's drawn */
 interface SagaSlot {
-  content: string;
+  /** The paragraph, followed by its modes */
+  paragraphs: TextRun[][];
   leftX: number;
   width: number;
   align?: 'top' | 'center';
@@ -45,11 +47,11 @@ interface SagaSlot {
 export const drawSagaOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText,
+    cardOracleText = { paragraphs: [] },
     cardColorTreatment,
     cardPower,
     cardToughness,
-  }: { cardOracleText?: string; cardColorTreatment: ColorTreatment; cardPower?: string; cardToughness?: string },
+  }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment; cardPower?: string; cardToughness?: string },
 ) => {
   const hasStats = cardPower != null && cardToughness != null;
 
@@ -63,7 +65,7 @@ export const drawSagaOracleBox = (
   const textY = y + textPaddingTop;
   const textHeight = height - textPaddingTop;
 
-  const { topParagraphs, chapters, bottomParagraphs } = parseSagaOracleText(cardOracleText);
+  const { introduction, chapters, conclusion } = getSagaParts(cardOracleText);
 
   const contentLeftX = textX + SIDE_BORDER_PADDING;
   const contentWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
@@ -81,21 +83,21 @@ export const drawSagaOracleBox = (
   // characters (including spaces), but at least the minimum height and tall
   // enough for a chapter's icons, like printed sagas
   const slots: SagaSlot[] = [
-    ...topParagraphs.map((content) => ({
-      content,
+    ...introduction.map((paragraph) => ({
+      paragraphs: toParagraphWithModes(paragraph),
       leftX: topParagraphX,
       width: contentLeftX + contentWidth - topParagraphX,
       align: 'top' as const,
     })),
-    ...chapters.map(({ labels, text }) => ({
-      content: text,
-      labels,
+    ...chapters.map((chapter) => ({
+      paragraphs: toParagraphWithModes(chapter),
+      labels: chapter.chapterNumbers,
       leftX: chapterTextX,
       width: chapterTextWidth,
       isChapter: true,
     })),
-    ...bottomParagraphs.map((content) => ({
-      content,
+    ...conclusion.map((paragraph) => ({
+      paragraphs: toParagraphWithModes(paragraph),
       leftX: textX + textWidth / 2,
       width: contentWidth,
       isBottom: true,
@@ -103,8 +105,8 @@ export const drawSagaOracleBox = (
   ];
   const slotHeights = distributeHeight(
     textHeight,
-    slots.map(({ content, labels }) => ({
-      weight: content.length,
+    slots.map(({ paragraphs, labels }) => ({
+      weight: paragraphs.reduce((length, paragraph) => length + getRunsText(paragraph).length, 0),
       minHeight: Math.max(MIN_SLOT_HEIGHT, (labels?.length ?? 0) * SAGA_CHAPTER_ICON_SPACING),
       // When the minimums don't fit, slots get the same height, except that a
       // chapter still needs room for its icons
@@ -115,18 +117,22 @@ export const drawSagaOracleBox = (
   const borderTopY = y;
   const chaptersEndY =
     textY +
-    slotHeights.slice(0, topParagraphs.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
-  const borderHeight = bottomParagraphs.length > 0 ? chaptersEndY - borderTopY : height + 10;
+    slotHeights.slice(0, introduction.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
+  const borderHeight = conclusion.length > 0 ? chaptersEndY - borderTopY : height + 10;
   drawSagaOracleBorder(ctx, { cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
 
   // All the slots use the same font size: the largest at which every slot's text fits
-  const fitParagraph = (content: string, width: number, slotHeight: number, fontSize: number) => {
+  const fitParagraph = (paragraphs: TextRun[][], width: number, slotHeight: number, fontSize: number) => {
     ctx.font = `${fontSize}px ${DISPLAY_FONT_FAMILY}`;
-    return fitTextIntoBox(ctx, [{ content, width }], slotHeight);
+    return fitTextIntoBox(
+      ctx,
+      paragraphs.map((content) => ({ content, width })),
+      slotHeight,
+    );
   };
   const fontSize = Math.min(
-    ...slots.map(({ content, width }, index) => {
-      fitParagraph(content, width, slotHeights[index], ORACLE_FONT_SIZE);
+    ...slots.map(({ paragraphs, width }, index) => {
+      fitParagraph(paragraphs, width, slotHeights[index], ORACLE_FONT_SIZE);
       return getFontSize(ctx);
     }),
   );
@@ -134,12 +140,12 @@ export const drawSagaOracleBox = (
   ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
 
   let currentY = textY;
-  slots.forEach(({ content, labels, leftX, width, align = 'center', isChapter, isBottom }, index) => {
+  slots.forEach(({ paragraphs, labels, leftX, width, align = 'center', isChapter, isBottom }, index) => {
     const slotY = currentY;
     const slotHeight = slotHeights[index];
 
     ctx.textAlign = isBottom ? 'center' : 'start';
-    const fitted = fitParagraph(content, width, slotHeight, fontSize);
+    const fitted = fitParagraph(paragraphs, width, slotHeight, fontSize);
     const totalTextHeight = fitted.reduce((sum, p) => sum + p.paragraphHeight, 0);
     let paragraphY =
       align === 'top'

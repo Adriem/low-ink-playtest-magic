@@ -27,7 +27,7 @@ test('maps a single-faced card to a card with its main face', () => {
       manaCost: '{4}{G}{G}',
       faceLayout: 'regular',
       typeLine: 'Creature — Dinosaur',
-      oracleText: 'Trample',
+      oracleText: { paragraphs: [{ text: 'Trample' }] },
       colors: ['G'],
       stats: { power: '6', toughness: '6' },
       art: { assetUrl: 'dreadmaw.jpg', crop: 'full' },

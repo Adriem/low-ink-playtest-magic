@@ -13,6 +13,8 @@ import type { SubCardPosition } from '../../../../domain/cards';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
+import type { OracleText } from '../../../../domain/oracleText';
+import { toTextParagraphs } from '../../common/textRuns';
 
 const TEXT_PADDING_FROM_CENTER = 15;
 const TEXT_PADDING_FROM_OUTSIDE = 10;
@@ -23,7 +25,7 @@ export const drawSubCardOracleBox = (
     cardOracleText,
     cardColorTreatment,
     position,
-  }: { cardOracleText?: string; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+  }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment; position: SubCardPosition },
 ) => {
   const cardWidth = ctx.canvas.width;
   const textMarginX = (cardWidth - CONTENT_WIDTH) / 2;
@@ -46,7 +48,7 @@ export const drawSubCardOracleBox = (
 
   fillMultilineText(
     ctx,
-    fitFontSizeInXY(ctx, (cardOracleText ?? '').split('\n'), textWidth, SUBCARD_ORACLE_HEIGHT),
+    fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText?.paragraphs ?? []), textWidth, SUBCARD_ORACLE_HEIGHT),
     textX,
     SUBCARD_ORACLE_Y,
   );

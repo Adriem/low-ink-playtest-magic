@@ -12,17 +12,18 @@ import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText } from './drawOracleText';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleLayout } from '../../styles';
+import type { OracleText } from '../../../../domain/oracleText';
 
 export const drawOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
-    cardOracleText = '',
+    cardOracleText = { paragraphs: [] },
     cardPower,
     cardToughness,
     cardColorTreatment,
     layout,
   }: {
-    cardOracleText?: string;
+    cardOracleText?: OracleText;
     cardPower?: string;
     cardToughness?: string;
     cardColorTreatment: ColorTreatment;

@@ -1,5 +1,6 @@
 import { computeCardColors, type ArtCrop, type Card, type CardFace } from '../../domain/cards';
 import { isColorSymbol } from '../../domain/colors';
+import { parseOracleText } from '../../domain/oracleText';
 import type { ScryfallCard, ScryfallCardFace } from './types';
 
 const SUBCARD_LAYOUTS: Record<string, Card['layout']> = {
@@ -44,7 +45,7 @@ const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: numbe
     manaCost: face.mana_cost,
     faceLayout: getFaceLayout(face),
     typeLine: face.type_line ?? '',
-    oracleText: face.oracle_text,
+    oracleText: parseOracleText(face.oracle_text),
     colors: toColors(colors),
     stats: getStats(face),
     art: {

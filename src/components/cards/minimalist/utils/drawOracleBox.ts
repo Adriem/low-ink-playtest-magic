@@ -15,6 +15,8 @@ import type { OracleLayout } from '../../styles';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
+import type { OracleText } from '../../../../domain/oracleText';
+import { toTextParagraphs } from '../../common/textRuns';
 
 const DIVIDER_TEXT_PADDING = 8;
 
@@ -27,7 +29,7 @@ export const drawOracleBox = (
     cardToughness,
     layout,
   }: {
-    cardOracleText?: string;
+    cardOracleText?: OracleText;
     cardColorTreatment: ColorTreatment;
     cardPower?: string;
     cardToughness?: string;
@@ -62,7 +64,7 @@ export const drawOracleBox = (
 
   const paragraphs = fitTextIntoBox(
     ctx,
-    (cardOracleText ?? '').split('\n').map((content) => ({ content, width: textWidth })),
+    toTextParagraphs(cardOracleText?.paragraphs ?? []).map((content) => ({ content, width: textWidth })),
     textHeight,
   );
 

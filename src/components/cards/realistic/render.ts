@@ -8,7 +8,7 @@ import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
 import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
-import { splitSagaCreatureText } from '../../../domain/sagaOracle';
+import { getSagaParts } from '../../../domain/oracleText';
 import { SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } from './config';
 import { drawSagaCreatureOracleBox } from './utils/drawSagaCreatureOracleBox';
 import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
@@ -44,7 +44,10 @@ export const renderRealisticCard = (
 
   if (face.faceLayout === 'saga') {
     if (powerAndToughness) {
-      const { sagaText, creatureText } = splitSagaCreatureText(cardOracleText);
+      // The paragraphs after the chapters are the creature's abilities, in their own box
+      const { introduction, chapters, conclusion } = getSagaParts(cardOracleText);
+      const sagaText = { paragraphs: [...introduction, ...chapters] };
+      const creatureText = { paragraphs: conclusion };
       drawSagaOracleAndArtBox(ctx, {
         cardOracleText: sagaText,
         cardArtUrl,

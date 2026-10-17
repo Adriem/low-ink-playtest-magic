@@ -1,10 +1,12 @@
 import { fitFontSizeInXY, getFontSize, getMultilineTextHeight } from '../../common/canvasText';
 import { fillMultilineText } from '../../common/oracleTextRenderer';
+import { toTextParagraphs, type TextRun } from '../../common/textRuns';
+import type { OracleText } from '../../../../domain/oracleText';
 import { FONT_FAMILY, ORACLE_FONT_SIZE } from '../config';
 import { REALISTIC_PALETTE } from '../palette';
 
 interface TextArea {
-  text: string;
+  paragraphs: TextRun[][];
   width: number;
   height: number;
   padding?: number;
@@ -23,13 +25,13 @@ export const drawOracleText = (
     y,
     width,
     height,
-  }: { cardOracleText: string; x: number; y: number; width: number; height: number },
+  }: { cardOracleText: OracleText; x: number; y: number; width: number; height: number },
 ) => {
   ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitFontSizeInXY(ctx, cardOracleText.split('\n'), width, height), x, y);
+  fillMultilineText(ctx, fitFontSizeInXY(ctx, toTextParagraphs(cardOracleText.paragraphs), width, height), x, y);
 };
 
 /**
@@ -37,10 +39,10 @@ export const drawOracleText = (
  */
 export const getFittingFontSize = (
   ctx: CanvasRenderingContext2D,
-  { text, width, height, padding = 0, fontSize = ORACLE_FONT_SIZE }: TextArea,
+  { paragraphs, width, height, padding = 0, fontSize = ORACLE_FONT_SIZE }: TextArea,
 ): number => {
   ctx.font = `${fontSize}px ${FONT_FAMILY}`;
-  fitFontSizeInXY(ctx, text.split('\n'), width, height - padding * 2);
+  fitFontSizeInXY(ctx, paragraphs, width, height - padding * 2);
   return getFontSize(ctx);
 };
 
@@ -52,7 +54,7 @@ export const getFittingFontSize = (
 export const drawTextInArea = (
   ctx: CanvasRenderingContext2D,
   {
-    text,
+    paragraphs,
     x,
     y,
     width,
@@ -66,7 +68,7 @@ export const drawTextInArea = (
   ctx.fillStyle = REALISTIC_PALETTE.TEXT;
   ctx.textAlign = 'start';
 
-  const lines = fitFontSizeInXY(ctx, text.split('\n'), width, height - padding * 2);
+  const lines = fitFontSizeInXY(ctx, paragraphs, width, height - padding * 2);
   const { fontBoundingBoxAscent: ascent } = ctx.measureText('');
   const textHeight = getMultilineTextHeight(ctx, lines);
   const textTop = align === 'top' ? y + padding : y + (height - textHeight) / 2;

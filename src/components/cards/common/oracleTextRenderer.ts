@@ -1,55 +1,45 @@
 import { getSymbolImage } from '../../../adapters/scryfall';
-import { splitReminderText, type TextRun } from '../../../domain/reminderText';
 import { parseTextWithSymbols, splitSymbols, type CardSymbol } from '../../../domain/symbols';
 import { drawWhenLoaded } from './canvasRendering';
-import { EMPTY_LINE_RELATIVE_SIZE, getReminderFont } from './canvasText';
+import { EMPTY_LINE_RELATIVE_SIZE, getItalicFont } from './canvasText';
+import { getRunsText, type TextLine } from './textRuns';
 
 // Stands in for each symbol when measuring a line, as it's about as wide as their images
 const SYMBOL_PLACEHOLDER = '‹::›';
 const SYMBOL_PADDING = 1;
 
-interface TextOptions {
-  /** Whether to draw the reminder text, in parentheses, in italics, as in rules text */
-  reminderText?: boolean;
-}
-
 /** A piece of a line, laid out: some text in a font, or a symbol */
 type LinePiece = { kind: 'text'; text: string; font: string; width: number } | { kind: 'symbol'; symbol: CardSymbol };
 
 /**
- * Draw lines of rules text, with their symbols as images and their reminder
- * text in italics. `originY` is the baseline of the first line, and empty
- * lines separate paragraphs.
+ * Draw lines of text, with their symbols as images and their italic runs
+ * (e.g. names and reminder text) in italics. `originY` is the baseline of the
+ * first line, and empty lines separate paragraphs.
  */
 export const fillMultilineText = (
   ctx: CanvasRenderingContext2D,
-  lines: string[],
+  lines: TextLine[],
   originX: number,
   originY: number,
-  { reminderText = true }: TextOptions = {},
 ) => {
   let currentBaseLine = originY;
   let previousFontSize: TextMetrics | null = null;
-  // Reminder texts can continue on the next lines, but not past the paragraph
-  let inReminder = false;
 
   for (const line of lines) {
-    const currentFontSize = ctx.measureText(toMeasurableLine(line));
+    const currentFontSize = ctx.measureText(toMeasurableLine(getRunsText(line)));
 
     if (previousFontSize) {
       const previousLineFontDescent = previousFontSize.fontBoundingBoxDescent;
       const currentLineFontAscent = currentFontSize.fontBoundingBoxAscent;
 
-      currentBaseLine += line
+      currentBaseLine += line.length
         ? previousLineFontDescent + currentLineFontAscent
         : (previousLineFontDescent + currentLineFontAscent) * EMPTY_LINE_RELATIVE_SIZE;
     }
 
     previousFontSize = currentFontSize;
 
-    inReminder = line
-      ? renderTextWithSymbols(ctx, line, originX, currentBaseLine, { reminderText, startsInReminder: inReminder })
-      : false;
+    renderTextWithSymbols(ctx, line, originX, currentBaseLine);
   }
 };
 
@@ -66,29 +56,18 @@ const toMeasurableLine = (line: string) => {
 
 /**
  * Draw a line of text with its symbols as images, as tall as the font's
- * ascent and centered on the line, and its reminder text in italics. The line
- * is aligned as a whole, following the context's text alignment.
- *
- * @param options.startsInReminder - Whether the line continues a reminder text
- * @returns Whether the line ends inside a reminder text, which the next line continues
+ * ascent and centered on the line, and its italic runs in italics. The line is
+ * aligned as a whole, following the context's text alignment, without the
+ * spaces around it.
  */
-export const renderTextWithSymbols = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  { reminderText = true, startsInReminder = false }: TextOptions & { startsInReminder?: boolean } = {},
-): boolean => {
+export const renderTextWithSymbols = (ctx: CanvasRenderingContext2D, line: TextLine, x: number, y: number) => {
   const font = ctx.font;
   const textAlign = ctx.textAlign;
   const { fontBoundingBoxAscent, fontBoundingBoxDescent } = ctx.measureText('');
   const symbolSize = fontBoundingBoxAscent;
   const symbolY = y - symbolSize + (fontBoundingBoxAscent + fontBoundingBoxDescent - symbolSize) / 2;
 
-  const { runs, endsInReminder }: { runs: TextRun[]; endsInReminder: boolean } = reminderText
-    ? splitReminderText(text.trim(), startsInReminder)
-    : { runs: [{ text: text.trim(), reminder: false }], endsInReminder: false };
-  const pieces = layOutLine(ctx, runs);
+  const pieces = layOutLine(ctx, trimLine(line));
   const lineWidth = getLineWidth(pieces, symbolSize);
 
   let currentX =
@@ -114,18 +93,29 @@ export const renderTextWithSymbols = (
 
   ctx.font = font;
   ctx.textAlign = textAlign;
-  return endsInReminder;
 };
 
 /**
- * The pieces of a line, in order: its text, measured in the font of its run
- * (italic for reminder text), and its symbols.
+ * A line without the spaces at its start and end.
  */
-const layOutLine = (ctx: CanvasRenderingContext2D, runs: TextRun[]): LinePiece[] => {
+const trimLine = (line: TextLine): TextLine => {
+  return line
+    .map((run, index) => {
+      const start = index === 0 ? run.text.trimStart() : run.text;
+      return { ...run, text: index === line.length - 1 ? start.trimEnd() : start };
+    })
+    .filter((run) => run.text);
+};
+
+/**
+ * The pieces of a line, in order: its text, measured in the font of its run,
+ * and its symbols.
+ */
+const layOutLine = (ctx: CanvasRenderingContext2D, line: TextLine): LinePiece[] => {
   const font = ctx.font;
 
-  const pieces = runs.flatMap(({ text, reminder }) => {
-    const runFont = reminder ? getReminderFont(font) : font;
+  const pieces = line.flatMap(({ text, italic }) => {
+    const runFont = italic ? getItalicFont(font) : font;
     ctx.font = runFont;
 
     return parseTextWithSymbols(text).flatMap((chunk): LinePiece[] => {

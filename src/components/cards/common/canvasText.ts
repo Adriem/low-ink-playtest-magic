@@ -1,4 +1,4 @@
-import { splitReminderText } from '../../../domain/reminderText';
+import { getRunsText, type TextLine, type TextRun } from './textRuns';
 
 const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 /** Height of empty lines, which separate paragraphs, relative to other lines */
@@ -6,41 +6,57 @@ export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = 0.75;
 
 export interface FittedParagraph {
-  originalContent: string;
+  originalContent: TextRun[];
   lineHeight: number;
   paragraphHeight: number;
-  lines: string[];
+  lines: TextLine[];
 }
 
 /**
- * Automatically wrap a given text to fit inside an specified maximum width on
- * a canvas with a properly set font. Reminder text is measured in italics, as
- * it's drawn.
+ * Automatically wrap a paragraph to fit inside a maximum width on a canvas
+ * with a properly set font. Each run is measured in its own style.
  *
- * @param text - Text to wrap within the given width
+ * @param paragraph - Runs of text to wrap within the given width
  * @param maxWidth - Maximum width where the text must be placed
- * @returns Array of strings containing the lines of text wrapped to fit in
- *   given width
+ * @returns Lines of text wrapped to fit in the given width
  */
-export const wrapText = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] => {
-  const textWords = text.split(/\s+/);
-  const lines: string[][] = [[]];
-  // Whether the current line continues a reminder text from the previous one
-  let lineStartsInReminder = false;
+export const wrapText = (ctx: CanvasRenderingContext2D, paragraph: TextRun[], maxWidth: number): TextLine[] => {
+  const words = paragraph.flatMap(({ text, italic }) => {
+    return text
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => ({ text: word, italic }));
+  });
+  const lines: TextRun[][] = [[]];
 
-  for (const currentWord of textWords) {
+  for (const word of words) {
     const currentLineWords = lines[lines.length - 1];
-    const newLineText = [...currentLineWords, currentWord].join(' ');
 
-    if (measureTextWidth(ctx, newLineText, lineStartsInReminder) < maxWidth) {
-      currentLineWords.push(currentWord);
+    if (measureRunsWidth(ctx, toLine([...currentLineWords, word])) < maxWidth) {
+      currentLineWords.push(word);
     } else {
-      lineStartsInReminder = splitReminderText(currentLineWords.join(' '), lineStartsInReminder).endsInReminder;
-      lines.push([currentWord]);
+      lines.push([word]);
     }
   }
 
-  return lines.map((words) => words.join(' '));
+  return lines.map(toLine);
+};
+
+/**
+ * A line from its words: consecutive words in the same style make a single
+ * run, and the space between runs ends the first of them.
+ */
+const toLine = (words: TextRun[]): TextLine => {
+  return words.reduce<TextLine>((line, word) => {
+    const last = line.at(-1);
+    if (last && Boolean(last.italic) === Boolean(word.italic)) {
+      last.text = `${last.text} ${word.text}`;
+    } else {
+      if (last) last.text += ' ';
+      line.push({ ...word });
+    }
+    return line;
+  }, []);
 };
 
 /**
@@ -104,10 +120,12 @@ export const fitFontSizeInX = (ctx: CanvasRenderingContext2D, text: string, maxW
  */
 export const fitFontSizeInXY = (
   ctx: CanvasRenderingContext2D,
-  paragraphs: string[],
+  paragraphs: TextRun[][],
   maxWidth: number,
   maxHeight: number,
-): string[] => {
+): TextLine[] => {
+  if (paragraphs.length === 0) return [];
+
   let textHeight;
   let textLines;
   do {
@@ -115,15 +133,15 @@ export const fitFontSizeInXY = (
 
     // Separate paragraphs with empty lines and flatten lines
     textLines = wrappedParagraphs.reduce((lines, paragraph) => {
-      if (lines.length) lines.push('');
+      if (lines.length) lines.push([]);
       lines.push(...paragraph);
       return lines;
     });
 
     textHeight = textLines.reduce((height, line) => {
-      const lineHeight = getLineHeight(ctx.measureText(line));
+      const lineHeight = getLineHeight(ctx.measureText(getRunsText(line)));
 
-      return line ? height + lineHeight : height + lineHeight * EMPTY_LINE_RELATIVE_SIZE;
+      return line.length ? height + lineHeight : height + lineHeight * EMPTY_LINE_RELATIVE_SIZE;
     }, 0);
 
     if (textHeight > maxHeight) reduceTextSize(ctx);
@@ -144,7 +162,7 @@ export const fitFontSizeInXY = (
  */
 export const fitTextIntoBox = (
   ctx: CanvasRenderingContext2D,
-  paragraphs: { content: string; width: number }[],
+  paragraphs: { content: TextRun[]; width: number }[],
   maxHeight: number,
 ): FittedParagraph[] => {
   let textHeight;
@@ -157,7 +175,7 @@ export const fitTextIntoBox = (
       const lines = wrapText(ctx, content, width);
 
       const paragraphHeight = lines.reduce((totalHeight, line) => {
-        return totalHeight + getLineHeight(ctx.measureText(line));
+        return totalHeight + getLineHeight(ctx.measureText(getRunsText(line)));
       }, 0);
 
       const paragraphHeightWithMargin =
@@ -189,28 +207,25 @@ export const fitTextIntoBox = (
  *
  * @param lines - Empty lines separate paragraphs
  */
-export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: string[]): number => {
+export const getMultilineTextHeight = (ctx: CanvasRenderingContext2D, lines: TextLine[]): number => {
   const { fontBoundingBoxAscent: ascent, fontBoundingBoxDescent: descent } = ctx.measureText('');
   const lineHeight = ascent + descent;
 
   return lines.reduce((height, line, index) => {
     if (index === 0) return lineHeight;
-    return height + (line ? lineHeight : lineHeight * EMPTY_LINE_RELATIVE_SIZE);
+    return height + (line.length ? lineHeight : lineHeight * EMPTY_LINE_RELATIVE_SIZE);
   }, 0);
 };
 
 /**
- * Width of a text with the current font, with its reminder text in italics.
- *
- * @param startsInReminder - Whether the text continues a reminder text
+ * Width of some runs of text with the current font, each in its style.
  */
-export const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, startsInReminder = false): number => {
-  const { runs } = splitReminderText(text, startsInReminder);
-  if (runs.every((run) => !run.reminder)) return ctx.measureText(text).width;
+export const measureRunsWidth = (ctx: CanvasRenderingContext2D, runs: TextRun[]): number => {
+  if (runs.every((run) => !run.italic)) return ctx.measureText(getRunsText(runs)).width;
 
   const font = ctx.font;
   const width = runs.reduce((total, run) => {
-    ctx.font = run.reminder ? getReminderFont(font) : font;
+    ctx.font = run.italic ? getItalicFont(font) : font;
     return total + ctx.measureText(run.text).width;
   }, 0);
   ctx.font = font;
@@ -218,8 +233,8 @@ export const measureTextWidth = (ctx: CanvasRenderingContext2D, text: string, st
 };
 
 /**
- * Italic variant of a font, for reminder text.
+ * Italic variant of a font.
  */
-export const getReminderFont = (font: string): string => {
+export const getItalicFont = (font: string): string => {
   return `italic ${font}`;
 };

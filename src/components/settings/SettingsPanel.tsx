@@ -1,6 +1,8 @@
 import type { ChangeEvent, Ref } from 'react';
 import { SETTING_NAMES, SETTINGS_DEFINITIONS, useSetting, type SettingName } from './SettingsContext';
 
+import './SettingsPanel.css';
+
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
   return (
     <dialog ref={ref}>
@@ -58,7 +60,7 @@ const SettingSlider = <Name extends SettingName>({ name }: { name: Name }) => {
   };
 
   return (
-    <fieldset disabled={definition.disabled}>
+    <fieldset className="setting-slider" disabled={definition.disabled}>
       <legend>{definition.label}</legend>
       <input
         id={inputId}

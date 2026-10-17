@@ -2,12 +2,23 @@ import type { InkLevel } from '../styles';
 import { get2dContext } from './canvasRendering';
 import type { CanvasPaint } from './canvasShapes';
 
-/** Opacity of the fills of the medium and splurge ink levels */
-const INK_FILL_OPACITY = 0.5;
+/** Opacity of the ink fills of the boxes (e.g. title and type), by ink level */
+const INK_FILL_OPACITY = { medium: 0.5, splurge: 0.35 };
+/** Opacity of the light ink fill of the text boxes (e.g. oracle and stats), only on splurge */
+const LIGHT_INK_FILL_OPACITY = 0.15;
 
 /** Space between the centers of the dots of the medium ink level, and their radius */
 const DOT_SPACING = 4;
 const DOT_RADIUS = 1;
+
+/** How strongly a box is filled: regular for the title and type boxes, light for the text boxes */
+export type InkFillStrength = 'regular' | 'light';
+
+/** Fill of a box at an ink level, and the opacity to draw it at over the box's background */
+export interface InkFill {
+  style: CanvasPaint;
+  opacity: number;
+}
 
 /**
  * Fill style for a single color, or for two colors a horizontal gradient
@@ -27,19 +38,25 @@ export const getFillStyle = (
 };
 
 /**
- * Fill style for a box at an ink level: nothing on `low`, a pattern of dots in
- * the colors (or the gradient between them) on `medium`, and the colors on
- * `splurge`. Meant to be drawn at half opacity over the box's background.
+ * Fill for a box at an ink level, to draw over the box's background. Regular
+ * fills are nothing on `low`, a pattern of dots in the colors (or the
+ * gradient between them) on `medium`, and the colors on `splurge`. Light fills
+ * are only on `splurge`, as the colors at a lower opacity.
  */
-export const getInkFillStyle = (
+export const getInkFill = (
   ctx: CanvasRenderingContext2D,
   colors: readonly [string] | readonly [string, string],
   inkLevel: InkLevel,
-): CanvasPaint | null => {
+  strength: InkFillStrength = 'regular',
+): InkFill | null => {
   if (inkLevel === 'low') return null;
-  if (inkLevel === 'splurge') return getFillStyle(ctx, colors);
+  if (strength === 'light') {
+    return inkLevel === 'splurge' ? { style: getFillStyle(ctx, colors), opacity: LIGHT_INK_FILL_OPACITY } : null;
+  }
+  if (inkLevel === 'splurge') return { style: getFillStyle(ctx, colors), opacity: INK_FILL_OPACITY.splurge };
 
-  return ctx.createPattern(getColoredDots(ctx, colors), 'no-repeat');
+  const dots = ctx.createPattern(getColoredDots(ctx, colors), 'no-repeat');
+  return dots && { style: dots, opacity: INK_FILL_OPACITY.medium };
 };
 
 /**
@@ -90,9 +107,9 @@ const getDotTile = () => {
 /**
  * Draw an ink level fill, at its opacity.
  */
-export const drawInkFill = (ctx: CanvasRenderingContext2D, draw: () => void) => {
+export const drawInkFill = (ctx: CanvasRenderingContext2D, { opacity }: InkFill, draw: () => void) => {
   ctx.save();
-  ctx.globalAlpha = INK_FILL_OPACITY;
+  ctx.globalAlpha = opacity;
   draw();
   ctx.restore();
 };

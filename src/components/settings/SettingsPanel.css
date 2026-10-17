@@ -1,0 +1,12 @@
+/* The slider takes the whole width, with the option picked centered below it */
+.setting-slider input[type='range'] {
+  display: block;
+  width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.setting-slider output {
+  display: block;
+  text-align: center;
+}

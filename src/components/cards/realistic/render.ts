@@ -57,7 +57,7 @@ export const renderRealisticCard = (
         typelineY: SAGA_CREATURE_TYPELINE_Y,
       });
       drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_CREATURE_TYPELINE_Y });
-      drawSagaCreatureOracleBox(ctx, { cardOracleText: creatureText, cardColorTreatment });
+      drawSagaCreatureOracleBox(ctx, { cardOracleText: creatureText, cardColorTreatment, inkLevel });
     } else {
       drawSagaOracleAndArtBox(ctx, { cardOracleText, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
       drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_TYPELINE_Y });
@@ -68,13 +68,20 @@ export const renderRealisticCard = (
     const oracleLayout =
       subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
     if (cardLoyalty) {
-      drawPlaneswalkerOracleBox(ctx, { cardOracleText, cardLoyalty, cardColorTreatment, layout: oracleLayout });
+      drawPlaneswalkerOracleBox(ctx, {
+        cardOracleText,
+        cardLoyalty,
+        cardColorTreatment,
+        inkLevel,
+        layout: oracleLayout,
+      });
     } else {
       drawOracleBox(ctx, {
         cardOracleText,
         cardPower: powerAndToughness?.power,
         cardToughness: powerAndToughness?.toughness,
         cardColorTreatment,
+        inkLevel,
         layout: oracleLayout,
       });
     }
@@ -89,6 +96,7 @@ export const renderRealisticCard = (
       cardPower: powerAndToughness.power,
       cardToughness: powerAndToughness.toughness,
       cardColorTreatment,
+      inkLevel,
     });
   }
 };
@@ -117,6 +125,7 @@ const drawSubCard = (
   drawSubCardOracleBox(ctx, {
     cardOracleText: subFace.oracleText,
     cardColorTreatment: subColorTreatment,
+    inkLevel,
     position,
   });
 };

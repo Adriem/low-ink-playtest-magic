@@ -2,7 +2,7 @@ import { drawRectangle, drawRoundedBox, type Box } from '../../common/canvasShap
 import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
 import { REALISTIC_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
-import { drawInkFill, getFillStyle, getInkFillStyle } from '../../common/canvasStyles';
+import { drawInkFill, getFillStyle, getInkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
 
 /**
@@ -17,7 +17,10 @@ import type { InkLevel } from '../../styles';
  * @param options.innerHeightAdjustment - Fine-tunes the inner box
  *   height
  * @param options.inkLevel - Fills the inner box with the card's colors above
- *   the low ink level, e.g. for the title and type boxes
+ *   the low ink level
+ * @param options.inkFillStrength - How strongly the ink level fills the inner
+ *   box: regular for the title and type boxes, light for the text boxes (oracle
+ *   and stats)
  * @returns The inner box
  */
 export const drawFramedBox = (
@@ -32,6 +35,7 @@ export const drawFramedBox = (
     flatSide = null,
     innerHeightAdjustment = 0,
     inkLevel = 'low',
+    inkFillStrength = 'regular',
   }: {
     x: number;
     y: number;
@@ -42,6 +46,7 @@ export const drawFramedBox = (
     flatSide?: 'left' | 'right' | null;
     innerHeightAdjustment?: number;
     inkLevel?: InkLevel;
+    inkFillStrength?: InkFillStrength;
   },
 ): Box => {
   const drawShape = shape === 'capsule' ? drawRoundedBox : drawRectangle;
@@ -72,9 +77,9 @@ export const drawFramedBox = (
   };
   drawShape(ctx, { ...innerLine, fillStyle: REALISTIC_PALETTE.PAPER });
 
-  const inkFillStyle = getInkFillStyle(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel);
-  if (inkFillStyle) {
-    drawInkFill(ctx, () => drawShape(ctx, { ...inner, lineWidth: 0, fillStyle: inkFillStyle, flatSide }));
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel, inkFillStrength);
+  if (inkFill) {
+    drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...inner, lineWidth: 0, fillStyle: inkFill.style, flatSide }));
     // The inner line goes over the fill, so it stays as dark
     drawShape(ctx, { ...innerLine, fillStyle: null });
   }

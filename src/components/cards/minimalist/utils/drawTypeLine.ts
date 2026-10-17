@@ -3,7 +3,7 @@ import { fitFontSizeInX, getFontSize } from '../../common/canvasText';
 import { PINLINE_THICKNESS, TEXT_FONT_FAMILY } from '../config';
 import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
-import { drawInkFill, getFillStyle, getInkFillStyle } from '../../common/canvasStyles';
+import { drawInkFill, getFillStyle, getInkFill } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
 
 const TYPELINE_BOX_PADDING_X = 15;
@@ -63,9 +63,9 @@ export const drawTypeLine = (
   const innerLine = { ...inner, lineWidth: TYPELINE_INNER_LINE_WIDTH, strokeStyle: MINIMALIST_PALETTE.PAPER };
   drawRoundedBox(ctx, { ...innerLine, fillStyle: MINIMALIST_PALETTE.PAPER });
 
-  const inkFillStyle = getInkFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE), inkLevel);
-  if (inkFillStyle) {
-    drawInkFill(ctx, () => drawRoundedBox(ctx, { ...inner, lineWidth: 0, fillStyle: inkFillStyle }));
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE), inkLevel);
+  if (inkFill) {
+    drawInkFill(ctx, inkFill, () => drawRoundedBox(ctx, { ...inner, lineWidth: 0, fillStyle: inkFill.style }));
     // The white line between the border and the box goes over the fill
     drawRoundedBox(ctx, { ...innerLine, fillStyle: null });
   }

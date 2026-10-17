@@ -11,7 +11,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText } from './drawOracleText';
 import type { ColorTreatment } from '../../../../domain/colorTreatment';
-import type { OracleLayout } from '../../styles';
+import type { InkLevel, OracleLayout } from '../../styles';
 import type { OracleText } from '../../../../domain/oracleText';
 
 export const drawOracleBox = (
@@ -21,12 +21,14 @@ export const drawOracleBox = (
     cardPower,
     cardToughness,
     cardColorTreatment,
+    inkLevel,
     layout,
   }: {
     cardOracleText?: OracleText;
     cardPower?: string;
     cardToughness?: string;
     cardColorTreatment: ColorTreatment;
+    inkLevel?: InkLevel;
     layout: OracleLayout;
   },
 ) => {
@@ -41,6 +43,8 @@ export const drawOracleBox = (
     width,
     height,
     cardColorTreatment,
+    inkLevel,
+    inkFillStrength: 'light',
     shape: 'rectangle',
   });
 

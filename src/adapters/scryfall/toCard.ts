@@ -1,6 +1,6 @@
 import { computeCardColors, type ArtCrop, type Card, type CardFace } from '../../domain/cards';
 import { isColorSymbol } from '../../domain/colors';
-import { parseOracleText } from '../../domain/oracleText';
+import type { LoyaltyAbility, OracleParagraph, OracleText, SagaChapter } from '../../domain/oracleText';
 import type { ScryfallCard, ScryfallCardFace } from './types';
 
 const SUBCARD_LAYOUTS: Record<string, Card['layout']> = {
@@ -11,6 +11,12 @@ const SUBCARD_LAYOUTS: Record<string, Card['layout']> = {
 /**
  * The card of the press for a card from Scryfall.
  */
+const MODE_PREFIX = '• ';
+const SAGA_CHAPTER_REGEX = /^([IVX]+(?:\s*,\s*[IVX]+)*)\s*[—–]\s*(.+)$/;
+const LOYALTY_ABILITY_REGEX = /^([+−-]?(?:\d+|X)):\s*(.+)$/;
+// Ability words and names of abilities: a short phrase without punctuation before " — "
+const NAME_REGEX = /^([A-Z][^—•(){}.,:;+]{0,40}?) — (.+)$/;
+
 export const toCard = (card: ScryfallCard): Card => {
   const [mainFace, secondaryFace] = card.card_faces ?? [card];
 
@@ -45,7 +51,7 @@ const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: numbe
     manaCost: face.mana_cost,
     faceLayout: getFaceLayout(face),
     typeLine: face.type_line ?? '',
-    oracleText: parseOracleText(face.oracle_text),
+    oracleText: toOracleText(face.oracle_text),
     colors: toColors(colors),
     stats: getStats(face),
     art: {
@@ -78,4 +84,77 @@ const getStats = ({ power, toughness, loyalty }: ScryfallCardFace): CardFace['st
   if (power != null && toughness != null) return { power, toughness };
   if (loyalty != null) return { loyalty };
   return undefined;
+};
+
+/**
+ * Parse the rules text of a card face, as Scryfall writes it: one paragraph
+ * per line, with "•" lines being modes of the paragraph above.
+ */
+const toOracleText = (oracleText = ''): OracleText => {
+  const paragraphs: OracleText['paragraphs'] = [];
+
+  for (const rawLine of oracleText.split('\n')) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    const previous = paragraphs.at(-1);
+    if (line.startsWith(MODE_PREFIX) && previous) {
+      previous.modes = [...(previous.modes ?? []), parseParagraph(line.slice(MODE_PREFIX.length))];
+      continue;
+    }
+
+    paragraphs.push(parseLine(line));
+  }
+
+  return { paragraphs };
+};
+
+const parseLine = (line: string): OracleParagraph | SagaChapter | LoyaltyAbility => {
+  const chapter = line.match(SAGA_CHAPTER_REGEX);
+  if (chapter) {
+    const chapterNumbers = chapter[1].split(',').map((number) => number.trim());
+    return { chapterNumbers, ...parseParagraph(chapter[2]) };
+  }
+
+  const loyaltyAbility = line.match(LOYALTY_ABILITY_REGEX);
+  if (loyaltyAbility) return { loyaltyCost: loyaltyAbility[1], ...parseParagraph(loyaltyAbility[2]) };
+
+  return parseParagraph(line);
+};
+
+/**
+ * A paragraph, with its name and reminder text apart from its rules text.
+ * Only a parenthetical at the end of the paragraph is reminder text: ones in
+ * the middle of it are part of the rules (e.g. "costs {U} (or {1}) less").
+ */
+const parseParagraph = (line: string): OracleParagraph => {
+  const named = line.match(NAME_REGEX);
+  const name = named?.[1];
+  const body = named ? named[2] : line;
+
+  const reminderStart = findTrailingParenthetical(body);
+  const text = reminderStart === -1 ? body : body.slice(0, reminderStart).trimEnd();
+  const reminderText = reminderStart === -1 ? undefined : body.slice(reminderStart);
+
+  return {
+    ...(name ? { name } : {}),
+    text,
+    ...(reminderText ? { reminderText } : {}),
+  };
+};
+
+/**
+ * Where the parenthetical that ends a text starts, or -1 if it doesn't end
+ * with one.
+ */
+const findTrailingParenthetical = (text: string) => {
+  if (!text.endsWith(')')) return -1;
+
+  let depth = 0;
+  for (let i = text.length - 1; i >= 0; i--) {
+    if (text[i] === ')') depth++;
+    if (text[i] === '(') depth--;
+    if (depth === 0) return i;
+  }
+  return -1;
 };

@@ -1,4 +1,3 @@
-import { parseOracleText } from '../../../domain/oracleText';
 import { getRunsText, toParagraphWithModes, toTextParagraphs, toTextRuns } from './textRuns';
 
 describe('toTextRuns', () => {
@@ -20,7 +19,7 @@ describe('toTextRuns', () => {
 });
 
 test('follows a paragraph with a "• " paragraph for each of its modes', () => {
-  const [paragraph] = parseOracleText('Choose one —\n• Draw a card.\n• Gain 3 life.').paragraphs;
+  const paragraph = { text: 'Choose one —', modes: [{ text: 'Draw a card.' }, { text: 'Gain 3 life.' }] };
 
   expect(toParagraphWithModes(paragraph).map(getRunsText)).toEqual([
     'Choose one —',
@@ -30,7 +29,10 @@ test('follows a paragraph with a "• " paragraph for each of its modes', () => 
 });
 
 test('puts chapter numbers and loyalty costs before the text, for boxes that draw them as text', () => {
-  const { paragraphs } = parseOracleText('II, III — Draw a card.\n−3: Destroy target creature.');
+  const paragraphs = [
+    { chapterNumbers: ['II', 'III'], text: 'Draw a card.' },
+    { loyaltyCost: '−3', text: 'Destroy target creature.' },
+  ];
 
   expect(toTextParagraphs(paragraphs).map(getRunsText)).toEqual([
     'II, III — Draw a card.',

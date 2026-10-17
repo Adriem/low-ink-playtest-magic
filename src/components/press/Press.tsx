@@ -15,7 +15,7 @@ import { whenRendered } from '../cards/common/canvasRendering';
 import { useCardCollection } from '../../hooks/useCardCollection';
 import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
-import { loadFromSessionStorage, saveToSessionStorage } from '../../utils/sessionStorage';
+import { loadFromStorage, saveToStorage } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
 
 const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
@@ -45,7 +45,7 @@ const Press = () => {
 
   useEffect(() => {
     const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
-    saveToSessionStorage(CARD_COLLECTION_STORAGE_KEY, loadedCards);
+    saveToStorage(sessionStorage, CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
 
   const handleAddCards = useCallback(
@@ -129,7 +129,7 @@ const exportCardsToPdf = async (canvases: HTMLCanvasElement[]) => {
 };
 
 const loadPersistedCards = () => {
-  return loadFromSessionStorage<CollectionCard[]>(CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
+  return loadFromStorage<CollectionCard[]>(sessionStorage, CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
 };
 
 // TODO: Replace alert with a toast notification

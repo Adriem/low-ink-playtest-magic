@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
-import { loadFromSessionStorage, saveToSessionStorage } from '../../utils/sessionStorage';
+import { loadFromStorage, saveToStorage } from '../../utils/storage';
 
 /** The value of each setting */
 export interface Settings {
@@ -14,13 +14,14 @@ export interface Settings {
 
 export type SettingName = keyof Settings;
 
+/** Local storage key the settings are saved in, as a JSON object */
+const SETTINGS_STORAGE_KEY = 'press:settings';
+
 export interface SettingDefinition<T extends string> {
   label: string;
   options: { value: T; label: string }[];
   /** Value of the default option */
   default: T;
-  /** Session storage key the value is saved in */
-  storageKey: string;
   /** Shown, but not available yet */
   disabled?: boolean;
   /** How the options are picked: radio buttons (the default), or a slider through them in order */
@@ -42,19 +43,16 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
       { value: 'minimalist', label: 'Minimalist' },
     ],
     default: 'realistic',
-    storageKey: 'press:cardVariant',
   },
   splitCardTreatment: {
     label: 'Split card treatment',
     options: TREATMENT_OPTIONS,
     default: 'unified',
-    storageKey: 'press:splitCardTreatment',
   },
   doubleFacedCardTreatment: {
     label: 'Double-Faced card treatment',
     options: TREATMENT_OPTIONS,
     default: 'separate',
-    storageKey: 'press:doubleFacedCardTreatment',
   },
   inkLevel: {
     label: 'Ink level',
@@ -65,7 +63,6 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
       { value: 'splurge', label: 'Splurge' },
     ],
     default: 'medium',
-    storageKey: 'press:inkLevel',
   },
   artFidelity: {
     label: 'Art fidelity',
@@ -77,7 +74,6 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
       { value: 'full', label: '5' },
     ],
     default: 'shaded',
-    storageKey: 'press:artFidelity',
     control: 'slider',
     // The minimalist style has no art
     cardStyles: ['realistic'],
@@ -108,27 +104,35 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
   }, []);
 
   useEffect(() => {
-    for (const name of SETTING_NAMES) {
-      saveToSessionStorage(SETTINGS_DEFINITIONS[name].storageKey, settings[name]);
-    }
+    saveToStorage(localStorage, SETTINGS_STORAGE_KEY, settings);
   }, [settings]);
 
   return <SettingsContext.Provider value={{ settings, setSetting }}>{children}</SettingsContext.Provider>;
 };
 
+/**
+ * The saved settings, with the default of each one that isn't saved or isn't
+ * one of its options.
+ */
 const loadInitialSettings = (): Settings => {
+  const saved = loadFromStorage<Record<string, unknown>>(localStorage, SETTINGS_STORAGE_KEY, {}, isObject);
   return {
-    cardVariant: loadSetting('cardVariant'),
-    splitCardTreatment: loadSetting('splitCardTreatment'),
-    doubleFacedCardTreatment: loadSetting('doubleFacedCardTreatment'),
-    inkLevel: loadSetting('inkLevel'),
-    artFidelity: loadSetting('artFidelity'),
+    cardVariant: getSavedSetting(saved, 'cardVariant'),
+    splitCardTreatment: getSavedSetting(saved, 'splitCardTreatment'),
+    doubleFacedCardTreatment: getSavedSetting(saved, 'doubleFacedCardTreatment'),
+    inkLevel: getSavedSetting(saved, 'inkLevel'),
+    artFidelity: getSavedSetting(saved, 'artFidelity'),
   };
 };
 
-const loadSetting = <Name extends SettingName>(name: Name): Settings[Name] => {
+const getSavedSetting = <Name extends SettingName>(saved: Record<string, unknown>, name: Name): Settings[Name] => {
   const definition = SETTINGS_DEFINITIONS[name];
-  return loadFromSessionStorage(definition.storageKey, definition.default);
+  const option = definition.options.find(({ value }) => value === saved[name]);
+  return option ? option.value : definition.default;
+};
+
+const isObject = (value: unknown): boolean => {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
 export const useSetting = <Name extends SettingName>(name: Name): [Settings[Name], (value: Settings[Name]) => void] => {

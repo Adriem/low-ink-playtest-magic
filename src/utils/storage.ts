@@ -1,16 +1,17 @@
 /**
- * Load a JSON value saved in the session storage.
+ * Load a JSON value saved in a storage, e.g. `sessionStorage` or `localStorage`.
  *
  * @param fallback - Returned when nothing valid is saved
  * @param isValid - Check for the loaded value
  */
-export const loadFromSessionStorage = <T>(
+export const loadFromStorage = <T>(
+  storage: Storage,
   key: string,
   fallback: T,
   isValid: (value: unknown) => boolean = () => true,
 ): T => {
   try {
-    const raw = sessionStorage.getItem(key);
+    const raw = storage.getItem(key);
     if (raw == null) return fallback;
 
     const value = JSON.parse(raw);
@@ -21,8 +22,8 @@ export const loadFromSessionStorage = <T>(
 };
 
 /**
- * Save a value as JSON in the session storage.
+ * Save a value as JSON in a storage, e.g. `sessionStorage` or `localStorage`.
  */
-export const saveToSessionStorage = (key: string, value: unknown) => {
-  sessionStorage.setItem(key, JSON.stringify(value));
+export const saveToStorage = (storage: Storage, key: string, value: unknown) => {
+  storage.setItem(key, JSON.stringify(value));
 };

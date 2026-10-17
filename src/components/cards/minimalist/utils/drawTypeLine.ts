@@ -65,9 +65,8 @@ export const drawTypeLine = (
 
   const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE), inkLevel);
   if (inkFill) {
-    drawInkFill(ctx, inkFill, () => drawRoundedBox(ctx, { ...inner, lineWidth: 0, fillStyle: inkFill.style }));
-    // The white line between the border and the box goes over the fill
-    drawRoundedBox(ctx, { ...innerLine, fillStyle: null });
+    // Filled where the box is white, so the fill doesn't cover the white line between the border and the box
+    drawInkFill(ctx, inkFill, () => drawRoundedBox(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
   }
 
   ctx.font = `bold ${fontSize}px ${TEXT_FONT_FAMILY}`;

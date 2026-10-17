@@ -79,9 +79,8 @@ export const drawFramedBox = (
 
   const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel, inkFillStrength);
   if (inkFill) {
-    drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...inner, lineWidth: 0, fillStyle: inkFill.style, flatSide }));
-    // The inner line goes over the fill, so it stays as dark
-    drawShape(ctx, { ...innerLine, fillStyle: null });
+    // Filled where the inner box is white, so the fill doesn't cover the inner line
+    drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
   }
 
   return inner;

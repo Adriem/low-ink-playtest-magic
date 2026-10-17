@@ -1,5 +1,11 @@
 import type { ChangeEvent, Ref } from 'react';
-import { SETTING_NAMES, SETTINGS_DEFINITIONS, isSettingShown, useSetting, type SettingName } from './SettingsContext';
+import {
+  SETTING_NAMES,
+  SETTINGS_DEFINITIONS,
+  isSettingAvailable,
+  useSetting,
+  type SettingName,
+} from './SettingsContext';
 
 import './SettingsPanel.css';
 
@@ -9,8 +15,9 @@ const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
   return (
     <dialog ref={ref}>
       <form method="dialog">
-        {SETTING_NAMES.filter((name) => isSettingShown(name, cardStyle)).map((name) => (
-          <SettingFieldset key={name} name={name} />
+        {SETTING_NAMES.map((name) => (
+          // Settings that don't apply to the card style stay, disabled, so the panel keeps its size
+          <SettingFieldset key={name} name={name} disabled={!isSettingAvailable(name, cardStyle)} />
         ))}
         <menu>
           <button type="submit">Close</button>
@@ -23,14 +30,14 @@ const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
 /**
  * Controls to pick the value of a setting: radio buttons, or a slider.
  */
-const SettingFieldset = <Name extends SettingName>({ name }: { name: Name }) => {
+const SettingFieldset = <Name extends SettingName>({ name, disabled = false }: { name: Name; disabled?: boolean }) => {
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
 
-  if (definition.control === 'slider') return <SettingSlider name={name} />;
+  if (definition.control === 'slider') return <SettingSlider name={name} disabled={disabled} />;
 
   return (
-    <fieldset disabled={definition.disabled}>
+    <fieldset disabled={disabled || definition.disabled}>
       <legend>{definition.label}</legend>
       {definition.options.map((option) => (
         <label key={option.value}>
@@ -51,7 +58,7 @@ const SettingFieldset = <Name extends SettingName>({ name }: { name: Name }) => 
 /**
  * Slider through the options of a setting, in order, showing the one picked.
  */
-const SettingSlider = <Name extends SettingName>({ name }: { name: Name }) => {
+const SettingSlider = <Name extends SettingName>({ name, disabled }: { name: Name; disabled: boolean }) => {
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
   const index = definition.options.findIndex((option) => option.value === value);
@@ -62,7 +69,7 @@ const SettingSlider = <Name extends SettingName>({ name }: { name: Name }) => {
   };
 
   return (
-    <fieldset className="setting-slider" disabled={definition.disabled}>
+    <fieldset className="setting-slider" disabled={disabled || definition.disabled}>
       <legend>{definition.label}</legend>
       <input
         id={inputId}

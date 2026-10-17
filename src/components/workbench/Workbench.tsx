@@ -5,7 +5,7 @@ import { getSubCardPosition } from '../../domain/cards';
 import { isColorSymbol, type ColorSymbol } from '../../domain/colors';
 import useCardData from './useCardData';
 import Reference from './Reference';
-import { SETTINGS_DEFINITIONS, isSettingShown, useSetting } from '../settings';
+import { SETTINGS_DEFINITIONS, isSettingAvailable, useSetting } from '../settings';
 
 import './Workbench.css';
 
@@ -144,18 +144,21 @@ const Workbench = () => {
               ))}
             </select>
           </div>
-          {isSettingShown('artFidelity', cardVariant) && (
-            <div className="workbench-field">
-              <label htmlFor="artFidelity">Art</label>
-              <select id="artFidelity" value={artFidelity} onChange={handleArtFidelityChange}>
-                {SETTINGS_DEFINITIONS.artFidelity.options.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
+          <div className="workbench-field">
+            <label htmlFor="artFidelity">Art</label>
+            <select
+              id="artFidelity"
+              value={artFidelity}
+              disabled={!isSettingAvailable('artFidelity', cardVariant)}
+              onChange={handleArtFidelityChange}
+            >
+              {SETTINGS_DEFINITIONS.artFidelity.options.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
           <div className="workbench-field workbench-reference-slider">
             <label htmlFor="referenceOpacity">Reference</label>
             <input

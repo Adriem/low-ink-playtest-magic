@@ -2,7 +2,7 @@ export {
   SETTING_NAMES,
   SETTINGS_DEFINITIONS,
   SettingsContextProvider,
-  isSettingShown,
+  isSettingAvailable,
   useSetting,
 } from './SettingsContext';
 export type { SettingName, Settings } from './SettingsContext';

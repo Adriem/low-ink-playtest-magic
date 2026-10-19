@@ -1,4 +1,10 @@
-import { boostHighlightsPassAdaptive, boostHighlightsPassFixed, lightGrayscalePass } from './canvasFilters';
+import {
+  boostHighlightsPassAdaptive,
+  boostHighlightsPassFixed,
+  lightGrayscalePass,
+  midBrightnessPassAdaptive,
+  midBrightnessPassFixed,
+} from './canvasFilters';
 
 test('turns pixels into light grays, by their brightness', () => {
   // A black, a white and a pure green pixel
@@ -73,6 +79,29 @@ describe('shaded art', () => {
     const mismatches = grays.filter((gray, i) => shades[i] !== expectedShadeOf(gray));
     expect(mismatches.length).toBeLessThan(grays.length * 0.02);
   };
+});
+
+describe('minimal art', () => {
+  test('shades the midtones of the art, leaving the darkest and brightest pixels light', () => {
+    const grays = [10, 30, 70, 100, 150, 200];
+    const pixels = grayPixels(grays);
+
+    midBrightnessPassFixed(createCtx(pixels), 0, 0, grays.length, 1);
+
+    expect(shadesOf(pixels)).toEqual([245, 210, 180, 230, 255, 255]);
+  });
+
+  test('moves the thresholds into the brightness range of the art, proportionally', () => {
+    // Art that only goes from 100 to 200: its pixels at 100 + 70 / 255 * 100 are shaded like ones at 70
+    const grays = Array.from({ length: 1000 }, (_, i) => 100 + i / 10);
+    const pixels = grayPixels(grays);
+
+    midBrightnessPassAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
+
+    const shades = shadesOf(pixels);
+    expect(shades[grays.indexOf(127.5)]).toBe(180);
+    expect(new Set(shades)).toEqual(new Set([255, 230, 180, 210, 245]));
+  });
 });
 
 // Gray pixels, as bright as their value

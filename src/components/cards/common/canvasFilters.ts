@@ -1,12 +1,32 @@
 /** How much lighter black-and-white art is drawn, as a share of the way to white */
 const BLACK_AND_WHITE_LIGHTENING = 0.35;
 
+/** A shade of gray, for the pixels brighter than its threshold (and not brighter than the level above's) */
+interface ShadeLevel {
+  threshold: number;
+  shade: number;
+}
+
 /**
- * Shades of gray of the shaded art fidelity, from the brightest pixels down:
- * pixels brighter than a level's threshold take its shade. The thresholds are
- * meant for art with every brightness, from 0 to 255, equally present.
+ * Shades of gray of the minimal art fidelity, from the brightest pixels down.
+ * The darkest pixels turn light again, so only the midtones take ink. The
+ * thresholds are meant for art with every brightness, from 0 to 255, equally
+ * present.
  */
-const SHADED_ART_LEVELS: { threshold: number; shade: number }[] = [
+const MINIMAL_ART_LEVELS: ShadeLevel[] = [
+  { threshold: 128, shade: 255 },
+  { threshold: 95, shade: 230 },
+  { threshold: 60, shade: 180 },
+  { threshold: 20, shade: 210 },
+  { threshold: -Infinity, shade: 245 },
+];
+
+/**
+ * Shades of gray of the shaded art fidelity, from the brightest pixels down.
+ * The thresholds are meant for art with every brightness, from 0 to 255,
+ * equally present.
+ */
+const SHADED_ART_LEVELS: ShadeLevel[] = [
   { threshold: 170, shade: 255 },
   { threshold: 128, shade: 245 },
   { threshold: 95, shade: 235 },
@@ -21,31 +41,37 @@ const SHADED_ART_LEVELS: { threshold: number; shade: number }[] = [
  */
 const BRIGHTNESS_RANGE_OUTLIERS = 0.01;
 
-export const midBrightnessPass = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
-  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
-  const data = imagePixels.data;
+/**
+ * Filter of the minimal art fidelity, with fixed thresholds: shade an area of
+ * the canvas in a few light grays by brightness (`MINIMAL_ART_LEVELS`), with
+ * the same thresholds for any art.
+ *
+ * Kept to compare it with `midBrightnessPassAdaptive`.
+ */
+export const midBrightnessPassFixed = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, () => MINIMAL_ART_LEVELS);
+};
 
-  for (let i = 0; i < data.length; i += 4) {
-    const r = data[i];
-    const g = data[i + 1];
-    const b = data[i + 2];
-    const computedBrightness = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-
-    if (computedBrightness > 170) {
-      data[i] = data[i + 1] = data[i + 2] = 255;
-    } else if (computedBrightness > 128) {
-      data[i] = data[i + 1] = data[i + 2] = 245;
-    } else if (computedBrightness > 95) {
-      data[i] = data[i + 1] = data[i + 2] = 220;
-    } else if (computedBrightness > 60) {
-      data[i] = data[i + 1] = data[i + 2] = 180;
-    } else if (computedBrightness > 20) {
-      data[i] = data[i + 1] = data[i + 2] = 245;
-    } else {
-      data[i] = data[i + 1] = data[i + 2] = 255;
-    }
-  }
-  ctx.putImageData(imagePixels, sx, sy);
+/**
+ * Filter of the minimal art fidelity, with adaptive thresholds: shade an area
+ * of the canvas in a few light grays by brightness (`MINIMAL_ART_LEVELS`),
+ * with the thresholds fitted to the art's brightness range, like
+ * `boostHighlightsPassAdaptive` does.
+ */
+export const midBrightnessPassAdaptive = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(MINIMAL_ART_LEVELS, brightnesses));
 };
 
 /**
@@ -96,7 +122,7 @@ export const boostHighlightsPassAdaptive = (
  * brightness range of some art, both measured leaving the outliers out. Art
  * with no range to speak of keeps the levels as they are.
  */
-const fitLevelsToBrightness = (levels: typeof SHADED_ART_LEVELS, brightnesses: Float64Array) => {
+const fitLevelsToBrightness = (levels: ShadeLevel[], brightnesses: Float64Array) => {
   const [low, high] = getBrightnessRange(brightnesses);
   if (high - low < 1) return levels;
 
@@ -138,7 +164,7 @@ const shadeByBrightness = (
   sy: number,
   sw: number,
   sh: number,
-  getLevels: (brightnesses: Float64Array) => typeof SHADED_ART_LEVELS,
+  getLevels: (brightnesses: Float64Array) => ShadeLevel[],
 ) => {
   const imagePixels = ctx.getImageData(sx, sy, sw, sh);
   const data = imagePixels.data;

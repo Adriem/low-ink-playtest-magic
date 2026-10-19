@@ -1,4 +1,4 @@
-import { lightGrayscalePass, midBrightnessPass, boostHighlightsPass } from '../../common/canvasFilters';
+import { lightGrayscalePass, midBrightnessPass, boostHighlightsPassAdaptive } from '../../common/canvasFilters';
 import { drawWhenLoaded, loadImage } from '../../common/canvasRendering';
 import type { ArtCrop } from '../../../../domain/cards';
 import type { ArtFidelity } from '../../styles';
@@ -41,7 +41,7 @@ export const drawArtImage = (
       ctx.drawImage(artImage, x, y, width, height);
     }
     if (artFidelity === 'minimal') midBrightnessPass(ctx, x, y, width, height);
-    if (artFidelity === 'shaded') boostHighlightsPass(ctx, x, y, width, height);
+    if (artFidelity === 'shaded') boostHighlightsPassAdaptive(ctx, x, y, width, height);
     if (artFidelity === 'black-and-white') lightGrayscalePass(ctx, x, y, width, height);
   });
 };

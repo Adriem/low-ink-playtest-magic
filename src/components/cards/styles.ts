@@ -30,12 +30,12 @@ export interface CardRenderProps {
 export type InkLevel = 'low' | 'medium' | 'high' | 'splurge';
 
 /**
- * How the art of a card is drawn: `none` leaves the art box blank, `contours`
- * draws only its contours, `minimal` draws it with a few light shades of
- * gray, `shaded` with more of them, `black-and-white` in light gray tones, and
- * `full` as it is.
+ * How the art of a card is drawn: `blank` leaves the art box blank,
+ * `contours` traces only its contours, `mid-tones` shades only its midtones,
+ * `posterized` reduces it to a few light grays, `grayscale` turns it to light
+ * grayscale, and `no-filter` draws it as it is.
  */
-export type ArtFidelity = 'none' | 'contours' | 'minimal' | 'shaded' | 'black-and-white' | 'full';
+export type ArtFidelity = 'blank' | 'contours' | 'mid-tones' | 'posterized' | 'grayscale' | 'no-filter';
 
 /** Draws a whole card on a CARD_WIDTH x CARD_HEIGHT canvas */
 export type CardRenderer = (canvas: HTMLCanvasElement, card: CardRenderProps) => void;

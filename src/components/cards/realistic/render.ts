@@ -25,7 +25,7 @@ import { get2dContext } from '../common/canvasRendering';
  */
 export const renderRealisticCard = (
   canvas: HTMLCanvasElement,
-  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', artFidelity = 'shaded' }: CardRenderProps,
+  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', artFidelity = 'posterized' }: CardRenderProps,
 ) => {
   const cardColorTreatment = getColorTreatment(face);
   const cardName = face.name;

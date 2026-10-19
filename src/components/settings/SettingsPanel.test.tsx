@@ -58,7 +58,7 @@ test('picks the art fidelity with a slider through its levels', () => {
 
   fireEvent.change(slider, { target: { value: '0' } });
 
-  expect(getSavedSettings().artFidelity).toBe('none');
+  expect(getSavedSettings().artFidelity).toBe('blank');
 });
 
 test('disables the art fidelity for the minimalist style, which has no art', async () => {

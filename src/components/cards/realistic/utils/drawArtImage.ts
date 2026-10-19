@@ -20,7 +20,7 @@ export const drawArtImage = (
   {
     cardArtUrl,
     cropArt,
-    artFidelity = 'shaded',
+    artFidelity = 'posterized',
     x,
     y,
     width,
@@ -35,7 +35,7 @@ export const drawArtImage = (
     height: number;
   },
 ) => {
-  if (!cardArtUrl || artFidelity === 'none') return;
+  if (!cardArtUrl || artFidelity === 'blank') return;
 
   void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
     if (cropArt && cropArt !== 'full') {
@@ -46,8 +46,8 @@ export const drawArtImage = (
       ctx.drawImage(artImage, x, y, width, height);
     }
     if (artFidelity === 'contours') traceContoursAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'minimal') shadeMidtonesAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'shaded') posterizeLightAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'black-and-white') lightenGrayscale(ctx, x, y, width, height);
+    if (artFidelity === 'mid-tones') shadeMidtonesAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'posterized') posterizeLightAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'grayscale') lightenGrayscale(ctx, x, y, width, height);
   });
 };

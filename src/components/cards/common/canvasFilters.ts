@@ -30,7 +30,7 @@ const SHADED_ART_LEVELS: ShadeLevel[] = [
   { threshold: 170, shade: 255 },
   { threshold: 128, shade: 245 },
   { threshold: 95, shade: 235 },
-  { threshold: 60, shade: 200 },
+  { threshold: 60, shade: 220 },
   { threshold: 20, shade: 170 },
   { threshold: -Infinity, shade: 150 },
 ];
@@ -40,6 +40,213 @@ const SHADED_ART_LEVELS: ShadeLevel[] = [
  * the brightness range of art, so a few outliers don't set it.
  */
 const BRIGHTNESS_RANGE_OUTLIERS = 0.01;
+
+/**
+ * Lines of the contours art fidelity, from the strongest edges down: pixels
+ * among the art's strongest edges, up to a level's share of its pixels, take
+ * its shade. Pixels of `connectedOnly` levels are only kept where they connect
+ * to the lines of the other levels, so weak edges extend the contours (e.g.
+ * where an outline fades) without adding traces of their own. The rest of the
+ * art turns white.
+ */
+const CONTOUR_LEVELS: { share: number; shade: number; connectedOnly?: boolean }[] = [
+  { share: 0.08, shade: 100 },
+  { share: 0.2, shade: 160 },
+  { share: 0.35, shade: 160, connectedOnly: true },
+];
+
+/**
+ * Edge strength below which pixels are never contours, so flat art doesn't
+ * turn its noise into lines to fill the shares of the levels.
+ */
+const MIN_CONTOUR_STRENGTH = 6;
+
+/**
+ * Pixels in the shortest contours kept: contours with fewer of them, like
+ * dots and short traces not connected to anything, are noise.
+ */
+const MIN_CONTOUR_PIXELS = 10;
+
+/**
+ * Filter of the contours art fidelity, with adaptive thresholds: draw the
+ * contours of the art in an area of the canvas as gray lines on white.
+ *
+ * Contours are where the brightness changes fastest, measured with a Sobel
+ * filter on the brightness, blurred first so texture and noise don't count.
+ * Edges are thinned to the pixels where they're strongest across them, so
+ * each contour is a single line, one pixel wide. The thresholds are shares of the art's own edges (`CONTOUR_LEVELS`): its
+ * strongest edges take the darkest lines, so low-contrast art gets as many
+ * contours as high-contrast art. Edges weaker than `MIN_CONTOUR_STRENGTH` are
+ * never contours, and contours shorter than `MIN_CONTOUR_PIXELS` (dots and
+ * short traces not connected to anything) are left out as noise. Then the
+ * lines left are extended with the weak edges connected to them (the
+ * `connectedOnly` levels).
+ */
+export const contoursPassAdaptive = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
+  const { data, width, height } = imagePixels;
+
+  const { strengths, thinStrengths } = getEdgeStrengths(blur(getBrightnesses(data), width, height), width, height);
+  // The thresholds come from the edges before thinning them, which leaves most pixels with no strength
+  const sortedStrengths = strengths.slice().sort();
+  const levels = CONTOUR_LEVELS.map(({ share, ...level }) => {
+    const threshold = sortedStrengths[Math.floor((1 - share) * (sortedStrengths.length - 1))];
+    return { ...level, threshold: Math.max(threshold, MIN_CONTOUR_STRENGTH) };
+  });
+
+  const pixelLevels = Array.from(thinStrengths, (strength) => levels.find(({ threshold }) => strength > threshold));
+  const shades = Float64Array.from(pixelLevels, (level) => (level && !level.connectedOnly ? level.shade : 255));
+  // Noise is removed before extending the lines, so weak edges don't make it long enough to stay
+  removeShortContours(shades, width, height);
+  const extensionShades = Float64Array.from(pixelLevels, (level) => (level?.connectedOnly ? level.shade : 255));
+  extendContours(shades, extensionShades, width, height);
+
+  for (const [i, shade] of shades.entries()) {
+    data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = shade;
+  }
+  ctx.putImageData(imagePixels, sx, sy);
+};
+
+/**
+ * Extend the contours of a grid of shades (the pixels that aren't white) with
+ * the pixels of another grid of shades connected to them, directly or through
+ * each other, by their sides or corners.
+ */
+const extendContours = (shades: Float64Array, extensionShades: Float64Array, width: number, height: number) => {
+  const reached: number[] = [];
+  for (const [i, shade] of shades.entries()) {
+    if (shade !== 255) reached.push(i);
+  }
+
+  for (let next = 0; next < reached.length; next++) {
+    forEachNeighbor(reached[next], width, height, (neighbor) => {
+      if (shades[neighbor] !== 255 || extensionShades[neighbor] === 255) return;
+      shades[neighbor] = extensionShades[neighbor];
+      reached.push(neighbor);
+    });
+  }
+};
+
+/**
+ * Turn white the contours, of a grid of shades, with fewer pixels than
+ * `MIN_CONTOUR_PIXELS`: the pixels that aren't white, connected to each other
+ * by their sides or corners.
+ */
+const removeShortContours = (shades: Float64Array, width: number, height: number) => {
+  const seen = new Uint8Array(shades.length);
+  for (let start = 0; start < shades.length; start++) {
+    if (seen[start] || shades[start] === 255) continue;
+
+    // Every pixel of the contour, found from its neighbors
+    const contour = [start];
+    seen[start] = 1;
+    for (let next = 0; next < contour.length; next++) {
+      forEachNeighbor(contour[next], width, height, (neighbor) => {
+        if (seen[neighbor] || shades[neighbor] === 255) return;
+        seen[neighbor] = 1;
+        contour.push(neighbor);
+      });
+    }
+
+    if (contour.length < MIN_CONTOUR_PIXELS) {
+      for (const pixel of contour) shades[pixel] = 255;
+    }
+  }
+};
+
+/**
+ * Values of a grid blurred with the average of each value and its neighbors.
+ */
+const blur = (values: Float64Array, width: number, height: number): Float64Array => {
+  const blurred = new Float64Array(values.length);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      let sum = 0;
+      for (let dy = -1; dy <= 1; dy++) {
+        for (let dx = -1; dx <= 1; dx++) sum += getClamped(values, width, height, x + dx, y + dy);
+      }
+      blurred[y * width + x] = sum / 9;
+    }
+  }
+  return blurred;
+};
+
+/**
+ * Edge strength of each value of a grid: how fast the values change around it,
+ * with a Sobel filter. Thinned, only where that's stronger than at its two
+ * neighbors across the edge, and 0 elsewhere: along a blurred edge, the
+ * strength peaks in its middle, which thinning keeps as a line one value wide.
+ */
+const getEdgeStrengths = (
+  values: Float64Array,
+  width: number,
+  height: number,
+): { strengths: Float64Array; thinStrengths: Float64Array } => {
+  const at = (x: number, y: number) => getClamped(values, width, height, x, y);
+  const strengths = new Float64Array(values.length);
+  // Neighbor across the edge, as the step from each value to it
+  const steps = new Array<[number, number]>(values.length);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const gx =
+        at(x + 1, y - 1) + 2 * at(x + 1, y) + at(x + 1, y + 1) - at(x - 1, y - 1) - 2 * at(x - 1, y) - at(x - 1, y + 1);
+      const gy =
+        at(x - 1, y + 1) + 2 * at(x, y + 1) + at(x + 1, y + 1) - at(x - 1, y - 1) - 2 * at(x, y - 1) - at(x + 1, y - 1);
+      strengths[y * width + x] = Math.hypot(gx, gy);
+      steps[y * width + x] = getStepAcrossEdge(gx, gy);
+    }
+  }
+
+  const thinStrengths = new Float64Array(values.length);
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const strength = strengths[y * width + x];
+      const [dx, dy] = steps[y * width + x];
+      const before = getClamped(strengths, width, height, x - dx, y - dy);
+      const after = getClamped(strengths, width, height, x + dx, y + dy);
+      // Of two equally strong values in the middle of an edge, only the first one is kept
+      if (strength > before && strength >= after) thinStrengths[y * width + x] = strength;
+    }
+  }
+  return { strengths, thinStrengths };
+};
+
+/**
+ * Step to the nearest neighbor in the direction the values change fastest,
+ * across the edge: right, down-right, down or up-right (y grows downwards).
+ */
+const getStepAcrossEdge = (gx: number, gy: number): [number, number] => {
+  const angle = ((Math.atan2(gy, gx) * 180) / Math.PI + 180) % 180;
+  if (angle < 22.5 || angle >= 157.5) return [1, 0];
+  if (angle < 67.5) return [1, 1];
+  if (angle < 112.5) return [0, 1];
+  return [1, -1];
+};
+
+/**
+ * Call a function with each neighbor of a position of a grid, by its sides or
+ * corners, inside the grid.
+ */
+const forEachNeighbor = (position: number, width: number, height: number, callback: (neighbor: number) => void) => {
+  const x = position % width;
+  const y = Math.floor(position / width);
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      const nx = x + dx;
+      const ny = y + dy;
+      if ((dx !== 0 || dy !== 0) && nx >= 0 && nx < width && ny >= 0 && ny < height) callback(ny * width + nx);
+    }
+  }
+};
+
+/**
+ * Value of a grid at a position, or at the nearest one inside the grid.
+ */
+const getClamped = (values: Float64Array, width: number, height: number, x: number, y: number): number => {
+  const clampedX = Math.min(Math.max(x, 0), width - 1);
+  const clampedY = Math.min(Math.max(y, 0), height - 1);
+  return values[clampedY * width + clampedX];
+};
 
 /**
  * Filter of the minimal art fidelity, with fixed thresholds: shade an area of
@@ -169,11 +376,7 @@ const shadeByBrightness = (
   const imagePixels = ctx.getImageData(sx, sy, sw, sh);
   const data = imagePixels.data;
 
-  const brightnesses = new Float64Array(data.length / 4);
-  for (let i = 0; i < brightnesses.length; i++) {
-    brightnesses[i] = 0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2];
-  }
-
+  const brightnesses = getBrightnesses(data);
   const levels = getLevels(brightnesses);
   for (const [i, brightness] of brightnesses.entries()) {
     const { shade } = levels.find(({ threshold }) => brightness > threshold) ?? levels[levels.length - 1];
@@ -195,4 +398,15 @@ export const lightGrayscalePass = (ctx: CanvasRenderingContext2D, sx: number, sy
     data[i] = data[i + 1] = data[i + 2] = brightness + (255 - brightness) * BLACK_AND_WHITE_LIGHTENING;
   }
   ctx.putImageData(imagePixels, sx, sy);
+};
+
+/**
+ * Brightness of each pixel of some image data, from 0 to 255.
+ */
+const getBrightnesses = (data: Uint8ClampedArray): Float64Array => {
+  const brightnesses = new Float64Array(data.length / 4);
+  for (let i = 0; i < brightnesses.length; i++) {
+    brightnesses[i] = 0.2126 * data[i * 4] + 0.7152 * data[i * 4 + 1] + 0.0722 * data[i * 4 + 2];
+  }
+  return brightnesses;
 };

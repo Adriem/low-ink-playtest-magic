@@ -48,13 +48,13 @@ test('picks the art fidelity with a slider through its levels', () => {
   renderPanel();
   const slider = screen.getByRole('slider', { name: 'Art fidelity', hidden: true });
 
-  expect(slider).toHaveValue('2');
-  expect(slider).toHaveAttribute('aria-valuetext', '3');
-
-  fireEvent.change(slider, { target: { value: '3' } });
-
+  expect(slider).toHaveValue('3');
   expect(slider).toHaveAttribute('aria-valuetext', '4');
-  expect(getSavedSettings().artFidelity).toBe('black-and-white');
+
+  fireEvent.change(slider, { target: { value: '1' } });
+
+  expect(slider).toHaveAttribute('aria-valuetext', '2');
+  expect(getSavedSettings().artFidelity).toBe('contours');
 
   fireEvent.change(slider, { target: { value: '0' } });
 

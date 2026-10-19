@@ -1,4 +1,9 @@
-import { boostHighlightsPassAdaptive, lightGrayscalePass, midBrightnessPassAdaptive } from '../../common/canvasFilters';
+import {
+  boostHighlightsPassAdaptive,
+  contoursPassAdaptive,
+  lightGrayscalePass,
+  midBrightnessPassAdaptive,
+} from '../../common/canvasFilters';
 import { drawWhenLoaded, loadImage } from '../../common/canvasRendering';
 import type { ArtCrop } from '../../../../domain/cards';
 import type { ArtFidelity } from '../../styles';
@@ -40,6 +45,7 @@ export const drawArtImage = (
     } else {
       ctx.drawImage(artImage, x, y, width, height);
     }
+    if (artFidelity === 'contours') contoursPassAdaptive(ctx, x, y, width, height);
     if (artFidelity === 'minimal') midBrightnessPassAdaptive(ctx, x, y, width, height);
     if (artFidelity === 'shaded') boostHighlightsPassAdaptive(ctx, x, y, width, height);
     if (artFidelity === 'black-and-white') lightGrayscalePass(ctx, x, y, width, height);

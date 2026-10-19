@@ -94,6 +94,7 @@ export const isSettingAvailable = (name: SettingName, cardStyle: CardStyle): boo
 interface SettingsContextValue {
   settings: Settings;
   setSetting: <Name extends SettingName>(name: Name, value: Settings[Name]) => void;
+  restoreDefaults: () => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -105,11 +106,30 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
     setSettings((prev) => ({ ...prev, [name]: value }));
   }, []);
 
+  const restoreDefaults = useCallback(() => {
+    setSettings(getDefaultSettings());
+  }, []);
+
   useEffect(() => {
     saveToStorage(localStorage, SETTINGS_STORAGE_KEY, settings);
   }, [settings]);
 
-  return <SettingsContext.Provider value={{ settings, setSetting }}>{children}</SettingsContext.Provider>;
+  return (
+    <SettingsContext.Provider value={{ settings, setSetting, restoreDefaults }}>{children}</SettingsContext.Provider>
+  );
+};
+
+/**
+ * The default of every setting.
+ */
+const getDefaultSettings = (): Settings => {
+  return {
+    cardVariant: SETTINGS_DEFINITIONS.cardVariant.default,
+    splitCardTreatment: SETTINGS_DEFINITIONS.splitCardTreatment.default,
+    doubleFacedCardTreatment: SETTINGS_DEFINITIONS.doubleFacedCardTreatment.default,
+    inkLevel: SETTINGS_DEFINITIONS.inkLevel.default,
+    artFidelity: SETTINGS_DEFINITIONS.artFidelity.default,
+  };
 };
 
 /**
@@ -137,4 +157,13 @@ export const useSetting = <Name extends SettingName>(name: Name): [Settings[Name
   const ctx = useContext(SettingsContext);
   if (!ctx) throw new Error('useSetting must be used within a SettingsContextProvider');
   return [ctx.settings[name], (value) => ctx.setSetting(name, value)];
+};
+
+/**
+ * Function that sets every setting back to its default.
+ */
+export const useRestoreDefaultSettings = (): (() => void) => {
+  const ctx = useContext(SettingsContext);
+  if (!ctx) throw new Error('useRestoreDefaultSettings must be used within a SettingsContextProvider');
+  return ctx.restoreDefaults;
 };

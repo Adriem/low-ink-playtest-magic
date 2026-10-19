@@ -24,7 +24,10 @@ vi.mock('../cards/DualCard', () => ({
     </div>
   ),
 }));
-vi.mock('../../adapters/jspdf', () => ({ exportToPDF: vi.fn() }));
+vi.mock('../../adapters/jspdf', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../adapters/jspdf')>()),
+  exportToPDF: vi.fn(),
+}));
 vi.mock('../../adapters/scryfall', () => ({
   fetchCard: vi.fn(),
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
@@ -38,6 +41,21 @@ const doubleFacedCard = testCard({
   multiverseIds: ['2'],
   mainFace: testFace({ name: 'Front' }),
   secondaryFace: testFace({ name: 'Back' }),
+});
+
+// jsdom has no modal dialogs, so opening one only shows it, and closing it hides it
+beforeAll(() => {
+  HTMLDialogElement.prototype.showModal = function () {
+    this.open = true;
+  };
+  HTMLDialogElement.prototype.close = function () {
+    this.open = false;
+  };
+});
+
+afterAll(() => {
+  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).showModal;
+  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).close;
 });
 
 // jsdom has no PointerEvent, which the overlay needs to tell mouse and touch apart
@@ -120,10 +138,46 @@ describe('exporting', () => {
     vi.mocked(exportToPDF).mockClear();
   });
 
-  test('exports the canvases of the cards in the order of the sheets', async () => {
+  // EXPORT opens the export options, which export with their own button
+  const exportPress = () => {
+    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
+  };
+
+  test('exports with the options picked', async () => {
     renderPress();
 
     fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    fireEvent.click(screen.getByLabelText('Letter'));
+    fireEvent.change(screen.getByLabelText('File name'), { target: { value: 'my-deck' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
+
+    await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
+    expect(vi.mocked(exportToPDF).mock.calls[0][1]).toEqual({
+      pageSize: 'letter',
+      fileName: 'my-deck',
+    });
+    expect(JSON.parse(localStorage.getItem('press:exportOptions') ?? '{}')).toEqual({
+      pageSize: 'letter',
+      fileName: 'my-deck',
+    });
+  });
+
+  test('does not export when canceling', async () => {
+    renderPress();
+
+    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(exportToPDF).not.toHaveBeenCalled();
+  });
+
+  test('exports the canvases of the cards in the order of the sheets', async () => {
+    renderPress();
+
+    exportPress();
 
     await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
     expect(exportedCardNames()).toEqual(['Colossal Dreadmaw', 'Front', 'Back']);
@@ -139,7 +193,7 @@ describe('exporting', () => {
       </SettingsContextProvider>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    exportPress();
 
     await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
     expect(exportedCardNames()).toEqual(cards.map((card) => card.name));

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
 import { loadFromStorage, saveToStorage } from '../../utils/storage';
+import { isRecord } from '../../utils/object';
 
 /** The value of each setting */
 export interface Settings {
@@ -115,7 +116,7 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
  * one of its options.
  */
 const loadInitialSettings = (): Settings => {
-  const saved = loadFromStorage<Record<string, unknown>>(localStorage, SETTINGS_STORAGE_KEY, {}, isObject);
+  const saved = loadFromStorage<Record<string, unknown>>(localStorage, SETTINGS_STORAGE_KEY, {}, isRecord);
   return {
     cardVariant: getSavedSetting(saved, 'cardVariant'),
     splitCardTreatment: getSavedSetting(saved, 'splitCardTreatment'),
@@ -129,10 +130,6 @@ const getSavedSetting = <Name extends SettingName>(saved: Record<string, unknown
   const definition = SETTINGS_DEFINITIONS[name];
   const option = definition.options.find(({ value }) => value === saved[name]);
   return option ? option.value : definition.default;
-};
-
-const isObject = (value: unknown): boolean => {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
 export const useSetting = <Name extends SettingName>(name: Name): [Settings[Name], (value: Settings[Name]) => void] => {

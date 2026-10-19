@@ -1,0 +1,14 @@
+/* The file name takes the whole width, with its extension after it */
+.export-panel .file-name {
+  display: flex;
+  align-items: baseline;
+}
+
+.export-panel .file-name input {
+  flex: 1;
+  min-width: 0;
+}
+
+.export-panel .export {
+  font-weight: bold;
+}

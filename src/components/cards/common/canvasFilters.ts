@@ -1,5 +1,5 @@
-/** How much lighter black-and-white art is drawn, as a share of the way to white */
-const BLACK_AND_WHITE_LIGHTENING = 0.35;
+/** How much lighter `lightenGrayscale` draws pixels, as a share of the way to white */
+const GRAYSCALE_LIGHTENING = 0.35;
 
 /** A shade of gray, for the pixels brighter than its threshold (and not brighter than the level above's) */
 interface ShadeLevel {
@@ -8,12 +8,12 @@ interface ShadeLevel {
 }
 
 /**
- * Shades of gray of the minimal art fidelity, from the brightest pixels down.
- * The darkest pixels turn light again, so only the midtones take ink. The
+ * Shades of gray of `shadeMidtones…`, from the brightest pixels down. The
+ * darkest pixels turn light again, so only the midtones take ink. The
  * thresholds are meant for art with every brightness, from 0 to 255, equally
  * present.
  */
-const MINIMAL_ART_LEVELS: ShadeLevel[] = [
+const MIDTONE_SHADES: ShadeLevel[] = [
   { threshold: 128, shade: 255 },
   { threshold: 95, shade: 230 },
   { threshold: 60, shade: 180 },
@@ -22,11 +22,11 @@ const MINIMAL_ART_LEVELS: ShadeLevel[] = [
 ];
 
 /**
- * Shades of gray of the shaded art fidelity, from the brightest pixels down.
- * The thresholds are meant for art with every brightness, from 0 to 255,
+ * Shades of gray of `posterizeLight…`, from the brightest pixels down: a few
+ * light grays, in the same order as the brightness. The thresholds are meant for art with every brightness, from 0 to 255,
  * equally present.
  */
-const SHADED_ART_LEVELS: ShadeLevel[] = [
+const LIGHT_POSTER_SHADES: ShadeLevel[] = [
   { threshold: 170, shade: 255 },
   { threshold: 128, shade: 245 },
   { threshold: 95, shade: 235 },
@@ -42,14 +42,14 @@ const SHADED_ART_LEVELS: ShadeLevel[] = [
 const BRIGHTNESS_RANGE_OUTLIERS = 0.01;
 
 /**
- * Lines of the contours art fidelity, from the strongest edges down: pixels
+ * Lines of `traceContoursAdaptive`, from the strongest edges down: pixels
  * among the art's strongest edges, up to a level's share of its pixels, take
  * its shade. Pixels of `connectedOnly` levels are only kept where they connect
  * to the lines of the other levels, so weak edges extend the contours (e.g.
  * where an outline fades) without adding traces of their own. The rest of the
  * art turns white.
  */
-const CONTOUR_LEVELS: { share: number; shade: number; connectedOnly?: boolean }[] = [
+const CONTOUR_LINES: { share: number; shade: number; connectedOnly?: boolean }[] = [
   { share: 0.08, shade: 100 },
   { share: 0.2, shade: 160 },
   { share: 0.35, shade: 160, connectedOnly: true },
@@ -68,28 +68,35 @@ const MIN_CONTOUR_STRENGTH = 6;
 const MIN_CONTOUR_PIXELS = 10;
 
 /**
- * Filter of the contours art fidelity, with adaptive thresholds: draw the
- * contours of the art in an area of the canvas as gray lines on white.
+ * Trace the contours of the art in an area of the canvas as thin gray lines
+ * on white, with adaptive thresholds. Nothing else of the art stays.
  *
  * Contours are where the brightness changes fastest, measured with a Sobel
  * filter on the brightness, blurred first so texture and noise don't count.
  * Edges are thinned to the pixels where they're strongest across them, so
- * each contour is a single line, one pixel wide. The thresholds are shares of the art's own edges (`CONTOUR_LEVELS`): its
- * strongest edges take the darkest lines, so low-contrast art gets as many
+ * each contour is a single line, one pixel wide. The thresholds are shares of
+ * the art's own edges (`CONTOUR_LINES`): its strongest edges take the darkest
+ * lines, so low-contrast art gets as many
  * contours as high-contrast art. Edges weaker than `MIN_CONTOUR_STRENGTH` are
  * never contours, and contours shorter than `MIN_CONTOUR_PIXELS` (dots and
  * short traces not connected to anything) are left out as noise. Then the
  * lines left are extended with the weak edges connected to them (the
  * `connectedOnly` levels).
  */
-export const contoursPassAdaptive = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+export const traceContoursAdaptive = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+) => {
   const imagePixels = ctx.getImageData(sx, sy, sw, sh);
   const { data, width, height } = imagePixels;
 
   const { strengths, thinStrengths } = getEdgeStrengths(blur(getBrightnesses(data), width, height), width, height);
   // The thresholds come from the edges before thinning them, which leaves most pixels with no strength
   const sortedStrengths = strengths.slice().sort();
-  const levels = CONTOUR_LEVELS.map(({ share, ...level }) => {
+  const levels = CONTOUR_LINES.map(({ share, ...level }) => {
     const threshold = sortedStrengths[Math.floor((1 - share) * (sortedStrengths.length - 1))];
     return { ...level, threshold: Math.max(threshold, MIN_CONTOUR_STRENGTH) };
   });
@@ -249,62 +256,51 @@ const getClamped = (values: Float64Array, width: number, height: number, x: numb
 };
 
 /**
- * Filter of the minimal art fidelity, with fixed thresholds: shade an area of
- * the canvas in a few light grays by brightness (`MINIMAL_ART_LEVELS`), with
- * the same thresholds for any art.
+ * Shade the midtones of the art in an area of the canvas in a few light grays
+ * (`MIDTONE_SHADES`), with fixed thresholds: the darkest and the brightest
+ * pixels both turn light, so only the midtones take ink. The thresholds are
+ * the same for any art.
  *
- * Kept to compare it with `midBrightnessPassAdaptive`.
+ * Not used: kept to compare it with `shadeMidtonesAdaptive`.
  */
-export const midBrightnessPassFixed = (
+export const shadeMidtonesFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, () => MIDTONE_SHADES);
+};
+
+/**
+ * Shade the midtones of the art in an area of the canvas in a few light grays
+ * (`MIDTONE_SHADES`), with adaptive thresholds: the darkest and the brightest
+ * pixels both turn light, so only the midtones take ink. The thresholds are
+ * fitted to the art's brightness range, like `posterizeLightAdaptive` does.
+ */
+export const shadeMidtonesAdaptive = (
   ctx: CanvasRenderingContext2D,
   sx: number,
   sy: number,
   sw: number,
   sh: number,
 ) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, () => MINIMAL_ART_LEVELS);
+  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(MIDTONE_SHADES, brightnesses));
 };
 
 /**
- * Filter of the minimal art fidelity, with adaptive thresholds: shade an area
- * of the canvas in a few light grays by brightness (`MINIMAL_ART_LEVELS`),
- * with the thresholds fitted to the art's brightness range, like
- * `boostHighlightsPassAdaptive` does.
- */
-export const midBrightnessPassAdaptive = (
-  ctx: CanvasRenderingContext2D,
-  sx: number,
-  sy: number,
-  sw: number,
-  sh: number,
-) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(MINIMAL_ART_LEVELS, brightnesses));
-};
-
-/**
- * Filter of the shaded art fidelity, with fixed thresholds: shade an area of
- * the canvas in a few grays by brightness (`SHADED_ART_LEVELS`), with the same
- * thresholds for any art.
+ * Posterize the art in an area of the canvas into a few light grays
+ * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with fixed
+ * thresholds: the same for any art.
  *
  * Not used: art that's mostly dark, bright or low in contrast falls into one
  * or two of the levels, so it comes out as flat gray or nearly blank (e.g.
  * Ishgard, the Holy See or Glasses of Urza). Kept to compare it with
- * `boostHighlightsPassAdaptive`, which replaced it.
+ * `posterizeLightAdaptive`, which replaced it.
  */
-export const boostHighlightsPassFixed = (
-  ctx: CanvasRenderingContext2D,
-  sx: number,
-  sy: number,
-  sw: number,
-  sh: number,
-) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, () => SHADED_ART_LEVELS);
+export const posterizeLightFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, () => LIGHT_POSTER_SHADES);
 };
 
 /**
- * Filter of the shaded art fidelity, with adaptive thresholds: shade an area
- * of the canvas in a few grays by brightness (`SHADED_ART_LEVELS`), with the
- * thresholds fitted to the art's brightness range.
+ * Posterize the art in an area of the canvas into a few light grays
+ * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with adaptive
+ * thresholds: fitted to the art's brightness range.
  *
  * The range is measured without the darkest and brightest outliers
  * (`BRIGHTNESS_RANGE_OUTLIERS`), and the thresholds move proportionally from
@@ -312,16 +308,16 @@ export const boostHighlightsPassFixed = (
  * from 0 to 255, while art with every brightness keeps the thresholds as they
  * are. So dark, bright or low-contrast art still gets every shade, though art
  * with a wide range but few dark pixels can come out darker than with
- * `boostHighlightsPassFixed`.
+ * `posterizeLightFixed`.
  */
-export const boostHighlightsPassAdaptive = (
+export const posterizeLightAdaptive = (
   ctx: CanvasRenderingContext2D,
   sx: number,
   sy: number,
   sw: number,
   sh: number,
 ) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(SHADED_ART_LEVELS, brightnesses));
+  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(LIGHT_POSTER_SHADES, brightnesses));
 };
 
 /**
@@ -386,16 +382,17 @@ const shadeByBrightness = (
 };
 
 /**
- * Turn an area of the canvas into light shades of gray: its brightness, moved
- * part of the way to white, so it takes less ink.
+ * Turn the art in an area of the canvas to grayscale, lightened: each pixel's
+ * brightness, moved part of the way to white (`GRAYSCALE_LIGHTENING`), so it
+ * takes less ink.
  */
-export const lightGrayscalePass = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+export const lightenGrayscale = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
   const imagePixels = ctx.getImageData(sx, sy, sw, sh);
   const data = imagePixels.data;
 
   for (let i = 0; i < data.length; i += 4) {
     const brightness = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
-    data[i] = data[i + 1] = data[i + 2] = brightness + (255 - brightness) * BLACK_AND_WHITE_LIGHTENING;
+    data[i] = data[i + 1] = data[i + 2] = brightness + (255 - brightness) * GRAYSCALE_LIGHTENING;
   }
   ctx.putImageData(imagePixels, sx, sy);
 };

@@ -1,8 +1,8 @@
 import {
-  boostHighlightsPassAdaptive,
-  contoursPassAdaptive,
-  lightGrayscalePass,
-  midBrightnessPassAdaptive,
+  posterizeLightAdaptive,
+  traceContoursAdaptive,
+  lightenGrayscale,
+  shadeMidtonesAdaptive,
 } from '../../common/canvasFilters';
 import { drawWhenLoaded, loadImage } from '../../common/canvasRendering';
 import type { ArtCrop } from '../../../../domain/cards';
@@ -45,9 +45,9 @@ export const drawArtImage = (
     } else {
       ctx.drawImage(artImage, x, y, width, height);
     }
-    if (artFidelity === 'contours') contoursPassAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'minimal') midBrightnessPassAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'shaded') boostHighlightsPassAdaptive(ctx, x, y, width, height);
-    if (artFidelity === 'black-and-white') lightGrayscalePass(ctx, x, y, width, height);
+    if (artFidelity === 'contours') traceContoursAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'minimal') shadeMidtonesAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'shaded') posterizeLightAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'black-and-white') lightenGrayscale(ctx, x, y, width, height);
   });
 };

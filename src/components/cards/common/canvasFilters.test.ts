@@ -1,10 +1,10 @@
 import {
-  boostHighlightsPassAdaptive,
-  boostHighlightsPassFixed,
-  contoursPassAdaptive,
-  lightGrayscalePass,
-  midBrightnessPassAdaptive,
-  midBrightnessPassFixed,
+  posterizeLightAdaptive,
+  posterizeLightFixed,
+  traceContoursAdaptive,
+  lightenGrayscale,
+  shadeMidtonesAdaptive,
+  shadeMidtonesFixed,
 } from './canvasFilters';
 
 test('turns pixels into light grays, by their brightness', () => {
@@ -12,7 +12,7 @@ test('turns pixels into light grays, by their brightness', () => {
   const pixels = new Uint8ClampedArray([0, 0, 0, 255, 255, 255, 255, 255, 0, 255, 0, 255]);
   const ctx = createCtx(pixels);
 
-  lightGrayscalePass(ctx, 0, 0, 3, 1);
+  lightenGrayscale(ctx, 0, 0, 3, 1);
 
   // Black is lifted 35% of the way to white, white stays white, and green is
   // as bright as 71.52% white before lifting it
@@ -21,7 +21,7 @@ test('turns pixels into light grays, by their brightness', () => {
   expect(ctx.putImageData).toHaveBeenCalledWith({ data: pixels, width: 3, height: 1 }, 0, 0);
 });
 
-describe('shaded art', () => {
+describe('posterizing lightly', () => {
   // Thresholds of the shaded levels, and the shades of pixels above each of them
   const THRESHOLDS = [170, 128, 95, 60, 20];
   const shadeOf = (brightness: number) => {
@@ -32,7 +32,7 @@ describe('shaded art', () => {
     const grays = [10, 30, 70, 100, 150, 200];
     const pixels = grayPixels(grays);
 
-    boostHighlightsPassFixed(createCtx(pixels), 0, 0, grays.length, 1);
+    posterizeLightFixed(createCtx(pixels), 0, 0, grays.length, 1);
 
     expect(shadesOf(pixels)).toEqual([150, 170, 220, 235, 245, 255]);
   });
@@ -41,7 +41,7 @@ describe('shaded art', () => {
     const grays = Array.from({ length: 2560 }, (_, i) => i / 10);
     const pixels = grayPixels(grays);
 
-    boostHighlightsPassAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
+    posterizeLightAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
 
     expectShadedAs(grays, pixels, shadeOf);
   });
@@ -51,7 +51,7 @@ describe('shaded art', () => {
     const grays = Array.from({ length: 1000 }, (_, i) => 100 + i / 10);
     const pixels = grayPixels(grays);
 
-    boostHighlightsPassAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
+    posterizeLightAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
 
     expectShadedAs(grays, pixels, (gray) => shadeOf(((gray - 100) / 100) * 255));
   });
@@ -61,7 +61,7 @@ describe('shaded art', () => {
     const grays = [0, ...Array.from({ length: 998 }, (_, i) => 100 + i / 10), 255];
     const pixels = grayPixels(grays);
 
-    boostHighlightsPassAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
+    posterizeLightAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
 
     expectShadedAs(grays.slice(1, -1), pixels.slice(4, -4), (gray) => shadeOf(((gray - 100) / 100) * 255));
   });
@@ -69,7 +69,7 @@ describe('shaded art', () => {
   test('keeps the thresholds for art of a single brightness', () => {
     const pixels = grayPixels([100, 100, 100]);
 
-    boostHighlightsPassAdaptive(createCtx(pixels), 0, 0, 3, 1);
+    posterizeLightAdaptive(createCtx(pixels), 0, 0, 3, 1);
 
     expect(shadesOf(pixels)).toEqual([235, 235, 235]);
   });
@@ -82,12 +82,12 @@ describe('shaded art', () => {
   };
 });
 
-describe('minimal art', () => {
+describe('shading the midtones', () => {
   test('shades the midtones of the art, leaving the darkest and brightest pixels light', () => {
     const grays = [10, 30, 70, 100, 150, 200];
     const pixels = grayPixels(grays);
 
-    midBrightnessPassFixed(createCtx(pixels), 0, 0, grays.length, 1);
+    shadeMidtonesFixed(createCtx(pixels), 0, 0, grays.length, 1);
 
     expect(shadesOf(pixels)).toEqual([245, 210, 180, 230, 255, 255]);
   });
@@ -97,7 +97,7 @@ describe('minimal art', () => {
     const grays = Array.from({ length: 1000 }, (_, i) => 100 + i / 10);
     const pixels = grayPixels(grays);
 
-    midBrightnessPassAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
+    shadeMidtonesAdaptive(createCtx(pixels), 0, 0, grays.length, 1);
 
     const shades = shadesOf(pixels);
     expect(shades[grays.indexOf(127.5)]).toBe(180);
@@ -105,7 +105,7 @@ describe('minimal art', () => {
   });
 });
 
-describe('contours', () => {
+describe('tracing contours', () => {
   // A 20x10 image of two halves of gray, with the edge between columns 9 and 10
   const twoHalves = (left: number, right: number) => {
     return grayPixels(Array.from({ length: 200 }, (_, i) => (i % 20 < 10 ? left : right)));
@@ -117,7 +117,7 @@ describe('contours', () => {
   test('draws lines along the edges of the art, leaving the rest white', () => {
     const pixels = twoHalves(0, 255);
 
-    contoursPassAdaptive(createCtx(pixels, 20, 10), 0, 0, 20, 10);
+    traceContoursAdaptive(createCtx(pixels, 20, 10), 0, 0, 20, 10);
 
     // A single dark line, one pixel wide, along the edge
     const shades = columnShades(pixels);
@@ -130,8 +130,8 @@ describe('contours', () => {
     const strong = twoHalves(0, 255);
     const faint = twoHalves(120, 140);
 
-    contoursPassAdaptive(createCtx(strong, 20, 10), 0, 0, 20, 10);
-    contoursPassAdaptive(createCtx(faint, 20, 10), 0, 0, 20, 10);
+    traceContoursAdaptive(createCtx(strong, 20, 10), 0, 0, 20, 10);
+    traceContoursAdaptive(createCtx(faint, 20, 10), 0, 0, 20, 10);
 
     expect(columnShades(faint)).toEqual(columnShades(strong));
   });
@@ -142,7 +142,7 @@ describe('contours', () => {
     grays[20 * 30 + 22] = 0;
     const pixels = grayPixels(grays);
 
-    contoursPassAdaptive(createCtx(pixels, 30, 30), 0, 0, 30, 30);
+    traceContoursAdaptive(createCtx(pixels, 30, 30), 0, 0, 30, 30);
 
     const shades = shadesOf(pixels);
     expect(shades.filter((shade, i) => i % 30 > 12 && shade !== 255)).toEqual([]);
@@ -165,8 +165,8 @@ describe('contours', () => {
     const fading = image(true);
     const apart = image(false);
 
-    contoursPassAdaptive(createCtx(fading, 60, 40), 0, 0, 60, 40);
-    contoursPassAdaptive(createCtx(apart, 60, 40), 0, 0, 60, 40);
+    traceContoursAdaptive(createCtx(fading, 60, 40), 0, 0, 60, 40);
+    traceContoursAdaptive(createCtx(apart, 60, 40), 0, 0, 60, 40);
 
     const shadeAt = (pixels: Uint8ClampedArray, x: number, y: number) => pixels[(y * 60 + x) * 4];
     // Rows below where the edge meets the stripes, which leaves a gap in the line
@@ -182,8 +182,8 @@ describe('contours', () => {
     const flat = twoHalves(128, 128);
     const faint = twoHalves(128, 130);
 
-    contoursPassAdaptive(createCtx(flat, 20, 10), 0, 0, 20, 10);
-    contoursPassAdaptive(createCtx(faint, 20, 10), 0, 0, 20, 10);
+    traceContoursAdaptive(createCtx(flat, 20, 10), 0, 0, 20, 10);
+    traceContoursAdaptive(createCtx(faint, 20, 10), 0, 0, 20, 10);
 
     expect(new Set(shadesOf(flat))).toEqual(new Set([255]));
     expect(new Set(shadesOf(faint))).toEqual(new Set([255]));

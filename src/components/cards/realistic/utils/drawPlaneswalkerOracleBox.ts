@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { drawLoyaltyBox } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
@@ -15,7 +16,6 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import type { InkLevel, OracleLayout } from '../../styles';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 
@@ -28,12 +28,14 @@ import type { OracleText } from '../../../../domain/oracleText';
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText = { lines: [] },
     cardLoyalty,
     cardColorTreatment,
     inkLevel,
     layout,
   }: {
+    palette: Palette;
     cardOracleText?: OracleText;
     cardLoyalty: string;
     cardColorTreatment: CardColorTreatment;
@@ -47,6 +49,7 @@ export const drawPlaneswalkerOracleBox = (
   const height = ORACLE_HEIGHT;
 
   drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -67,7 +70,7 @@ export const drawPlaneswalkerOracleBox = (
   const textHeight = height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom;
 
   ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   fillMultilineText(
@@ -82,6 +85,6 @@ export const drawPlaneswalkerOracleBox = (
     x: LOYALTY_BOX_X,
     y: LOYALTY_BOX_Y,
     fontFamily: FONT_FAMILY,
-    colors: REALISTIC_PALETTE,
+    colors: palette,
   });
 };

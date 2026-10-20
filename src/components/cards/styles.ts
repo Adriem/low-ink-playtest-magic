@@ -1,8 +1,7 @@
 import type { CardFace, SubCardPosition } from '../../domain/cards';
 import type { Palette } from '../../domain/colorTreatment';
-import { MINIMALIST_PALETTE } from './minimalist/palette';
 import { renderMinimalistCard } from './minimalist/render';
-import { REALISTIC_PALETTE } from './realistic/palette';
+import { DEFAULT_PALETTES } from './palettes';
 import { renderRealisticCard } from './realistic/render';
 
 /** Part of the card's width the oracle box takes, next to a sub-card */
@@ -19,7 +18,12 @@ export interface CardRenderProps {
   blackBordered?: boolean;
   inkLevel?: InkLevel;
   artFidelity?: ArtFidelity;
+  /** Colors of the card style's palette that replace its defaults, e.g. ones saved by the user */
+  customPalette?: CustomPalette;
 }
+
+/** Colors of a palette by name (e.g. `RED`), as hex values */
+export type CustomPalette = Partial<Record<string, string>>;
 
 /**
  * How much ink to spend on a card: `low` leaves its boxes blank, `medium`
@@ -48,8 +52,8 @@ interface CardStyleDefinition {
 }
 
 const CARD_STYLES: Record<CardStyle, CardStyleDefinition> = {
-  realistic: { render: renderRealisticCard, palette: REALISTIC_PALETTE },
-  minimalist: { render: renderMinimalistCard, palette: MINIMALIST_PALETTE },
+  realistic: { render: renderRealisticCard, palette: DEFAULT_PALETTES.realistic },
+  minimalist: { render: renderMinimalistCard, palette: DEFAULT_PALETTES.minimalist },
 };
 
 export const DEFAULT_CARD_STYLE: CardStyle = 'realistic';

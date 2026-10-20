@@ -1,8 +1,8 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { getFontSize, getMultilineTextHeight } from '../../common/canvasText';
 import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import type { OracleLine, OracleText } from '../../../../domain/oracleText';
 import { FONT_FAMILY, ORACLE_FONT_SIZE } from '../config';
-import { REALISTIC_PALETTE } from '../palette';
 
 interface TextArea {
   lines: OracleLine[];
@@ -19,15 +19,16 @@ interface TextArea {
 export const drawOracleText = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText,
     x,
     y,
     width,
     height,
-  }: { cardOracleText: OracleText; x: number; y: number; width: number; height: number },
+  }: { palette: Palette; cardOracleText: OracleText; x: number; y: number; width: number; height: number },
 ) => {
   ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   fillMultilineText(ctx, fitOracleLines(ctx, cardOracleText.lines, width, height), x, y);
@@ -53,6 +54,7 @@ export const getFittingFontSize = (
 export const drawTextInArea = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     lines,
     x,
     y,
@@ -61,10 +63,10 @@ export const drawTextInArea = (
     padding = 0,
     align = 'center',
     fontSize = ORACLE_FONT_SIZE,
-  }: TextArea & { x: number; y: number; align?: 'top' | 'center' },
+  }: TextArea & { palette: Palette; x: number; y: number; align?: 'top' | 'center' },
 ) => {
   ctx.font = `${fontSize}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   const fittedLines = fitOracleLines(ctx, lines, width, height - padding * 2);

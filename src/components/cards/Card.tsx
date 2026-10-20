@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, finishRender } from './common/canvasRendering';
+import { resolvePalette } from './common/canvasStyles';
 import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './styles';
 
 /**
@@ -17,6 +18,7 @@ const Card = ({
   blackBordered,
   inkLevel,
   artFidelity,
+  customPalette,
   ref,
 }: CardRenderProps & { cardStyle: string; ref?: RefCallback<HTMLCanvasElement> }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -27,15 +29,16 @@ const Card = ({
     },
     [ref],
   );
-  const { render, palette } = getCardStyle(cardStyle);
+  const { render, palette: defaultPalette } = getCardStyle(cardStyle);
+  const paper = resolvePalette(defaultPalette, customPalette).PAPER;
 
   useEffect(() => {
     if (canvas == null) return;
 
     beginRender(canvas);
-    render(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity });
+    render(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette });
     void finishRender(canvas);
-  }, [canvas, render, face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity]);
+  }, [canvas, render, face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette]);
 
   return (
     <canvas
@@ -43,7 +46,7 @@ const Card = ({
       ref={handleCanvasRef}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
-      style={{ background: palette.PAPER }}
+      style={{ background: paper }}
     />
   );
 };

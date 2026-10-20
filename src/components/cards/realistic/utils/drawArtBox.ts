@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { ARTWORK_HEIGHT, ARTWORK_Y, CONTENT_WIDTH, PINLINE_THICKNESS } from '../config';
 import { drawArtImage } from './drawArtImage';
 import { drawFramedBox } from './drawFramedBox';
@@ -8,11 +9,18 @@ import type { ArtFidelity } from '../../styles';
 export const drawArtBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardColorTreatment,
     cardArtUrl,
     cropArt,
     artFidelity,
-  }: { cardColorTreatment: CardColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop; artFidelity?: ArtFidelity },
+  }: {
+    palette: Palette;
+    cardColorTreatment: CardColorTreatment;
+    cardArtUrl?: string;
+    cropArt?: ArtCrop;
+    artFidelity?: ArtFidelity;
+  },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;
@@ -20,6 +28,7 @@ export const drawArtBox = (
   const height = ARTWORK_HEIGHT;
 
   drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,

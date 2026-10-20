@@ -1,6 +1,6 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { drawRectangle, drawRoundedBox, type Box } from '../../common/canvasShapes';
 import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
-import { REALISTIC_PALETTE } from '../palette';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { drawInkFill, getFillStyle, getInkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
@@ -26,6 +26,7 @@ import type { InkLevel } from '../../styles';
 export const drawFramedBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     x,
     y,
     width,
@@ -37,6 +38,7 @@ export const drawFramedBox = (
     inkLevel = 'low',
     inkFillStrength = 'regular',
   }: {
+    palette: Palette;
     x: number;
     y: number;
     width: number;
@@ -66,20 +68,20 @@ export const drawFramedBox = (
     width,
     height,
     lineWidth: 0,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, REALISTIC_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
     flatSide,
   });
   const innerLine = {
     ...inner,
     lineWidth: shape === 'capsule' ? CAPSULE_INNER_STROKE : PINLINE_THICKNESS,
-    strokeStyle: REALISTIC_PALETTE.LINE,
+    strokeStyle: palette.LINE,
     flatSide,
   };
-  drawShape(ctx, { ...innerLine, fillStyle: REALISTIC_PALETTE.PAPER });
+  drawShape(ctx, { ...innerLine, fillStyle: palette.PAPER });
 
   const inkFill = getInkFill(
     ctx,
-    getPaletteColors(cardColorTreatment.backgroundColors, REALISTIC_PALETTE),
+    getPaletteColors(cardColorTreatment.backgroundColors, palette),
     inkLevel,
     inkFillStrength,
   );

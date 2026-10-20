@@ -5,3 +5,34 @@
   margin: 0;
   box-sizing: border-box;
 }
+
+/* Each card style on its own line, with its palette button on the right */
+.card-styles .card-style,
+.palette-editor .palette-color {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.card-styles .card-style + .card-style,
+.palette-editor .palette-color + .palette-color {
+  margin-top: 0.25rem;
+}
+
+/* Marks the colors changed and not saved yet */
+.palette-editor .modified-dot {
+  display: inline-block;
+  width: 0.5em;
+  height: 0.5em;
+  margin-left: 0.4em;
+  border-radius: 50%;
+  background: #1a73e8;
+  vertical-align: middle;
+}
+
+/* Restoring the defaults goes below the colors, centered */
+.palette-editor .palette-restore {
+  margin-top: 0.75em;
+  text-align: center;
+}

@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import {
   CONTENT_WIDTH,
   ORACLE_TEXT_PADDING_X,
@@ -20,12 +21,14 @@ import type { InkLevel } from '../../styles';
 export const drawSagaCreatureOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText,
     cardColorTreatment,
     inkLevel,
-  }: { cardOracleText: OracleText; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
+  }: { palette: Palette; cardOracleText: OracleText; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
 ) => {
   const inner = drawFramedBox(ctx, {
+    palette,
     x: (ctx.canvas.width - CONTENT_WIDTH) / 2,
     y: SAGA_CREATURE_ORACLE_Y,
     width: CONTENT_WIDTH,
@@ -38,6 +41,7 @@ export const drawSagaCreatureOracleBox = (
 
   const textTop = inner.y + PINLINE_THICKNESS;
   drawTextInArea(ctx, {
+    palette,
     lines: cardOracleText.lines,
     x: inner.x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
     y: textTop,

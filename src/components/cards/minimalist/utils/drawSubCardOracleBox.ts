@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { drawRectangle } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
@@ -9,7 +10,6 @@ import {
   TEXT_FONT_FAMILY,
 } from '../config';
 import type { SubCardPosition } from '../../../../domain/cards';
-import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import type { OracleText } from '../../../../domain/oracleText';
@@ -20,10 +20,16 @@ const TEXT_PADDING_FROM_OUTSIDE = 10;
 export const drawSubCardOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText,
     cardColorTreatment,
     position,
-  }: { cardOracleText?: OracleText; cardColorTreatment: CardColorTreatment; position: SubCardPosition },
+  }: {
+    palette: MinimalistPalette;
+    cardOracleText?: OracleText;
+    cardColorTreatment: CardColorTreatment;
+    position: SubCardPosition;
+  },
 ) => {
   const cardWidth = ctx.canvas.width;
   const textMarginX = (cardWidth - CONTENT_WIDTH) / 2;
@@ -34,14 +40,10 @@ export const drawSubCardOracleBox = (
       : ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 + TEXT_PADDING_FROM_CENTER;
   const textWidth = CONTENT_WIDTH / 2 - PINLINE_THICKNESS / 2 - TEXT_PADDING_FROM_CENTER - TEXT_PADDING_FROM_OUTSIDE;
 
-  drawOracleBorder(ctx, {
-    cardColorTreatment,
-    position,
-    y: SUBCARD_ORACLE_Y + SUBCARD_ORACLE_HEIGHT,
-  });
+  drawOracleBorder(ctx, { palette, cardColorTreatment, position, y: SUBCARD_ORACLE_Y + SUBCARD_ORACLE_HEIGHT });
 
   ctx.font = `${SUBCARD_ORACLE_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
-  ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   fillMultilineText(
@@ -54,7 +56,12 @@ export const drawSubCardOracleBox = (
 
 const drawOracleBorder = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, position, y }: { cardColorTreatment: CardColorTreatment; position: SubCardPosition; y: number },
+  {
+    palette,
+    cardColorTreatment,
+    position,
+    y,
+  }: { palette: MinimalistPalette; cardColorTreatment: CardColorTreatment; position: SubCardPosition; y: number },
 ) => {
   const x =
     position === 'right' ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
@@ -65,6 +72,6 @@ const drawOracleBorder = (
     y,
     width,
     height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
   });
 };

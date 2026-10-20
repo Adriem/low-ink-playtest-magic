@@ -3,6 +3,9 @@ export {
   SETTINGS_DEFINITIONS,
   SettingsContextProvider,
   isSettingAvailable,
+  useCardPalette,
+  useDiscardPalettePreviews,
+  usePaletteEditor,
   useRestoreDefaultSettings,
   useSetting,
 } from './SettingsContext';

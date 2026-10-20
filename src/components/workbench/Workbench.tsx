@@ -5,7 +5,7 @@ import { getSubCardPosition } from '../../domain/cards';
 import { isColorSymbol, type ColorSymbol } from '../../domain/colors';
 import useCardData from './useCardData';
 import Reference from './Reference';
-import { SETTINGS_DEFINITIONS, isSettingAvailable, useSetting } from '../settings';
+import { SETTINGS_DEFINITIONS, isSettingAvailable, useCardPalette, useSetting } from '../settings';
 
 import './Workbench.css';
 
@@ -37,6 +37,7 @@ const Workbench = () => {
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
   const [cardVariant, setCardVariant] = useSetting('cardVariant');
   const [inkLevel, setInkLevel] = useSetting('inkLevel');
+  const customPalette = useCardPalette(cardVariant);
   const [artFidelity, setArtFidelity] = useSetting('artFidelity');
 
   const { card, referenceImageUrl, loading, error } = useCardData(cardName);
@@ -94,6 +95,7 @@ const Workbench = () => {
               subFacePosition={getSubCardPosition(card)}
               blackBordered={blackBordered}
               inkLevel={inkLevel}
+              customPalette={customPalette}
               artFidelity={artFidelity}
             />
           </div>

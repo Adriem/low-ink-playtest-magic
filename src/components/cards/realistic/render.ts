@@ -15,7 +15,9 @@ import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps, InkLevel } from '../styles';
-import { hasBlackBorder } from '../common/canvasStyles';
+import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
+import { REALISTIC_PALETTE } from './palette';
+import type { Palette } from '../../../domain/colorTreatment';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
@@ -25,8 +27,17 @@ import { get2dContext } from '../common/canvasRendering';
  */
 export const renderRealisticCard = (
   canvas: HTMLCanvasElement,
-  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', artFidelity = 'posterized' }: CardRenderProps,
+  {
+    face,
+    subFace,
+    subFacePosition,
+    blackBordered,
+    inkLevel = 'medium',
+    artFidelity = 'posterized',
+    customPalette,
+  }: CardRenderProps,
 ) => {
+  const palette = resolvePalette(REALISTIC_PALETTE, customPalette);
   const cardColorTreatment = getCardColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
@@ -40,8 +51,13 @@ export const renderRealisticCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }), inkLevel, cardColorTreatment });
-  drawTitleBox(ctx, { cardName, cardManaCost, cardColorTreatment, inkLevel });
+  drawOuterFrame(ctx, {
+    palette,
+    blackBordered: hasBlackBorder({ blackBordered, inkLevel }),
+    inkLevel,
+    cardColorTreatment,
+  });
+  drawTitleBox(ctx, { palette, cardName, cardManaCost, cardColorTreatment, inkLevel });
 
   if (face.faceLayout === 'saga') {
     if (powerAndToughness) {
@@ -50,6 +66,7 @@ export const renderRealisticCard = (
       const sagaText = { lines: [...sagaAbilities, ...chapters] };
       const creatureText = { lines: creatureAbilities };
       drawSagaOracleAndArtBox(ctx, {
+        palette,
         cardOracleText: sagaText,
         cardArtUrl,
         cropArt,
@@ -57,19 +74,20 @@ export const renderRealisticCard = (
         cardColorTreatment,
         typelineY: SAGA_CREATURE_TYPELINE_Y,
       });
-      drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_CREATURE_TYPELINE_Y });
-      drawSagaCreatureOracleBox(ctx, { cardOracleText: creatureText, cardColorTreatment, inkLevel });
+      drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_CREATURE_TYPELINE_Y });
+      drawSagaCreatureOracleBox(ctx, { palette, cardOracleText: creatureText, cardColorTreatment, inkLevel });
     } else {
-      drawSagaOracleAndArtBox(ctx, { cardOracleText, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
-      drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_TYPELINE_Y });
+      drawSagaOracleAndArtBox(ctx, { palette, cardOracleText, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
+      drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_TYPELINE_Y });
     }
   } else {
-    drawArtBox(ctx, { cardArtUrl, cropArt, artFidelity, cardColorTreatment });
-    drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel });
+    drawArtBox(ctx, { palette, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
+    drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel });
     const oracleLayout =
       subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
     if (cardLoyalty) {
       drawPlaneswalkerOracleBox(ctx, {
+        palette,
         cardOracleText,
         cardLoyalty,
         cardColorTreatment,
@@ -78,6 +96,7 @@ export const renderRealisticCard = (
       });
     } else {
       drawOracleBox(ctx, {
+        palette,
         cardOracleText,
         cardPower: powerAndToughness?.power,
         cardToughness: powerAndToughness?.toughness,
@@ -89,11 +108,12 @@ export const renderRealisticCard = (
   }
 
   if (subFace && subFacePosition) {
-    drawSubCard(ctx, subFace, subFacePosition, inkLevel);
+    drawSubCard(ctx, subFace, subFacePosition, inkLevel, palette);
   }
 
   if (powerAndToughness) {
     drawStatsBox(ctx, {
+      palette,
       cardPower: powerAndToughness.power,
       cardToughness: powerAndToughness.toughness,
       cardColorTreatment,
@@ -107,10 +127,12 @@ const drawSubCard = (
   subFace: CardFace,
   position: SubCardPosition,
   inkLevel: InkLevel,
+  palette: Palette,
 ) => {
   const subColorTreatment = getCardColorTreatment(subFace);
 
   drawSubCardTitleBox(ctx, {
+    palette,
     cardName: subFace.name,
     cardManaCost: subFace.manaCost,
     cardColorTreatment: subColorTreatment,
@@ -118,12 +140,14 @@ const drawSubCard = (
     position,
   });
   drawSubCardTypeBox(ctx, {
+    palette,
     cardType: subFace.typeLine,
     cardColorTreatment: subColorTreatment,
     inkLevel,
     position,
   });
   drawSubCardOracleBox(ctx, {
+    palette,
     cardOracleText: subFace.oracleText,
     cardColorTreatment: subColorTreatment,
     inkLevel,

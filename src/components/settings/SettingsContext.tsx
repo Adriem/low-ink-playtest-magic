@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
-import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
+import type { ArtFidelity, CardStyle, CustomPalette, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
 import { loadFromStorage, saveToStorage } from '../../utils/storage';
 import { isRecord } from '../../utils/object';
@@ -17,6 +17,9 @@ export type SettingName = keyof Settings;
 
 /** Local storage key the settings are saved in, as a JSON object */
 const SETTINGS_STORAGE_KEY = 'press:settings';
+
+/** Local storage key prefix each card style's palette is saved in, as a JSON object of its colors */
+const PALETTE_STORAGE_KEY_PREFIX = 'press:palette:';
 
 export interface SettingDefinition<T extends string> {
   label: string;
@@ -95,6 +98,13 @@ interface SettingsContextValue {
   settings: Settings;
   setSetting: <Name extends SettingName>(name: Name, value: Settings[Name]) => void;
   restoreDefaults: () => void;
+  /** Custom colors saved for each card style's palette */
+  palettes: Record<CardStyle, CustomPalette>;
+  /** Colors being edited and not saved yet, which the cards are drawn with meanwhile */
+  palettePreviews: Partial<Record<CardStyle, CustomPalette>>;
+  previewPalette: (cardStyle: CardStyle, palette: CustomPalette) => void;
+  savePalette: (cardStyle: CardStyle, palette: CustomPalette) => void;
+  discardPalettePreviews: (cardStyle?: CardStyle) => void;
 }
 
 const SettingsContext = createContext<SettingsContextValue | null>(null);
@@ -110,13 +120,69 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
     setSettings(getDefaultSettings());
   }, []);
 
+  const [palettes, setPalettes] = useState(loadPalettes);
+  const [palettePreviews, setPalettePreviews] = useState<Partial<Record<CardStyle, CustomPalette>>>({});
+
+  const previewPalette = useCallback((cardStyle: CardStyle, palette: CustomPalette) => {
+    setPalettePreviews((prev) => ({ ...prev, [cardStyle]: palette }));
+  }, []);
+
+  // Each palette is saved on its own, and stops being a preview
+  const savePalette = useCallback((cardStyle: CardStyle, palette: CustomPalette) => {
+    setPalettes((prev) => ({ ...prev, [cardStyle]: palette }));
+    setPalettePreviews((prev) => withoutPreview(prev, cardStyle));
+    saveToStorage(localStorage, PALETTE_STORAGE_KEY_PREFIX + cardStyle, palette);
+  }, []);
+
+  // The preview of a card style's palette, or of every one
+  const discardPalettePreviews = useCallback((cardStyle?: CardStyle) => {
+    setPalettePreviews((prev) => (cardStyle == null ? {} : withoutPreview(prev, cardStyle)));
+  }, []);
+
   useEffect(() => {
     saveToStorage(localStorage, SETTINGS_STORAGE_KEY, settings);
   }, [settings]);
 
   return (
-    <SettingsContext.Provider value={{ settings, setSetting, restoreDefaults }}>{children}</SettingsContext.Provider>
+    <SettingsContext.Provider
+      value={{
+        settings,
+        setSetting,
+        restoreDefaults,
+        palettes,
+        palettePreviews,
+        previewPalette,
+        savePalette,
+        discardPalettePreviews,
+      }}
+    >
+      {children}
+    </SettingsContext.Provider>
   );
+};
+
+/**
+ * Palette previews without a card style's.
+ */
+const withoutPreview = (previews: Partial<Record<CardStyle, CustomPalette>>, cardStyle: CardStyle) => {
+  const rest = { ...previews };
+  delete rest[cardStyle];
+  return rest;
+};
+
+/**
+ * The custom colors saved for each card style's palette.
+ */
+const loadPalettes = (): Record<CardStyle, CustomPalette> => {
+  const cardStyles = SETTINGS_DEFINITIONS.cardVariant.options.map(({ value }) => value);
+  return Object.fromEntries(
+    cardStyles.map((cardStyle) => {
+      return [
+        cardStyle,
+        loadFromStorage<CustomPalette>(localStorage, PALETTE_STORAGE_KEY_PREFIX + cardStyle, {}, isRecord),
+      ];
+    }),
+  ) as Record<CardStyle, CustomPalette>;
 };
 
 /**
@@ -166,4 +232,40 @@ export const useRestoreDefaultSettings = (): (() => void) => {
   const ctx = useContext(SettingsContext);
   if (!ctx) throw new Error('useRestoreDefaultSettings must be used within a SettingsContextProvider');
   return ctx.restoreDefaults;
+};
+
+/**
+ * The custom colors to draw a card style with: the ones being edited, if any,
+ * or the saved ones.
+ */
+export const useCardPalette = (cardStyle: CardStyle): CustomPalette => {
+  const ctx = useContext(SettingsContext);
+  if (!ctx) throw new Error('useCardPalette must be used within a SettingsContextProvider');
+  return ctx.palettePreviews[cardStyle] ?? ctx.palettes[cardStyle];
+};
+
+/**
+ * What the editor of a card style's palette needs: its saved colors, its
+ * colors being edited, if any, and functions to preview, save and discard
+ * them.
+ */
+export const usePaletteEditor = (cardStyle: CardStyle) => {
+  const ctx = useContext(SettingsContext);
+  if (!ctx) throw new Error('usePaletteEditor must be used within a SettingsContextProvider');
+  return {
+    savedPalette: ctx.palettes[cardStyle],
+    previewedPalette: ctx.palettePreviews[cardStyle],
+    preview: (palette: CustomPalette) => ctx.previewPalette(cardStyle, palette),
+    save: (palette: CustomPalette) => ctx.savePalette(cardStyle, palette),
+    discard: () => ctx.discardPalettePreviews(cardStyle),
+  };
+};
+
+/**
+ * Function that discards the colors of every palette being edited and not saved.
+ */
+export const useDiscardPalettePreviews = (): (() => void) => {
+  const ctx = useContext(SettingsContext);
+  if (!ctx) throw new Error('useDiscardPalettePreviews must be used within a SettingsContextProvider');
+  return () => ctx.discardPalettePreviews();
 };

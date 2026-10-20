@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
@@ -9,7 +10,6 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 import type { InkLevel } from '../../styles';
@@ -17,11 +17,13 @@ import type { InkLevel } from '../../styles';
 export const drawSubCardOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText,
     cardColorTreatment,
     inkLevel,
     position,
   }: {
+    palette: Palette;
     cardOracleText?: OracleText;
     cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
@@ -40,6 +42,7 @@ export const drawSubCardOracleBox = (
     width: innerWidth,
     height: innerHeight,
   } = drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -58,7 +61,7 @@ export const drawSubCardOracleBox = (
   const textBottomY = innerY + innerHeight - 6;
 
   ctx.font = `${SUBCARD_ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   fillMultilineText(

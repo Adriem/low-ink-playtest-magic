@@ -7,7 +7,7 @@ import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
 import PressActions from './PressActions';
 import SheetSlot from './SheetSlot';
-import { useSetting } from '../settings';
+import { useSetting, useCardPalette } from '../settings';
 
 import './Press.css';
 import { exportToPDF, type PdfExportOptions } from '../../adapters/jspdf';
@@ -28,6 +28,7 @@ const Press = () => {
   const [splitCardTreatment] = useSetting('splitCardTreatment');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const [inkLevel] = useSetting('inkLevel');
+  const customPalette = useCardPalette(cardVariant);
   const [artFidelity] = useSetting('artFidelity');
   const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
@@ -90,6 +91,7 @@ const Press = () => {
                       cardStyle={cardVariant}
                       faces={item.faces}
                       inkLevel={inkLevel}
+                      customPalette={customPalette}
                       artFidelity={artFidelity}
                       ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                     />
@@ -100,6 +102,7 @@ const Press = () => {
                       subFace={item.subFace}
                       subFacePosition={item.subFacePosition}
                       inkLevel={inkLevel}
+                      customPalette={customPalette}
                       artFidelity={artFidelity}
                       ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                     />

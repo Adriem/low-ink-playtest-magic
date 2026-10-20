@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { drawRectangle } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
@@ -11,7 +12,6 @@ import {
   TEXT_FONT_FAMILY,
 } from '../config';
 import type { OracleLayout } from '../../styles';
-import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import type { OracleText } from '../../../../domain/oracleText';
@@ -21,12 +21,14 @@ const DIVIDER_TEXT_PADDING = 8;
 export const drawOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText,
     cardColorTreatment,
     cardPower,
     cardToughness,
     layout,
   }: {
+    palette: MinimalistPalette;
     cardOracleText?: OracleText;
     cardColorTreatment: CardColorTreatment;
     cardPower?: string;
@@ -43,9 +45,9 @@ export const drawOracleBox = (
   const height = hasStats ? ORACLE_HEIGHT : ORACLE_HEIGHT + ORACLE_EXTENDED_EXTRA;
 
   if (layout !== 'full-width') {
-    drawSubCardDivider(ctx, { cardColorTreatment, height });
+    drawSubCardDivider(ctx, { palette, cardColorTreatment, height });
   }
-  drawOracleBorder(ctx, { cardColorTreatment, layout, y: y + height });
+  drawOracleBorder(ctx, { palette, cardColorTreatment, layout, y: y + height });
 
   const textPaddingX = layout === 'full-width' ? 0 : DIVIDER_TEXT_PADDING;
   const textX = layout === 'right-half' ? x + textPaddingX : x;
@@ -57,7 +59,7 @@ export const drawOracleBox = (
   const textHeight = height - textPaddingTop - textPaddingBottom;
 
   ctx.font = `${ORACLE_FONT_SIZE}px ${TEXT_FONT_FAMILY}`;
-  ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   const paragraphs = fitOracleLinesIntoBox(ctx, cardOracleText?.lines ?? [], textWidth, textHeight);
@@ -71,20 +73,29 @@ export const drawOracleBox = (
 
 const drawSubCardDivider = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, height }: { cardColorTreatment: CardColorTreatment; height: number },
+  {
+    palette,
+    cardColorTreatment,
+    height,
+  }: { palette: MinimalistPalette; cardColorTreatment: CardColorTreatment; height: number },
 ) => {
   drawRectangle(ctx, {
     x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
     y: ORACLE_Y,
     width: PINLINE_THICKNESS,
     height: height,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
   });
 };
 
 const drawOracleBorder = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, layout, y }: { cardColorTreatment: CardColorTreatment; layout: OracleLayout; y: number },
+  {
+    palette,
+    cardColorTreatment,
+    layout,
+    y,
+  }: { palette: MinimalistPalette; cardColorTreatment: CardColorTreatment; layout: OracleLayout; y: number },
 ) => {
   const x =
     layout === 'right-half' ? ctx.canvas.width / 2 - PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
@@ -95,6 +106,6 @@ const drawOracleBorder = (
     y,
     width,
     height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
   });
 };

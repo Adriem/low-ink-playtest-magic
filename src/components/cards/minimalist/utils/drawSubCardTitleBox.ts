@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { splitSymbols } from '../../../../domain/symbols';
 import { calculateManaCostWidth, renderManaCost } from '../../common/manaCostRenderer';
 import { drawTitleText } from './drawTitleText';
@@ -13,11 +14,18 @@ const MANA_SYMBOLS_SPACING = 4;
 export const drawSubCardTitleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardName,
     cardManaCost,
     position,
     maxHeight = SUBCARD_TITLE_HEIGHT,
-  }: { cardName: string; cardManaCost?: string; position: SubCardPosition; maxHeight?: number },
+  }: {
+    palette: MinimalistPalette;
+    cardName: string;
+    cardManaCost?: string;
+    position: SubCardPosition;
+    maxHeight?: number;
+  },
 ) => {
   const cardWidth = ctx.canvas.width;
   const subCardWidth = cardWidth / 2;
@@ -40,6 +48,7 @@ export const drawSubCardTitleBox = (
   const titleLine2Width = subTitleWidth - TITLE_BOX_MARGIN_FROM_CENTER * 2;
 
   drawTitleText(ctx, {
+    palette,
     text: cardName,
     x: titleLinesX,
     y: titleLinesY,

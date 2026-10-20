@@ -7,7 +7,7 @@ import {
   type CanvasPaint,
   type CornerRadius,
 } from '../../common/canvasShapes';
-import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
+import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, CARD_LAYOUTS, type Orientation } from '../config';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { drawInkFill, getFillStyle, getInkFill, type InkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
@@ -61,6 +61,7 @@ export const drawFramedBox = (
     innerHeightAdjustment = 0,
     inkLevel = 'low',
     inkFillStrength = 'regular',
+    orientation = 'portrait',
   }: {
     palette: Palette;
     x: number;
@@ -76,6 +77,8 @@ export const drawFramedBox = (
     innerHeightAdjustment?: number;
     inkLevel?: InkLevel;
     inkFillStrength?: InkFillStrength;
+    /** Which way the card is drawn: landscape cards (e.g. battles) are laid out sideways */
+    orientation?: Orientation;
   },
 ): Box => {
   const drawShape = shape === 'capsule' ? drawRoundedBox : drawRectangle;
@@ -89,12 +92,15 @@ export const drawFramedBox = (
     height: height - PINLINE_THICKNESS - bottomPinlineWidth + innerHeightAdjustment,
   };
 
-  const pinlineStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette));
+  // Gradients and dot patterns span the whole card, whichever way it's drawn
+  const cardSize = CARD_LAYOUTS[orientation];
+  const pinlineStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette), cardSize.width);
   const inkFill = getInkFill(
     ctx,
     getPaletteColors(cardColorTreatment.backgroundColors, palette),
     inkLevel,
     inkFillStrength,
+    cardSize,
   );
 
   const hasRegularPinlines = leftPinlineWidth === PINLINE_THICKNESS && bottomPinlineWidth === PINLINE_THICKNESS;

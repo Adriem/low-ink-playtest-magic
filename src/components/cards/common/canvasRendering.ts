@@ -21,7 +21,9 @@ export const beginRender = (canvas: HTMLCanvasElement) => {
 
 /**
  * Draw something once it has loaded, as part of the current render of the
- * canvas. Skipped if a newer render started in the meantime.
+ * canvas, with the transform the context had when asked (e.g. rotated, for
+ * landscape cards drawn sideways). Skipped if a newer render started in the
+ * meantime.
  *
  * @param loading - e.g. an image being loaded
  */
@@ -31,10 +33,14 @@ export const drawWhenLoaded = <T>(
   draw: (loaded: T) => void,
 ): Promise<void> => {
   const render = renders.get(ctx.canvas);
+  const transform = ctx.getTransform();
 
   const drawing = loading.then((loaded) => {
     if (render && renders.get(ctx.canvas) !== render) return;
+    ctx.save();
+    ctx.setTransform(transform);
     draw(loaded);
+    ctx.restore();
   });
 
   render?.pendingDrawings.push(drawing);

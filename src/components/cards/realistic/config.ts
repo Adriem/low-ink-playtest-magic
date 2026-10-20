@@ -75,7 +75,65 @@ export const ORACLE_TEXT_PADDING_X = 8;
 export const ORACLE_TEXT_PADDING_Y = 11;
 // Bottom padding of the oracle text when the stats or loyalty box overlaps the box
 export const ORACLE_TEXT_STATS_CLEARANCE = 26;
+// Space above and below the oracle text of landscape cards, which have little room for it
+export const LANDSCAPE_ORACLE_TEXT_PADDING_Y = 6;
 
 // Center of the bottom of the planeswalker loyalty box
 export const LOYALTY_BOX_X = 439;
 export const LOYALTY_BOX_Y = 664;
+
+/** Which way a card is drawn: landscape ones (e.g. battles) are drawn sideways in the card */
+export type Orientation = 'portrait' | 'landscape';
+
+/** Size of a card, and where its boxes go */
+export interface CardLayout {
+  width: number;
+  height: number;
+  titleY: number;
+  titleWidth: number;
+  contentWidth: number;
+  artY: number;
+  artHeight: number;
+  typelineY: number;
+  oracleY: number;
+  oracleHeight: number;
+  /** Middle of the bottom of the defense box, of battles */
+  defenseX: number;
+  defenseY: number;
+  /** Space between the bottom of the card background and the bottom of the card */
+  backgroundMarginBottom: number;
+}
+
+/** Layout of cards by orientation: portrait ones are 500x700, landscape ones 700x500 */
+export const CARD_LAYOUTS: Record<Orientation, CardLayout> = {
+  portrait: {
+    width: 500,
+    height: 700,
+    titleY: TITLE_Y,
+    titleWidth: TITLE_WIDTH,
+    contentWidth: CONTENT_WIDTH,
+    artY: ARTWORK_Y,
+    artHeight: ARTWORK_HEIGHT,
+    typelineY: TYPELINE_Y,
+    oracleY: ORACLE_Y,
+    oracleHeight: ORACLE_HEIGHT,
+    defenseX: LOYALTY_BOX_X,
+    defenseY: LOYALTY_BOX_Y,
+    backgroundMarginBottom: 60,
+  },
+  landscape: {
+    width: 700,
+    height: 500,
+    titleY: TITLE_Y,
+    titleWidth: 650,
+    contentWidth: 634,
+    artY: ARTWORK_Y,
+    artHeight: 200,
+    typelineY: 273,
+    oracleY: 317,
+    oracleHeight: 138,
+    defenseX: 660,
+    defenseY: 490,
+    backgroundMarginBottom: 52,
+  },
+};

@@ -1,5 +1,5 @@
 import type { Palette } from '../../../../domain/colorTreatment';
-import { ARTWORK_HEIGHT, ARTWORK_Y, CONTENT_WIDTH } from '../config';
+import { CARD_LAYOUTS, type Orientation } from '../config';
 import { ART_INSET } from '../planeswalkerLayout';
 import { drawArtImage } from './drawArtImage';
 import { drawFramedBox, type CornerRadii } from './drawFramedBox';
@@ -15,9 +15,10 @@ export const drawArtBox = (
     cardArtUrl,
     cropArt,
     artFidelity,
-    y = ARTWORK_Y,
-    width = CONTENT_WIDTH,
-    height = ARTWORK_HEIGHT,
+    orientation = 'portrait',
+    y = CARD_LAYOUTS[orientation].artY,
+    width = CARD_LAYOUTS[orientation].contentWidth,
+    height = CARD_LAYOUTS[orientation].artHeight,
     cornerRadii,
   }: {
     palette: Palette;
@@ -25,6 +26,8 @@ export const drawArtBox = (
     cardArtUrl?: string;
     cropArt?: ArtCrop;
     artFidelity?: ArtFidelity;
+    /** Which way the card is drawn: landscape cards (e.g. battles) are laid out sideways */
+    orientation?: Orientation;
     /** Top of the box, higher on planeswalkers */
     y?: number;
     /** Width of the box, centered on the card, wider on planeswalkers */
@@ -35,7 +38,7 @@ export const drawArtBox = (
     cornerRadii?: { pinline: CornerRadii; art: CornerRadii };
   },
 ) => {
-  const x = (ctx.canvas.width - width) / 2;
+  const x = (CARD_LAYOUTS[orientation].width - width) / 2;
 
   const innerRadii = cornerRadii?.art;
   const inner = drawFramedBox(ctx, {
@@ -46,6 +49,7 @@ export const drawArtBox = (
     height,
     cardColorTreatment,
     shape: 'rectangle',
+    orientation,
     innerHeightAdjustment: 1,
     cornerRadii: cornerRadii && { outer: cornerRadii.pinline, inner: cornerRadii.art },
   });

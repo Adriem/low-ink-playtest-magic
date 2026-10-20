@@ -1,6 +1,7 @@
 import { testCard, testFace } from '../testUtils';
 import {
   computeCardColors,
+  getDefense,
   getLoyalty,
   getPowerAndToughness,
   getSubCardPosition,
@@ -44,4 +45,6 @@ test('gets the stats of a face', () => {
   expect(getLoyalty(creature)).toBeUndefined();
   expect(getLoyalty(planeswalker)).toBe('3');
   expect(getPowerAndToughness(planeswalker)).toBeUndefined();
+  expect(getDefense(testFace({ name: 'Invasion of Ravnica', stats: { defense: '4' } }))).toBe('4');
+  expect(getDefense(planeswalker)).toBeUndefined();
 });

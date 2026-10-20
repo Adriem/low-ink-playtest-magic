@@ -26,6 +26,7 @@ export const drawOracleBox = (
     cardColorTreatment,
     cardPower,
     cardToughness,
+    cardDefense,
     layout,
   }: {
     palette: MinimalistPalette;
@@ -33,10 +34,12 @@ export const drawOracleBox = (
     cardColorTreatment: CardColorTreatment;
     cardPower?: string;
     cardToughness?: string;
+    /** Defense of a battle, below the box like the stats */
+    cardDefense?: string;
     layout: OracleLayout;
   },
 ) => {
-  const hasStats = cardPower != null && cardToughness != null;
+  const hasStats = (cardPower != null && cardToughness != null) || cardDefense != null;
 
   const x =
     layout === 'right-half' ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;

@@ -1,3 +1,4 @@
+import { drawDefenseBox } from '../common/canvasShapes';
 import { drawArtBox } from './utils/drawArtBox';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawOuterFrame } from './utils/drawOuterFrame';
@@ -9,15 +10,21 @@ import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
 import { getSagaParts } from '../../../domain/oracleText';
-import { SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } from './config';
+import { CARD_LAYOUTS, FONT_FAMILY, SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } from './config';
 import { drawSagaCreatureOracleBox } from './utils/drawSagaCreatureOracleBox';
 import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
-import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
+import {
+  getDefense,
+  getLoyalty,
+  getPowerAndToughness,
+  type CardFace,
+  type SubCardPosition,
+} from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
-import type { CardRenderProps, InkLevel } from '../styles';
+import type { ArtFidelity, CardRenderProps, InkLevel } from '../styles';
 import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
 import { REALISTIC_PALETTE } from './palette';
-import type { Palette } from '../../../domain/colorTreatment';
+import type { CardColorTreatment, Palette } from '../../../domain/colorTreatment';
 import { drawWhenLoaded, get2dContext, loadImage } from '../common/canvasRendering';
 import { ART_CORNER_RADII, getPlaneswalkerLayout, type PlaneswalkerLayout } from './planeswalkerLayout';
 
@@ -51,6 +58,11 @@ export const renderRealisticCard = (
 
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (face.faceLayout === 'battle') {
+    drawBattle(ctx, { face, palette, cardColorTreatment, blackBordered, inkLevel, artFidelity });
+    return;
+  }
 
   drawOuterFrame(ctx, {
     palette,
@@ -146,6 +158,81 @@ export const renderRealisticCard = (
       inkLevel,
     });
   }
+};
+
+/**
+ * Draw a battle: a landscape card, laid out sideways and turned
+ * counterclockwise into the canvas.
+ */
+const drawBattle = (
+  ctx: CanvasRenderingContext2D,
+  {
+    face,
+    palette,
+    cardColorTreatment,
+    blackBordered,
+    inkLevel,
+    artFidelity,
+  }: {
+    face: CardFace;
+    palette: Palette;
+    cardColorTreatment: CardColorTreatment;
+    blackBordered?: boolean;
+    inkLevel: InkLevel;
+    artFidelity: ArtFidelity;
+  },
+) => {
+  const orientation = 'landscape';
+  const layout = CARD_LAYOUTS[orientation];
+  const cardDefense = getDefense(face);
+
+  ctx.save();
+  ctx.translate(0, ctx.canvas.height);
+  ctx.rotate(-Math.PI / 2);
+
+  drawOuterFrame(ctx, {
+    palette,
+    blackBordered: hasBlackBorder({ blackBordered, inkLevel }),
+    inkLevel,
+    cardColorTreatment,
+    orientation,
+  });
+  drawTitleBox(ctx, {
+    palette,
+    cardName: face.name,
+    cardManaCost: face.manaCost,
+    cardColorTreatment,
+    inkLevel,
+    orientation,
+  });
+  drawArtBox(ctx, {
+    palette,
+    cardArtUrl: face.art.assetUrl,
+    cropArt: face.art.crop,
+    artFidelity,
+    cardColorTreatment,
+    orientation,
+  });
+  drawTypeBox(ctx, { palette, cardType: face.typeLine, cardColorTreatment, inkLevel, orientation });
+  drawOracleBox(ctx, {
+    palette,
+    cardOracleText: face.oracleText,
+    cardColorTreatment,
+    inkLevel,
+    layout: 'full-width',
+    orientation,
+  });
+  if (cardDefense) {
+    drawDefenseBox(ctx, {
+      cardDefense,
+      x: layout.defenseX,
+      y: layout.defenseY,
+      fontFamily: FONT_FAMILY,
+      colors: palette,
+    });
+  }
+
+  ctx.restore();
 };
 
 const drawSubCard = (

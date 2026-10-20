@@ -12,8 +12,8 @@ import {
   TITLE_FONT_SIZE,
   TITLE_HEIGHT,
   TITLE_TEXT_BASELINE_OFFSET,
-  TITLE_WIDTH,
-  TITLE_Y,
+  CARD_LAYOUTS,
+  type Orientation,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
@@ -28,19 +28,22 @@ export const drawTitleBox = (
     cardColorTreatment,
     inkLevel,
     cardManaCost,
-    y = TITLE_Y,
+    orientation = 'portrait',
+    y = CARD_LAYOUTS[orientation].titleY,
   }: {
     palette: Palette;
     cardName: string;
     cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     cardManaCost?: string;
+    /** Which way the card is drawn: landscape cards (e.g. battles) are laid out sideways */
+    orientation?: Orientation;
     /** Top of the box, higher on planeswalkers */
     y?: number;
   },
 ) => {
-  const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
-  const width = TITLE_WIDTH;
+  const { width: cardWidth, titleWidth: width } = CARD_LAYOUTS[orientation];
+  const x = (cardWidth - width) / 2;
   const height = TITLE_HEIGHT;
 
   const manaSymbols = splitSymbols(cardManaCost ?? '');
@@ -52,6 +55,7 @@ export const drawTitleBox = (
 
   drawFramedBox(ctx, {
     palette,
+    orientation,
     x,
     y,
     width,

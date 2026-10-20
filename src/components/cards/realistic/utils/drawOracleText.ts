@@ -1,5 +1,5 @@
 import type { Palette } from '../../../../domain/colorTreatment';
-import { getFontSize, getMultilineTextHeight } from '../../common/canvasText';
+import { getFontSize, getMultilineTextHeight, toPlainText } from '../../common/canvasText';
 import { fillMultilineText, fitOracleLines } from '../../common/oracleTextRenderer';
 import type { OracleLine, OracleText } from '../../../../domain/oracleText';
 import { FONT_FAMILY, ORACLE_FONT_SIZE } from '../config';
@@ -14,7 +14,9 @@ interface TextArea {
 
 /**
  * Draw the card's rules text in the given area, shrinking it until it fits.
- * `y` is the baseline of the first line.
+ *
+ * @param options.y - Baseline of the first line, or with `fromTop` the top of
+ *   the text, where the first line starts at whatever size it's shrunk to
  */
 export const drawOracleText = (
   ctx: CanvasRenderingContext2D,
@@ -25,13 +27,24 @@ export const drawOracleText = (
     y,
     width,
     height,
-  }: { palette: Palette; cardOracleText: OracleText; x: number; y: number; width: number; height: number },
+    fromTop = false,
+  }: {
+    palette: Palette;
+    cardOracleText: OracleText;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    fromTop?: boolean;
+  },
 ) => {
   ctx.font = `${ORACLE_FONT_SIZE}px ${FONT_FAMILY}`;
   ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
-  fillMultilineText(ctx, fitOracleLines(ctx, cardOracleText.lines, width, height), x, y);
+  const lines = fitOracleLines(ctx, cardOracleText.lines, width, height);
+  const baseline = fromTop && lines.length ? y + ctx.measureText(toPlainText(lines[0])).fontBoundingBoxAscent : y;
+  fillMultilineText(ctx, lines, x, baseline);
 };
 
 /**

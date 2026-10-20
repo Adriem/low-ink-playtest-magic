@@ -68,6 +68,148 @@ const MIN_CONTOUR_STRENGTH = 6;
 const MIN_CONTOUR_PIXELS = 10;
 
 /**
+ * Shade the midtones of the art in an area of the canvas in a few light grays
+ * (`MIDTONE_SHADES`), with fixed thresholds: the darkest and the brightest
+ * pixels both turn light, so only the midtones take ink. The thresholds are
+ * the same for any art.
+ *
+ * Not used: kept to compare it with `shadeMidtonesAdaptive`.
+ */
+export const shadeMidtonesFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, () => MIDTONE_SHADES);
+};
+
+/**
+ * Shade the midtones of the art in an area of the canvas in a few light grays
+ * (`MIDTONE_SHADES`), with adaptive thresholds: the darkest and the brightest
+ * pixels both turn light, so only the midtones take ink. The thresholds are
+ * fitted to the art's brightness range, like `posterizeLightAdaptive` does.
+ */
+export const shadeMidtonesAdaptive = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(MIDTONE_SHADES, brightnesses));
+};
+
+/**
+ * Posterize the art in an area of the canvas into a few light grays
+ * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with fixed
+ * thresholds: the same for any art.
+ *
+ * Not used: art that's mostly dark, bright or low in contrast falls into one
+ * or two of the levels, so it comes out as flat gray or nearly blank (e.g.
+ * Ishgard, the Holy See or Glasses of Urza). Kept to compare it with
+ * `posterizeLightAdaptive`, which replaced it.
+ */
+export const posterizeLightFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, () => LIGHT_POSTER_SHADES);
+};
+
+/**
+ * Posterize the art in an area of the canvas into a few light grays
+ * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with adaptive
+ * thresholds: fitted to the art's brightness range.
+ *
+ * The range is measured without the darkest and brightest outliers
+ * (`BRIGHTNESS_RANGE_OUTLIERS`), and the thresholds move proportionally from
+ * 0-255 into it: art that only goes from 100 to 200 is shaded like art going
+ * from 0 to 255, while art with every brightness keeps the thresholds as they
+ * are. So dark, bright or low-contrast art still gets every shade, though art
+ * with a wide range but few dark pixels can come out darker than with
+ * `posterizeLightFixed`.
+ */
+export const posterizeLightAdaptive = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+) => {
+  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(LIGHT_POSTER_SHADES, brightnesses));
+};
+
+/**
+ * Levels with their thresholds moved from the range of uniform art to the
+ * brightness range of some art, both measured leaving the outliers out. Art
+ * with no range to speak of keeps the levels as they are.
+ */
+const fitLevelsToBrightness = (levels: ShadeLevel[], brightnesses: Float64Array) => {
+  const [low, high] = getBrightnessRange(brightnesses);
+  if (high - low < 1) return levels;
+
+  const uniformLow = 255 * BRIGHTNESS_RANGE_OUTLIERS;
+  const uniformHigh = 255 * (1 - BRIGHTNESS_RANGE_OUTLIERS);
+  const scale = (high - low) / (uniformHigh - uniformLow);
+  return levels.map(({ threshold, shade }) => ({ threshold: low + (threshold - uniformLow) * scale, shade }));
+};
+
+/**
+ * Brightness range of some pixels, without the darkest and brightest
+ * outliers: the brightness below which, and above which, that share of them
+ * falls.
+ */
+const getBrightnessRange = (brightnesses: Float64Array): [number, number] => {
+  const histogram = new Uint32Array(256);
+  for (const brightness of brightnesses) histogram[Math.round(brightness)]++;
+
+  const getPercentile = (share: number) => {
+    const count = share * brightnesses.length;
+    let seen = 0;
+    for (let value = 0; value < 256; value++) {
+      seen += histogram[value];
+      if (seen > count) return value;
+    }
+    return 255;
+  };
+  return [getPercentile(BRIGHTNESS_RANGE_OUTLIERS), getPercentile(1 - BRIGHTNESS_RANGE_OUTLIERS)];
+};
+
+/**
+ * Turn an area of the canvas into the shades of the levels its pixels' brightness falls in.
+ *
+ * @param getLevels - The levels to use, given the brightness of every pixel
+ */
+const shadeByBrightness = (
+  ctx: CanvasRenderingContext2D,
+  sx: number,
+  sy: number,
+  sw: number,
+  sh: number,
+  getLevels: (brightnesses: Float64Array) => ShadeLevel[],
+) => {
+  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
+  const data = imagePixels.data;
+
+  const brightnesses = getBrightnesses(data);
+  const levels = getLevels(brightnesses);
+  for (const [i, brightness] of brightnesses.entries()) {
+    const { shade } = levels.find(({ threshold }) => brightness > threshold) ?? levels[levels.length - 1];
+    data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = shade;
+  }
+  ctx.putImageData(imagePixels, sx, sy);
+};
+
+/**
+ * Turn the art in an area of the canvas to grayscale, lightened: each pixel's
+ * brightness, moved part of the way to white (`GRAYSCALE_LIGHTENING`), so it
+ * takes less ink.
+ */
+export const lightenGrayscale = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
+  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
+  const data = imagePixels.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
+    data[i] = data[i + 1] = data[i + 2] = brightness + (255 - brightness) * GRAYSCALE_LIGHTENING;
+  }
+  ctx.putImageData(imagePixels, sx, sy);
+};
+
+/**
  * Trace the contours of the art in an area of the canvas as thin gray lines
  * on white, with adaptive thresholds. Nothing else of the art stays.
  *
@@ -253,148 +395,6 @@ const getClamped = (values: Float64Array, width: number, height: number, x: numb
   const clampedX = Math.min(Math.max(x, 0), width - 1);
   const clampedY = Math.min(Math.max(y, 0), height - 1);
   return values[clampedY * width + clampedX];
-};
-
-/**
- * Shade the midtones of the art in an area of the canvas in a few light grays
- * (`MIDTONE_SHADES`), with fixed thresholds: the darkest and the brightest
- * pixels both turn light, so only the midtones take ink. The thresholds are
- * the same for any art.
- *
- * Not used: kept to compare it with `shadeMidtonesAdaptive`.
- */
-export const shadeMidtonesFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, () => MIDTONE_SHADES);
-};
-
-/**
- * Shade the midtones of the art in an area of the canvas in a few light grays
- * (`MIDTONE_SHADES`), with adaptive thresholds: the darkest and the brightest
- * pixels both turn light, so only the midtones take ink. The thresholds are
- * fitted to the art's brightness range, like `posterizeLightAdaptive` does.
- */
-export const shadeMidtonesAdaptive = (
-  ctx: CanvasRenderingContext2D,
-  sx: number,
-  sy: number,
-  sw: number,
-  sh: number,
-) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(MIDTONE_SHADES, brightnesses));
-};
-
-/**
- * Posterize the art in an area of the canvas into a few light grays
- * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with fixed
- * thresholds: the same for any art.
- *
- * Not used: art that's mostly dark, bright or low in contrast falls into one
- * or two of the levels, so it comes out as flat gray or nearly blank (e.g.
- * Ishgard, the Holy See or Glasses of Urza). Kept to compare it with
- * `posterizeLightAdaptive`, which replaced it.
- */
-export const posterizeLightFixed = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, () => LIGHT_POSTER_SHADES);
-};
-
-/**
- * Posterize the art in an area of the canvas into a few light grays
- * (`LIGHT_POSTER_SHADES`), in the same order as its brightness, with adaptive
- * thresholds: fitted to the art's brightness range.
- *
- * The range is measured without the darkest and brightest outliers
- * (`BRIGHTNESS_RANGE_OUTLIERS`), and the thresholds move proportionally from
- * 0-255 into it: art that only goes from 100 to 200 is shaded like art going
- * from 0 to 255, while art with every brightness keeps the thresholds as they
- * are. So dark, bright or low-contrast art still gets every shade, though art
- * with a wide range but few dark pixels can come out darker than with
- * `posterizeLightFixed`.
- */
-export const posterizeLightAdaptive = (
-  ctx: CanvasRenderingContext2D,
-  sx: number,
-  sy: number,
-  sw: number,
-  sh: number,
-) => {
-  shadeByBrightness(ctx, sx, sy, sw, sh, (brightnesses) => fitLevelsToBrightness(LIGHT_POSTER_SHADES, brightnesses));
-};
-
-/**
- * Levels with their thresholds moved from the range of uniform art to the
- * brightness range of some art, both measured leaving the outliers out. Art
- * with no range to speak of keeps the levels as they are.
- */
-const fitLevelsToBrightness = (levels: ShadeLevel[], brightnesses: Float64Array) => {
-  const [low, high] = getBrightnessRange(brightnesses);
-  if (high - low < 1) return levels;
-
-  const uniformLow = 255 * BRIGHTNESS_RANGE_OUTLIERS;
-  const uniformHigh = 255 * (1 - BRIGHTNESS_RANGE_OUTLIERS);
-  const scale = (high - low) / (uniformHigh - uniformLow);
-  return levels.map(({ threshold, shade }) => ({ threshold: low + (threshold - uniformLow) * scale, shade }));
-};
-
-/**
- * Brightness range of some pixels, without the darkest and brightest
- * outliers: the brightness below which, and above which, that share of them
- * falls.
- */
-const getBrightnessRange = (brightnesses: Float64Array): [number, number] => {
-  const histogram = new Uint32Array(256);
-  for (const brightness of brightnesses) histogram[Math.round(brightness)]++;
-
-  const getPercentile = (share: number) => {
-    const count = share * brightnesses.length;
-    let seen = 0;
-    for (let value = 0; value < 256; value++) {
-      seen += histogram[value];
-      if (seen > count) return value;
-    }
-    return 255;
-  };
-  return [getPercentile(BRIGHTNESS_RANGE_OUTLIERS), getPercentile(1 - BRIGHTNESS_RANGE_OUTLIERS)];
-};
-
-/**
- * Turn an area of the canvas into the shades of the levels its pixels' brightness falls in.
- *
- * @param getLevels - The levels to use, given the brightness of every pixel
- */
-const shadeByBrightness = (
-  ctx: CanvasRenderingContext2D,
-  sx: number,
-  sy: number,
-  sw: number,
-  sh: number,
-  getLevels: (brightnesses: Float64Array) => ShadeLevel[],
-) => {
-  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
-  const data = imagePixels.data;
-
-  const brightnesses = getBrightnesses(data);
-  const levels = getLevels(brightnesses);
-  for (const [i, brightness] of brightnesses.entries()) {
-    const { shade } = levels.find(({ threshold }) => brightness > threshold) ?? levels[levels.length - 1];
-    data[i * 4] = data[i * 4 + 1] = data[i * 4 + 2] = shade;
-  }
-  ctx.putImageData(imagePixels, sx, sy);
-};
-
-/**
- * Turn the art in an area of the canvas to grayscale, lightened: each pixel's
- * brightness, moved part of the way to white (`GRAYSCALE_LIGHTENING`), so it
- * takes less ink.
- */
-export const lightenGrayscale = (ctx: CanvasRenderingContext2D, sx: number, sy: number, sw: number, sh: number) => {
-  const imagePixels = ctx.getImageData(sx, sy, sw, sh);
-  const data = imagePixels.data;
-
-  for (let i = 0; i < data.length; i += 4) {
-    const brightness = 0.2126 * data[i] + 0.7152 * data[i + 1] + 0.0722 * data[i + 2];
-    data[i] = data[i + 1] = data[i + 2] = brightness + (255 - brightness) * GRAYSCALE_LIGHTENING;
-  }
-  ctx.putImageData(imagePixels, sx, sy);
 };
 
 /**

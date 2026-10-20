@@ -1,6 +1,6 @@
 import { drawRectangle } from '../../common/canvasShapes';
 import { drawInkFill, getInkFill } from '../../common/canvasStyles';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { REALISTIC_PALETTE } from '../palette';
 import type { InkLevel } from '../../styles';
 
@@ -25,7 +25,7 @@ export const drawOuterFrame = (
     blackBordered,
     inkLevel = 'low',
     cardColorTreatment,
-  }: { blackBordered?: boolean; inkLevel?: InkLevel; cardColorTreatment: ColorTreatment },
+  }: { blackBordered?: boolean; inkLevel?: InkLevel; cardColorTreatment: CardColorTreatment },
 ) => {
   drawRectangle(ctx, {
     x: 0,
@@ -57,7 +57,7 @@ export const hasCardBackground = (inkLevel: InkLevel): boolean => {
  */
 const drawCardBackground = (
   ctx: CanvasRenderingContext2D,
-  { inkLevel, cardColorTreatment }: { inkLevel: InkLevel; cardColorTreatment: ColorTreatment },
+  { inkLevel, cardColorTreatment }: { inkLevel: InkLevel; cardColorTreatment: CardColorTreatment },
 ) => {
   const panel = {
     x: BACKGROUND_MARGIN,
@@ -70,7 +70,7 @@ const drawCardBackground = (
   };
   drawRectangle(ctx, { ...panel, strokeStyle: REALISTIC_PALETTE.LINE, fillStyle: REALISTIC_PALETTE.PAPER });
 
-  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel);
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment.backgroundColors, REALISTIC_PALETTE), inkLevel);
   if (inkFill) {
     // Filled where the panel is white, so the fill doesn't cover its outline
     drawInkFill(ctx, inkFill, () => drawRectangle(ctx, { ...panel, fillStyle: inkFill.style }));

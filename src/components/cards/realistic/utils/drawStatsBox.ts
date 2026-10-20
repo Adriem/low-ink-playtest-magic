@@ -8,7 +8,7 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawStatsBox = (
@@ -18,7 +18,7 @@ export const drawStatsBox = (
     cardToughness,
     cardColorTreatment,
     inkLevel,
-  }: { cardPower: string; cardToughness: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel },
+  }: { cardPower: string; cardToughness: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2 + TITLE_WIDTH - STATSLINE_WIDTH;
   const y = STATSLINE_Y;

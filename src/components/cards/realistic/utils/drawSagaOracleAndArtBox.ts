@@ -18,7 +18,7 @@ import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText, drawTextInArea, getFittingFontSize } from './drawOracleText';
 import type { ArtCrop } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { ArtFidelity } from '../../styles';
 
 const CHAPTER_SEPARATOR_THICKNESS = 1;
@@ -61,7 +61,7 @@ export const drawSagaOracleAndArtBox = (
     cardArtUrl?: string;
     cropArt?: ArtCrop;
     artFidelity?: ArtFidelity;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     typelineY?: number;
   },
 ) => {

@@ -13,7 +13,7 @@ import { SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } from './config';
 import { drawSagaCreatureOracleBox } from './utils/drawSagaCreatureOracleBox';
 import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
-import { getColorTreatment } from '../../../domain/colorTreatment';
+import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps, InkLevel } from '../styles';
 import { hasBlackBorder } from '../common/canvasStyles';
 import { get2dContext } from '../common/canvasRendering';
@@ -27,7 +27,7 @@ export const renderRealisticCard = (
   canvas: HTMLCanvasElement,
   { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', artFidelity = 'posterized' }: CardRenderProps,
 ) => {
-  const cardColorTreatment = getColorTreatment(face);
+  const cardColorTreatment = getCardColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
   const cardTypeLine = face.typeLine;
@@ -108,7 +108,7 @@ const drawSubCard = (
   position: SubCardPosition,
   inkLevel: InkLevel,
 ) => {
-  const subColorTreatment = getColorTreatment(subFace);
+  const subColorTreatment = getCardColorTreatment(subFace);
 
   drawSubCardTitleBox(ctx, {
     cardName: subFace.name,

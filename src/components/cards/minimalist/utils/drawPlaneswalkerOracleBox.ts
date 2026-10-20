@@ -13,7 +13,7 @@ import {
 } from '../config';
 import { getSideBorderEdges } from './sideBorder';
 import { MINIMALIST_PALETTE } from '../palette';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
 
@@ -21,7 +21,7 @@ const LOYALTY_ABILITY_OFFSET = 45;
 
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
-  { cardOracleText, cardColorTreatment }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment },
+  { cardOracleText, cardColorTreatment }: { cardOracleText?: OracleText; cardColorTreatment: CardColorTreatment },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
@@ -89,9 +89,14 @@ export const drawPlaneswalkerOracleBox = (
 
 const drawPlaneswalkerOracleBorder = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, x, y, height }: { cardColorTreatment: ColorTreatment; x: number; y: number; height: number },
+  {
+    cardColorTreatment,
+    x,
+    y,
+    height,
+  }: { cardColorTreatment: CardColorTreatment; x: number; y: number; height: number },
 ) => {
-  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE));
+  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE));
 
   const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
 

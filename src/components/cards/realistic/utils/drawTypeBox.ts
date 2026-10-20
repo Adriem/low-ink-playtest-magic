@@ -12,7 +12,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawTypeBox = (
@@ -22,7 +22,7 @@ export const drawTypeBox = (
     cardColorTreatment,
     inkLevel,
     y = TYPELINE_Y,
-  }: { cardType?: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel; y?: number },
+  }: { cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; y?: number },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const width = TITLE_WIDTH;

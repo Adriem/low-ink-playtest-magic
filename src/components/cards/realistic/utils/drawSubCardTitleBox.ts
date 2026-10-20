@@ -16,7 +16,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawSubCardTitleBox = (
@@ -30,7 +30,7 @@ export const drawSubCardTitleBox = (
   }: {
     cardName: string;
     cardManaCost?: string;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     position: SubCardPosition;
   },

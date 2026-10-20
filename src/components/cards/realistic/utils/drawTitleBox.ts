@@ -17,7 +17,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawTitleBox = (
@@ -27,7 +27,7 @@ export const drawTitleBox = (
     cardColorTreatment,
     inkLevel,
     cardManaCost,
-  }: { cardName: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel; cardManaCost?: string },
+  }: { cardName: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; cardManaCost?: string },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const y = TITLE_Y;

@@ -16,7 +16,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import type { InkLevel, OracleLayout } from '../../styles';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 
 // TODO: Change the way planeswalker oracle boxes are rendered. For now they're
@@ -36,7 +36,7 @@ export const drawPlaneswalkerOracleBox = (
   }: {
     cardOracleText?: OracleText;
     cardLoyalty: string;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     layout: OracleLayout;
   },

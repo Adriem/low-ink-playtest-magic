@@ -11,7 +11,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawSubCardTypeBox = (
@@ -21,7 +21,7 @@ export const drawSubCardTypeBox = (
     cardColorTreatment,
     inkLevel,
     position,
-  }: { cardType?: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel; position: SubCardPosition },
+  }: { cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; position: SubCardPosition },
 ) => {
   const x = position === 'left' ? (ctx.canvas.width - TITLE_WIDTH) / 2 : ctx.canvas.width / 2;
   const y = SUBCARD_TYPELINE_Y;

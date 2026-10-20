@@ -1,7 +1,7 @@
 import { ARTWORK_HEIGHT, ARTWORK_Y, CONTENT_WIDTH, PINLINE_THICKNESS } from '../config';
 import { drawArtImage } from './drawArtImage';
 import { drawFramedBox } from './drawFramedBox';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { ArtCrop } from '../../../../domain/cards';
 import type { ArtFidelity } from '../../styles';
 
@@ -12,7 +12,7 @@ export const drawArtBox = (
     cardArtUrl,
     cropArt,
     artFidelity,
-  }: { cardColorTreatment: ColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop; artFidelity?: ArtFidelity },
+  }: { cardColorTreatment: CardColorTreatment; cardArtUrl?: string; cropArt?: ArtCrop; artFidelity?: ArtFidelity },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const width = CONTENT_WIDTH;

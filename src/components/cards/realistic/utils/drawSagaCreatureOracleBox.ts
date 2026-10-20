@@ -8,7 +8,7 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { drawTextInArea } from './drawOracleText';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 import type { InkLevel } from '../../styles';
 
@@ -23,7 +23,7 @@ export const drawSagaCreatureOracleBox = (
     cardOracleText,
     cardColorTreatment,
     inkLevel,
-  }: { cardOracleText: OracleText; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel },
+  }: { cardOracleText: OracleText; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
 ) => {
   const inner = drawFramedBox(ctx, {
     x: (ctx.canvas.width - CONTENT_WIDTH) / 2,

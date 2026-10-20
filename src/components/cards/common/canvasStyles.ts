@@ -11,6 +11,12 @@ const LIGHT_INK_FILL_OPACITY = 0.15;
 const DOT_SPACING = 4;
 const DOT_RADIUS = 1;
 
+/**
+ * Scale canvases are shown at, when drawn smaller or bigger elsewhere (e.g.
+ * the faces of split cards), so their dot patterns look the same on any card.
+ */
+const displayScales = new WeakMap<HTMLCanvasElement, number>();
+
 /** How strongly a box is filled: regular for the title and type boxes, light for the text boxes */
 export type InkFillStrength = 'regular' | 'light';
 
@@ -72,6 +78,15 @@ export const hasBlackBorder = ({
 };
 
 /**
+ * Set the scale a canvas is shown at, when it's drawn smaller or bigger
+ * elsewhere (e.g. the faces of split cards, drawn into half a card), so the
+ * dot patterns drawn on it look the same as on any card.
+ */
+export const setDisplayScale = (canvas: HTMLCanvasElement, scale: number) => {
+  displayScales.set(canvas, scale);
+};
+
+/**
  * A canvas as big as the context's, covered with dots in the colors, so a
  * pattern made from it lines up with the gradient of the colors.
  */
@@ -86,7 +101,11 @@ const getColoredDots = (ctx: CanvasRenderingContext2D, colors: readonly [string]
   dotsCtx.fillRect(0, 0, width, height);
   // Keep the colors only where there are dots
   dotsCtx.globalCompositeOperation = 'destination-in';
-  dotsCtx.fillStyle = dotsCtx.createPattern(getDotTile(), 'repeat') ?? 'transparent';
+  const dotPattern = dotsCtx.createPattern(getDotTile(), 'repeat');
+  // The dots are as big as the canvas is shown smaller, so they look the same
+  const displayScale = displayScales.get(ctx.canvas) ?? 1;
+  if (displayScale !== 1) dotPattern?.setTransform(new DOMMatrix().scale(1 / displayScale));
+  dotsCtx.fillStyle = dotPattern ?? 'transparent';
   dotsCtx.fillRect(0, 0, width, height);
 
   return dots;

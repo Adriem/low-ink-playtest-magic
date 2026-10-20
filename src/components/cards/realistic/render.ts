@@ -40,7 +40,7 @@ export const renderRealisticCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
+  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }), inkLevel, cardColorTreatment });
   drawTitleBox(ctx, { cardName, cardManaCost, cardColorTreatment, inkLevel });
 
   if (face.faceLayout === 'saga') {

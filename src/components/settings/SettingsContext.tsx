@@ -68,13 +68,14 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
   artFidelity: {
     label: 'Art fidelity',
     options: [
-      { value: 'none', label: '1' },
-      { value: 'minimal', label: '2' },
-      { value: 'shaded', label: '3' },
-      { value: 'black-and-white', label: '4' },
-      { value: 'full', label: '5' },
+      { value: 'blank', label: '1' },
+      { value: 'contours', label: '2' },
+      { value: 'mid-tones', label: '3' },
+      { value: 'posterized', label: '4' },
+      { value: 'grayscale', label: '5' },
+      { value: 'no-filter', label: '6' },
     ],
-    default: 'shaded',
+    default: 'posterized',
     control: 'slider',
     // The minimalist style has no art
     cardStyles: ['realistic'],

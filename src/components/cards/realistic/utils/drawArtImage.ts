@@ -1,4 +1,9 @@
-import { lightGrayscalePass, midBrightnessPass, boostHighlightsPass } from '../../common/canvasFilters';
+import {
+  posterizeLightAdaptive,
+  traceContoursAdaptive,
+  lightenGrayscale,
+  shadeMidtonesAdaptive,
+} from '../../common/canvasFilters';
 import { drawWhenLoaded, loadImage } from '../../common/canvasRendering';
 import type { ArtCrop } from '../../../../domain/cards';
 import type { ArtFidelity } from '../../styles';
@@ -15,7 +20,7 @@ export const drawArtImage = (
   {
     cardArtUrl,
     cropArt,
-    artFidelity = 'shaded',
+    artFidelity = 'posterized',
     x,
     y,
     width,
@@ -30,7 +35,7 @@ export const drawArtImage = (
     height: number;
   },
 ) => {
-  if (!cardArtUrl || artFidelity === 'none') return;
+  if (!cardArtUrl || artFidelity === 'blank') return;
 
   void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
     if (cropArt && cropArt !== 'full') {
@@ -40,8 +45,9 @@ export const drawArtImage = (
     } else {
       ctx.drawImage(artImage, x, y, width, height);
     }
-    if (artFidelity === 'minimal') midBrightnessPass(ctx, x, y, width, height);
-    if (artFidelity === 'shaded') boostHighlightsPass(ctx, x, y, width, height);
-    if (artFidelity === 'black-and-white') lightGrayscalePass(ctx, x, y, width, height);
+    if (artFidelity === 'contours') traceContoursAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'mid-tones') shadeMidtonesAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'posterized') posterizeLightAdaptive(ctx, x, y, width, height);
+    if (artFidelity === 'grayscale') lightenGrayscale(ctx, x, y, width, height);
   });
 };

@@ -82,6 +82,27 @@ test('loads the saved settings, with the defaults for missing and unknown values
   expect(screen.getByLabelText('Medium')).toBeChecked();
 });
 
+test('restores the default of every setting', async () => {
+  localStorage.setItem(
+    'press:settings',
+    JSON.stringify({ cardVariant: 'minimalist', inkLevel: 'splurge', artFidelity: 'contours' }),
+  );
+  renderPanel();
+
+  await user.click(screen.getByRole('button', { name: 'Restore defaults', hidden: true }));
+
+  expect(screen.getByLabelText('Realistic')).toBeChecked();
+  expect(screen.getByLabelText('Medium')).toBeChecked();
+  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toHaveAttribute('aria-valuetext', '4');
+  expect(getSavedSettings()).toEqual({
+    cardVariant: 'realistic',
+    splitCardTreatment: 'unified',
+    doubleFacedCardTreatment: 'separate',
+    inkLevel: 'medium',
+    artFidelity: 'posterized',
+  });
+});
+
 const getSavedSettings = () => {
   return JSON.parse(localStorage.getItem('press:settings') ?? '{}');
 };

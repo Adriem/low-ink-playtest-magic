@@ -4,6 +4,7 @@ import {
   SETTING_NAMES,
   SETTINGS_DEFINITIONS,
   isSettingAvailable,
+  useRestoreDefaultSettings,
   useSetting,
   type SettingName,
 } from './SettingsContext';
@@ -12,6 +13,11 @@ import './SettingsPanel.css';
 
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
   const [cardStyle] = useSetting('cardVariant');
+  const restoreDefaults = useRestoreDefaultSettings();
+
+  const handleRestoreDefaultsClick = () => {
+    restoreDefaults();
+  };
 
   return (
     <Popup ref={ref}>
@@ -21,6 +27,9 @@ const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
           <SettingFieldset key={name} name={name} disabled={!isSettingAvailable(name, cardStyle)} />
         ))}
         <menu>
+          <button type="button" onClick={handleRestoreDefaultsClick}>
+            Restore defaults
+          </button>
           <button type="submit">Close</button>
         </menu>
       </form>

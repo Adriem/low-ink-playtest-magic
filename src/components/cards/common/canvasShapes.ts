@@ -32,6 +32,15 @@ interface LoyaltyCostShape {
   innerArcs: LoyaltyCostArc[];
 }
 
+/**
+ * Radius of a rounded corner: a number for a circular corner, or its
+ * horizontal and vertical radii for an elliptical one.
+ */
+export type CornerRadius = number | { horizontal: number; vertical: number };
+
+/** Font size of the number in loyalty cost icons, at their default scale */
+export const LOYALTY_COST_FONT_SIZE = 22;
+
 const LOYALTY_COST_SHAPES: Record<'plus' | 'minus' | 'zero', LoyaltyCostShape> = {
   plus: {
     anchorOffsetY: -18,
@@ -96,8 +105,8 @@ export const drawRectangle = (
     lineWidth?: number;
     strokeStyle?: CanvasPaint | null;
     fillStyle?: CanvasPaint | null;
-    borderRadiusTop?: number;
-    borderRadiusBottom?: number;
+    borderRadiusTop?: CornerRadius;
+    borderRadiusBottom?: CornerRadius;
   },
 ) => {
   ctx.moveTo(x, y);
@@ -106,39 +115,60 @@ export const drawRectangle = (
   if (strokeStyle != null) ctx.strokeStyle = strokeStyle;
   if (fillStyle != null) ctx.fillStyle = fillStyle;
 
-  ctx.beginPath();
-  ctx.arc(
-    x + lineWidth / 2 + borderRadiusTop,
-    y + lineWidth / 2 + borderRadiusTop,
-    borderRadiusTop,
-    Math.PI,
-    1.5 * Math.PI,
-  );
-  ctx.arc(
-    x + width - lineWidth / 2 - borderRadiusTop,
-    y + lineWidth / 2 + borderRadiusTop,
-    borderRadiusTop,
-    1.5 * Math.PI,
-    0,
-  );
-  ctx.arc(
-    x + width - lineWidth / 2 - borderRadiusBottom,
-    y + height - lineWidth / 2 - borderRadiusBottom,
-    borderRadiusBottom,
-    0,
-    0.5 * Math.PI,
-  );
-  ctx.arc(
-    x + lineWidth / 2 + borderRadiusBottom,
-    y + height - lineWidth / 2 - borderRadiusBottom,
-    borderRadiusBottom,
-    0.5 * Math.PI,
-    Math.PI,
-  );
-  ctx.closePath();
+  traceRectangle(ctx, { x, y, width, height }, { top: borderRadiusTop, bottom: borderRadiusBottom }, lineWidth);
 
   if (strokeStyle != null) ctx.stroke();
   if (fillStyle != null) ctx.fill();
+};
+
+/**
+ * Trace the path of a rectangle with rounded corners, e.g. to fill it or clip
+ * drawings to it.
+ *
+ * @param lineWidth - Width of the line it'll be stroked with, which goes inside it
+ */
+export const traceRectangle = (
+  ctx: CanvasRenderingContext2D,
+  { x, y, width, height }: Box,
+  { top: topRadius = 0, bottom: bottomRadius = topRadius }: { top?: CornerRadius; bottom?: CornerRadius },
+  lineWidth = 0,
+) => {
+  const top = toEllipseRadii(topRadius);
+  const bottom = toEllipseRadii(bottomRadius);
+  const left = x + lineWidth / 2;
+  const right = x + width - lineWidth / 2;
+  const upper = y + lineWidth / 2;
+  const lower = y + height - lineWidth / 2;
+
+  ctx.beginPath();
+  traceCorner(ctx, left + top.horizontal, upper + top.vertical, top, Math.PI, 1.5 * Math.PI);
+  traceCorner(ctx, right - top.horizontal, upper + top.vertical, top, 1.5 * Math.PI, 0);
+  traceCorner(ctx, right - bottom.horizontal, lower - bottom.vertical, bottom, 0, 0.5 * Math.PI);
+  traceCorner(ctx, left + bottom.horizontal, lower - bottom.vertical, bottom, 0.5 * Math.PI, Math.PI);
+  ctx.closePath();
+};
+
+/**
+ * Horizontal and vertical radii of a corner.
+ */
+const toEllipseRadii = (radius: CornerRadius): { horizontal: number; vertical: number } => {
+  return typeof radius === 'number' ? { horizontal: radius, vertical: radius } : radius;
+};
+
+/**
+ * Trace a rounded corner: an arc of a circle, or of an ellipse when its radii
+ * differ.
+ */
+const traceCorner = (
+  ctx: CanvasRenderingContext2D,
+  centerX: number,
+  centerY: number,
+  { horizontal, vertical }: { horizontal: number; vertical: number },
+  startAngle: number,
+  endAngle: number,
+) => {
+  if (horizontal === vertical) ctx.arc(centerX, centerY, horizontal, startAngle, endAngle);
+  else ctx.ellipse(centerX, centerY, horizontal, vertical, 0, startAngle, endAngle);
 };
 
 export const drawRoundedBox = (
@@ -205,7 +235,7 @@ export const drawLoyaltyCost = (
     y,
     scale = 1,
     fontFamily,
-    fontSize = 22,
+    fontSize = LOYALTY_COST_FONT_SIZE,
     colors,
   }: {
     loyaltyCost: string;
@@ -217,11 +247,7 @@ export const drawLoyaltyCost = (
     colors: ShapeColors;
   },
 ) => {
-  const shape = loyaltyCost.startsWith('+')
-    ? LOYALTY_COST_SHAPES.plus
-    : loyaltyCost === '0'
-      ? LOYALTY_COST_SHAPES.zero
-      : LOYALTY_COST_SHAPES.minus;
+  const shape = getLoyaltyCostShape(loyaltyCost);
 
   const anchorY = y + shape.anchorOffsetY;
   const arcY = anchorY + shape.arcOffsetY * scale;
@@ -245,6 +271,21 @@ export const drawLoyaltyCost = (
   ctx.textAlign = 'center';
   if (shape.fitText) fitFontSizeInX(ctx, loyaltyCost, 30 * scale);
   ctx.fillText(loyaltyCost, x, anchorY + shape.textOffsetY * scale);
+};
+
+/**
+ * How far below the position of a loyalty cost's icon its number's baseline
+ * is: it varies with the icon's shape (plus, zero or minus).
+ */
+export const getLoyaltyCostNumberOffset = (loyaltyCost: string, scale = 1): number => {
+  const shape = getLoyaltyCostShape(loyaltyCost);
+  return shape.anchorOffsetY + shape.textOffsetY * scale;
+};
+
+const getLoyaltyCostShape = (loyaltyCost: string): LoyaltyCostShape => {
+  if (loyaltyCost.startsWith('+')) return LOYALTY_COST_SHAPES.plus;
+  if (loyaltyCost === '0') return LOYALTY_COST_SHAPES.zero;
+  return LOYALTY_COST_SHAPES.minus;
 };
 
 /**

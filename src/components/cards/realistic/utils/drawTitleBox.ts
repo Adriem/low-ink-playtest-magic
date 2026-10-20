@@ -28,16 +28,18 @@ export const drawTitleBox = (
     cardColorTreatment,
     inkLevel,
     cardManaCost,
+    y = TITLE_Y,
   }: {
     palette: Palette;
     cardName: string;
     cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     cardManaCost?: string;
+    /** Top of the box, higher on planeswalkers */
+    y?: number;
   },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
-  const y = TITLE_Y;
   const width = TITLE_WIDTH;
   const height = TITLE_HEIGHT;
 

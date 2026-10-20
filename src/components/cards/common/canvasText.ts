@@ -2,6 +2,8 @@ const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 /** Height of empty lines, which separate paragraphs, relative to other lines */
 export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = 0.75;
+/** Smallest font size text is shrunk to, to fit it in a box */
+const MIN_FONT_SIZE = 6;
 
 /** Text in a single format */
 export type FormattedText = { text: string; format: 'regular' | 'italic' };
@@ -13,6 +15,8 @@ export interface FittedParagraph {
   originalContent: RichText;
   lineHeight: number;
   paragraphHeight: number;
+  /** Space above the text, centering it in its paragraph when the paragraph has a minimum height */
+  textOffset: number;
   lines: RichText[];
 }
 
@@ -166,7 +170,7 @@ export const fitFontSizeInXY = (
  */
 export const fitTextIntoBox = (
   ctx: CanvasRenderingContext2D,
-  paragraphs: { content: RichText; width: number }[],
+  paragraphs: { content: RichText; width: number; minHeight?: number }[],
   maxHeight: number,
 ): FittedParagraph[] => {
   let textHeight;
@@ -175,12 +179,13 @@ export const fitTextIntoBox = (
   do {
     const currentFont = getFontSize(ctx);
 
-    processedParagraphs = paragraphs.map(({ content, width }, position) => {
+    processedParagraphs = paragraphs.map(({ content, width, minHeight = 0 }, position) => {
       const lines = wrapText(ctx, content, width);
 
-      const paragraphHeight = lines.reduce((totalHeight, line) => {
+      const linesHeight = lines.reduce((totalHeight, line) => {
         return totalHeight + getLineHeight(ctx.measureText(toPlainText(line)));
       }, 0);
+      const paragraphHeight = Math.max(linesHeight, minHeight);
 
       const paragraphHeightWithMargin =
         position === paragraphs.length - 1
@@ -192,6 +197,7 @@ export const fitTextIntoBox = (
         lines,
         lineHeight: currentFont,
         paragraphHeight: paragraphHeightWithMargin,
+        textOffset: (paragraphHeight - linesHeight) / 2,
       };
     });
 
@@ -199,7 +205,9 @@ export const fitTextIntoBox = (
       return totalHeight + paragraphHeight;
     }, 0);
 
-    if (textHeight > maxHeight) reduceTextSize(ctx);
+    // Text that doesn't fit even at the smallest size (e.g. as the minimum heights alone don't) is left as it is
+    if (textHeight > maxHeight && getFontSize(ctx) > MIN_FONT_SIZE) reduceTextSize(ctx);
+    else break;
   } while (textHeight > maxHeight);
 
   return processedParagraphs;

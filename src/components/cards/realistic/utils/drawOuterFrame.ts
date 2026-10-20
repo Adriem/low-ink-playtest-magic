@@ -10,9 +10,9 @@ const OUTER_BORDER_STROKE = 8;
 // The card background: a panel inside the border, behind the boxes, like the
 // frame of printed cards
 const BACKGROUND_MARGIN = 20;
-const BACKGROUND_MARGIN_BOTTOM = 50;
+const BACKGROUND_MARGIN_BOTTOM = 60;
 const BACKGROUND_RADIUS_TOP = 10;
-const BACKGROUND_RADIUS_BOTTOM = 70;
+const BACKGROUND_RADIUS_BOTTOM = 55;
 
 /**
  * Draw the border of the card and, on the high and splurge ink levels, the

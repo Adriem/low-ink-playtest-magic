@@ -43,7 +43,8 @@ export const drawWhenLoaded = <T>(
 
 /**
  * Wait for the drawings of the current render to finish (or fail, so a missing
- * image doesn't block it), then mark the canvas as rendered.
+ * image doesn't block it), including drawings they start (e.g. the art, drawn
+ * once the layout it depends on is known), then mark the canvas as rendered.
  *
  * @returns Whether this is still the current render, i.e. no newer render
  *   started while waiting
@@ -52,7 +53,11 @@ export const finishRender = async (canvas: HTMLCanvasElement): Promise<boolean> 
   const render = renders.get(canvas);
   if (!render) return true;
 
-  await Promise.allSettled(render.pendingDrawings);
+  let waitedFor = 0;
+  while (waitedFor < render.pendingDrawings.length) {
+    waitedFor = render.pendingDrawings.length;
+    await Promise.allSettled(render.pendingDrawings);
+  }
 
   const isCurrentRender = renders.get(canvas) === render;
   if (isCurrentRender) canvas.dataset.rendered = 'true';

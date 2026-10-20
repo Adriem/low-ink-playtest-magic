@@ -1,9 +1,22 @@
 import type { Palette } from '../../../../domain/colorTreatment';
-import { drawRectangle, drawRoundedBox, type Box } from '../../common/canvasShapes';
+import {
+  drawRectangle,
+  drawRoundedBox,
+  traceRectangle,
+  type Box,
+  type CanvasPaint,
+  type CornerRadius,
+} from '../../common/canvasShapes';
 import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
-import { drawInkFill, getFillStyle, getInkFill, type InkFillStrength } from '../../common/canvasStyles';
+import { drawInkFill, getFillStyle, getInkFill, type InkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
+
+/** Radii of a rectangle's top and bottom corners, circular or elliptical */
+export interface CornerRadii {
+  top: CornerRadius;
+  bottom: CornerRadius;
+}
 
 /**
  * Draw a box in the card's colors with a white inner box and a pinline, the
@@ -14,6 +27,14 @@ import type { InkLevel } from '../../styles';
  *   and oracle boxes) have a pinline-thick inner stroke
  * @param options.flatSide - Side with no colored
  *   border, for subcard boxes that take half the card
+ * @param options.leftPinlineWidth - Width of the colored border on the left,
+ *   wider than the others e.g. for the loyalty costs of planeswalkers
+ * @param options.bottomPinlineWidth - Width of the colored border at the bottom,
+ *   thicker than the others e.g. for planeswalkers' oracle boxes
+ * @param options.cornerRadii - Radii of the corners of rectangles: of the
+ *   colored box, and of the inner box, at the top and the bottom. With
+ *   regular pinlines all around, the pinline is also drawn around the inner
+ *   box, so it's at least as wide as the other boxes' everywhere
  * @param options.innerHeightAdjustment - Fine-tunes the inner box
  *   height
  * @param options.inkLevel - Fills the inner box with the card's colors above
@@ -34,6 +55,9 @@ export const drawFramedBox = (
     cardColorTreatment,
     shape,
     flatSide = null,
+    leftPinlineWidth = PINLINE_THICKNESS,
+    bottomPinlineWidth = PINLINE_THICKNESS,
+    cornerRadii,
     innerHeightAdjustment = 0,
     inkLevel = 'low',
     inkFillStrength = 'regular',
@@ -46,6 +70,9 @@ export const drawFramedBox = (
     cardColorTreatment: CardColorTreatment;
     shape: 'capsule' | 'rectangle';
     flatSide?: 'left' | 'right' | null;
+    leftPinlineWidth?: number;
+    bottomPinlineWidth?: number;
+    cornerRadii?: { outer: CornerRadii; inner: CornerRadii };
     innerHeightAdjustment?: number;
     inkLevel?: InkLevel;
     inkFillStrength?: InkFillStrength;
@@ -53,14 +80,36 @@ export const drawFramedBox = (
 ): Box => {
   const drawShape = shape === 'capsule' ? drawRoundedBox : drawRectangle;
 
-  const innerLeftPad = flatSide === 'left' ? 0 : PINLINE_THICKNESS;
+  const innerLeftPad = flatSide === 'left' ? 0 : leftPinlineWidth;
   const innerRightPad = flatSide === 'right' ? 0 : PINLINE_THICKNESS;
   const inner = {
     x: x + innerLeftPad,
     y: y + PINLINE_THICKNESS,
     width: width - innerLeftPad - innerRightPad,
-    height: height - PINLINE_THICKNESS * 2 + innerHeightAdjustment,
+    height: height - PINLINE_THICKNESS - bottomPinlineWidth + innerHeightAdjustment,
   };
+
+  const pinlineStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette));
+  const inkFill = getInkFill(
+    ctx,
+    getPaletteColors(cardColorTreatment.backgroundColors, palette),
+    inkLevel,
+    inkFillStrength,
+  );
+
+  const hasRegularPinlines = leftPinlineWidth === PINLINE_THICKNESS && bottomPinlineWidth === PINLINE_THICKNESS;
+  if (shape === 'rectangle' && cornerRadii && hasRegularPinlines) {
+    drawRoundedFramedBox(ctx, {
+      outer: { x, y, width, height },
+      outerRadii: cornerRadii.outer,
+      inner,
+      innerRadii: cornerRadii.inner,
+      pinlineStyle,
+      inkFill,
+      palette,
+    });
+    return inner;
+  }
 
   drawShape(ctx, {
     x,
@@ -68,27 +117,94 @@ export const drawFramedBox = (
     width,
     height,
     lineWidth: 0,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
+    fillStyle: pinlineStyle,
     flatSide,
+    ...toBorderRadii(cornerRadii?.outer),
   });
   const innerLine = {
     ...inner,
     lineWidth: shape === 'capsule' ? CAPSULE_INNER_STROKE : PINLINE_THICKNESS,
     strokeStyle: palette.LINE,
     flatSide,
+    ...toBorderRadii(cornerRadii?.inner),
   };
   drawShape(ctx, { ...innerLine, fillStyle: palette.PAPER });
 
-  const inkFill = getInkFill(
-    ctx,
-    getPaletteColors(cardColorTreatment.backgroundColors, palette),
-    inkLevel,
-    inkFillStrength,
-  );
   if (inkFill) {
     // Filled where the inner box is white, so the fill doesn't cover the inner line
     drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
   }
-
   return inner;
+};
+
+/**
+ * The corner radii of a rectangle, as the options of the shapes that draw it.
+ */
+const toBorderRadii = (radii?: CornerRadii) => {
+  return radii ? { borderRadiusTop: radii.top, borderRadiusBottom: radii.bottom } : {};
+};
+
+/**
+ * Draw a framed box with rounded corners and regular pinlines. Curves shrunk
+ * or grown by a width aren't parallel to the original ones when they're
+ * elliptical, so besides its outer shape, its pinline is a stroke around its
+ * inner box, and its inner line one inside it, which are at least as wide as
+ * the other boxes' everywhere.
+ */
+const drawRoundedFramedBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    outer,
+    outerRadii,
+    inner,
+    innerRadii,
+    pinlineStyle,
+    inkFill,
+    palette,
+  }: {
+    outer: Box;
+    outerRadii: CornerRadii;
+    inner: Box;
+    innerRadii: CornerRadii;
+    pinlineStyle: CanvasPaint;
+    inkFill: InkFill | null;
+    palette: Palette;
+  },
+) => {
+  traceRectangle(ctx, outer, outerRadii);
+  ctx.fillStyle = pinlineStyle;
+  ctx.fill();
+
+  traceRectangle(ctx, inner, innerRadii);
+  ctx.fillStyle = pinlineStyle;
+  ctx.strokeStyle = pinlineStyle;
+  ctx.lineWidth = PINLINE_THICKNESS * 2;
+  ctx.fill();
+  ctx.stroke();
+
+  ctx.fillStyle = palette.PAPER;
+  ctx.fill();
+  if (inkFill) {
+    drawInkFill(ctx, inkFill, () => {
+      traceRectangle(ctx, inner, innerRadii);
+      ctx.fillStyle = inkFill.style;
+      ctx.fill();
+    });
+  }
+
+  drawInnerLine(ctx, inner, innerRadii, palette.LINE);
+};
+
+/**
+ * Draw the line just inside the outline of a box with rounded corners, as
+ * wide as the inner lines of square boxes (half the pinline).
+ */
+export const drawInnerLine = (ctx: CanvasRenderingContext2D, box: Box, radii: CornerRadii, color: string) => {
+  ctx.save();
+  traceRectangle(ctx, box, radii);
+  ctx.clip();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = PINLINE_THICKNESS;
+  ctx.stroke();
+  ctx.restore();
 };

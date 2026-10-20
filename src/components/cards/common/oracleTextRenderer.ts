@@ -58,14 +58,24 @@ export const fitOracleLinesIntoBox = (
   lines: OracleLine[],
   width: number | ((line: OracleLine) => number),
   maxHeight: number,
-  options: OracleTextOptions = {},
+  {
+    minParagraphHeight,
+    ...options
+  }: OracleTextOptions & {
+    /** Least room each paragraph takes, e.g. for the icon next to it, with its text centered in it */
+    minParagraphHeight?: (line: OracleLine, isMode: boolean) => number;
+  } = {},
 ): FittedOracleParagraph[] => {
   const paragraphs = lines.flatMap((line) => {
     return toLineParagraphs(line, options).map((content, index) => ({ content, line, isMode: index > 0 }));
   });
   const fitted = fitTextIntoBox(
     ctx,
-    paragraphs.map(({ content, line }) => ({ content, width: typeof width === 'function' ? width(line) : width })),
+    paragraphs.map(({ content, line, isMode }) => ({
+      content,
+      width: typeof width === 'function' ? width(line) : width,
+      minHeight: minParagraphHeight?.(line, isMode),
+    })),
     maxHeight,
   );
 

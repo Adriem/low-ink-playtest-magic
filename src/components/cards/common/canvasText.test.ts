@@ -1,4 +1,4 @@
-import { fitFontSizeInXY, measureRichTextWidth, wrapText } from './canvasText';
+import { fitFontSizeInXY, fitTextIntoBox, measureRichTextWidth, wrapText } from './canvasText';
 
 describe('measureRichTextWidth', () => {
   test('measures each piece in its format', () => {
@@ -65,6 +65,33 @@ describe('fitFontSizeInXY', () => {
 
   test('has no lines without paragraphs', () => {
     expect(fitFontSizeInXY(createCtx(), [], 100, 100)).toEqual([]);
+  });
+});
+
+describe('fitTextIntoBox', () => {
+  test('gives paragraphs at least their minimum height, centering their text in it', () => {
+    const paragraphs = fitTextIntoBox(
+      createCtx(),
+      [
+        { content: [{ text: 'a', format: 'regular' }], width: 100, minHeight: 30 },
+        { content: [{ text: 'b', format: 'regular' }], width: 100 },
+      ],
+      1000,
+    );
+
+    // 30px, plus the space between paragraphs (0.75 of the 10px font); the last paragraph has none
+    expect(paragraphs.map(({ paragraphHeight, textOffset }) => [paragraphHeight, textOffset])).toEqual([
+      [37.5, 10],
+      [10, 0],
+    ]);
+  });
+
+  test('stops shrinking the text at the smallest font size, when it still does not fit', () => {
+    const ctx = createCtx();
+
+    fitTextIntoBox(ctx, [{ content: [{ text: 'a', format: 'regular' }], width: 100, minHeight: 100 }], 50);
+
+    expect(ctx.font).toBe('6px Serif');
   });
 });
 

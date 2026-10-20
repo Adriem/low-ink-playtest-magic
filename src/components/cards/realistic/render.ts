@@ -18,7 +18,8 @@ import type { CardRenderProps, InkLevel } from '../styles';
 import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
 import { REALISTIC_PALETTE } from './palette';
 import type { Palette } from '../../../domain/colorTreatment';
-import { get2dContext } from '../common/canvasRendering';
+import { drawWhenLoaded, get2dContext, loadImage } from '../common/canvasRendering';
+import { ART_CORNER_RADII, getPlaneswalkerLayout, type PlaneswalkerLayout } from './planeswalkerLayout';
 
 /**
  * Draw a card in the realistic style on a canvas.
@@ -57,7 +58,12 @@ export const renderRealisticCard = (
     inkLevel,
     cardColorTreatment,
   });
-  drawTitleBox(ctx, { palette, cardName, cardManaCost, cardColorTreatment, inkLevel });
+  // Planeswalkers have their title higher, whatever their art
+  const titleY = cardLoyalty ? getPlaneswalkerLayout().titleY : undefined;
+  drawTitleBox(ctx, { palette, cardName, cardManaCost, cardColorTreatment, inkLevel, y: titleY });
+
+  const oracleLayout =
+    subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
 
   if (face.faceLayout === 'saga') {
     if (powerAndToughness) {
@@ -80,12 +86,21 @@ export const renderRealisticCard = (
       drawSagaOracleAndArtBox(ctx, { palette, cardOracleText, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
       drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel, y: SAGA_TYPELINE_Y });
     }
-  } else {
-    drawArtBox(ctx, { palette, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
-    drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel });
-    const oracleLayout =
-      subFacePosition === 'left' ? 'right-half' : subFacePosition === 'right' ? 'left-half' : 'full-width';
-    if (cardLoyalty) {
+  } else if (cardLoyalty) {
+    // Planeswalkers lay out their boxes from their art, once it loads
+    const drawBoxes = (layout: PlaneswalkerLayout) => {
+      drawArtBox(ctx, {
+        palette,
+        cardArtUrl,
+        cropArt,
+        artFidelity,
+        cardColorTreatment,
+        y: layout.artY,
+        width: layout.artWidth,
+        height: layout.artHeight,
+        cornerRadii: ART_CORNER_RADII,
+      });
+      drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel, y: layout.typelineY });
       drawPlaneswalkerOracleBox(ctx, {
         palette,
         cardOracleText,
@@ -93,18 +108,29 @@ export const renderRealisticCard = (
         cardColorTreatment,
         inkLevel,
         layout: oracleLayout,
+        y: layout.oracleY,
+        height: layout.oracleHeight,
       });
+    };
+    if (cardArtUrl) {
+      // Art that doesn't load leaves the boxes where other cards have them
+      const art = loadImage(cardArtUrl).catch(() => null);
+      void drawWhenLoaded(ctx, art, (loadedArt) => drawBoxes(getPlaneswalkerLayout(loadedArt)));
     } else {
-      drawOracleBox(ctx, {
-        palette,
-        cardOracleText,
-        cardPower: powerAndToughness?.power,
-        cardToughness: powerAndToughness?.toughness,
-        cardColorTreatment,
-        inkLevel,
-        layout: oracleLayout,
-      });
+      drawBoxes(getPlaneswalkerLayout());
     }
+  } else {
+    drawArtBox(ctx, { palette, cardArtUrl, cropArt, artFidelity, cardColorTreatment });
+    drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel });
+    drawOracleBox(ctx, {
+      palette,
+      cardOracleText,
+      cardPower: powerAndToughness?.power,
+      cardToughness: powerAndToughness?.toughness,
+      cardColorTreatment,
+      inkLevel,
+      layout: oracleLayout,
+    });
   }
 
   if (subFace && subFacePosition) {

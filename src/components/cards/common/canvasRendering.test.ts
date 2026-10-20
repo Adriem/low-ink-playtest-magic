@@ -21,6 +21,27 @@ test('marks the canvas as rendered once its drawings finish', async () => {
   expect(canvas.dataset.rendered).toBe('true');
 });
 
+test('waits for the drawings that its drawings start, too', async () => {
+  const { canvas, ctx } = setupCanvas();
+  const layout = deferred();
+  const art = deferred();
+  const drawArt = vi.fn();
+
+  beginRender(canvas);
+  void drawWhenLoaded(ctx, layout.promise, () => {
+    void drawWhenLoaded(ctx, art.promise, drawArt);
+  });
+  const finished = finishRender(canvas);
+  layout.resolve('layout');
+  await new Promise((resolve) => setTimeout(resolve, 0));
+
+  expect(canvas.dataset.rendered).toBe('false');
+
+  art.resolve('art');
+  await expect(finished).resolves.toBe(true);
+  expect(drawArt).toHaveBeenCalledWith('art');
+});
+
 test('a drawing that fails to load does not block the render', async () => {
   const { canvas, ctx } = setupCanvas();
 

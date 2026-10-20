@@ -13,7 +13,6 @@ const BACKGROUND_MARGIN = 20;
 const BACKGROUND_MARGIN_BOTTOM = 50;
 const BACKGROUND_RADIUS_TOP = 10;
 const BACKGROUND_RADIUS_BOTTOM = 70;
-const BACKGROUND_STROKE = 4;
 
 /**
  * Draw the border of the card and, on the high and splurge ink levels, the
@@ -52,8 +51,8 @@ export const hasCardBackground = (inkLevel: InkLevel): boolean => {
 };
 
 /**
- * Draw the card background: a white panel with a dark outline, filled with
- * the card's colors like the title and type boxes.
+ * Draw the card background: a panel with no outline, like the pinlines,
+ * filled with the card's colors like the title and type boxes.
  */
 const drawCardBackground = (
   ctx: CanvasRenderingContext2D,
@@ -64,15 +63,15 @@ const drawCardBackground = (
     y: BACKGROUND_MARGIN,
     width: ctx.canvas.width - BACKGROUND_MARGIN * 2,
     height: ctx.canvas.height - BACKGROUND_MARGIN - BACKGROUND_MARGIN_BOTTOM,
-    lineWidth: BACKGROUND_STROKE,
+    lineWidth: 0,
     borderRadiusTop: BACKGROUND_RADIUS_TOP,
     borderRadiusBottom: BACKGROUND_RADIUS_BOTTOM,
   };
-  drawRectangle(ctx, { ...panel, strokeStyle: REALISTIC_PALETTE.LINE, fillStyle: REALISTIC_PALETTE.PAPER });
+  drawRectangle(ctx, { ...panel, fillStyle: REALISTIC_PALETTE.PAPER });
 
   const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment.backgroundColors, REALISTIC_PALETTE), inkLevel);
   if (inkFill) {
-    // Filled where the panel is white, so the fill doesn't cover its outline
+    // Over a white panel, so the fill is as light as on white cards on black-bordered ones too
     drawInkFill(ctx, inkFill, () => drawRectangle(ctx, { ...panel, fillStyle: inkFill.style }));
   }
 };

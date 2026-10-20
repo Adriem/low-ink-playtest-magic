@@ -228,6 +228,10 @@ const createCtx = () => {
       ctx.drawn.push([text, x, y, ctx.font]);
     }),
     drawImage: vi.fn(),
+    getTransform: vi.fn(),
+    setTransform: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
     canvas: document.createElement('canvas'),
   };
   return ctx as unknown as CanvasRenderingContext2D & {

@@ -4,11 +4,11 @@ import {
   CAPSULE_TEXT_INSET,
   FONT_FAMILY,
   PINLINE_THICKNESS,
-  TITLE_WIDTH,
   TYPELINE_FONT_SIZE,
   TYPELINE_HEIGHT,
   TYPELINE_TEXT_BASELINE_OFFSET,
-  TYPELINE_Y,
+  CARD_LAYOUTS,
+  type Orientation,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
@@ -22,11 +22,20 @@ export const drawTypeBox = (
     cardType = '',
     cardColorTreatment,
     inkLevel,
-    y = TYPELINE_Y,
-  }: { palette: Palette; cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; y?: number },
+    orientation = 'portrait',
+    y = CARD_LAYOUTS[orientation].typelineY,
+  }: {
+    palette: Palette;
+    cardType?: string;
+    cardColorTreatment: CardColorTreatment;
+    inkLevel?: InkLevel;
+    /** Which way the card is drawn: landscape cards (e.g. battles) are laid out sideways */
+    orientation?: Orientation;
+    y?: number;
+  },
 ) => {
-  const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
-  const width = TITLE_WIDTH;
+  const { width: cardWidth, titleWidth: width } = CARD_LAYOUTS[orientation];
+  const x = (cardWidth - width) / 2;
   const height = TYPELINE_HEIGHT;
 
   drawFramedBox(ctx, {
@@ -37,6 +46,7 @@ export const drawTypeBox = (
     height,
     cardColorTreatment,
     shape: 'capsule',
+    orientation,
     inkLevel,
     // Over the card background, filled as lightly as the oracle box
     inkFillStrength: inkLevel && hasCardBackground(inkLevel) ? 'light' : 'regular',

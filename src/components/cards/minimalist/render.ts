@@ -1,3 +1,4 @@
+import { drawBattleOracleBox } from './utils/drawBattleOracleBox';
 import { drawLoyaltyBox } from '../common/canvasShapes';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
@@ -10,7 +11,13 @@ import { drawSubCardTypeBox } from './utils/drawSubCardTypeBox';
 import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
 import { DISPLAY_FONT_FAMILY, LOYALTY_BOX_SCALE, LOYALTY_BOX_X, LOYALTY_BOX_Y, TITLE_HEIGHT } from './config';
-import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
+import {
+  getDefense,
+  getLoyalty,
+  getPowerAndToughness,
+  type CardFace,
+  type SubCardPosition,
+} from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps, InkLevel } from '../styles';
 import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
@@ -58,6 +65,8 @@ export const renderMinimalistCard = (
     });
   } else if (cardLoyalty) {
     drawPlaneswalkerOracleBox(ctx, { palette, cardOracleText, cardColorTreatment });
+  } else if (face.faceLayout === 'battle') {
+    drawBattleOracleBox(ctx, { palette, cardOracleText, cardColorTreatment, cardDefense: getDefense(face) });
   } else {
     drawOracleBox(ctx, {
       palette,

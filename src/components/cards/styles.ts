@@ -49,11 +49,18 @@ export type CardStyle = 'realistic' | 'minimalist';
 interface CardStyleDefinition {
   render: CardRenderer;
   palette: Palette;
+  /** Whether a face is drawn sideways, turned counterclockwise into the card (e.g. realistic battles) */
+  isDrawnSideways: (face: CardFace) => boolean;
 }
 
 const CARD_STYLES: Record<CardStyle, CardStyleDefinition> = {
-  realistic: { render: renderRealisticCard, palette: DEFAULT_PALETTES.realistic },
-  minimalist: { render: renderMinimalistCard, palette: DEFAULT_PALETTES.minimalist },
+  realistic: {
+    render: renderRealisticCard,
+    palette: DEFAULT_PALETTES.realistic,
+    isDrawnSideways: (face) => face.faceLayout === 'battle',
+  },
+  // Minimalist battles keep their title and type line upright, so the card reads in hand
+  minimalist: { render: renderMinimalistCard, palette: DEFAULT_PALETTES.minimalist, isDrawnSideways: () => false },
 };
 
 export const DEFAULT_CARD_STYLE: CardStyle = 'realistic';

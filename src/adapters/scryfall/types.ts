@@ -15,6 +15,7 @@ export interface ScryfallCardFace {
   power?: string;
   toughness?: string;
   loyalty?: string;
+  defense?: string;
   image_uris?: ScryfallImageUris;
 }
 
@@ -33,6 +34,7 @@ export interface ScryfallCard {
   power?: string;
   toughness?: string;
   loyalty?: string;
+  defense?: string;
 }
 
 export interface ScryfallSymbology {

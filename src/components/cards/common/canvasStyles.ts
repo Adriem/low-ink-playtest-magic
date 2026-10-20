@@ -31,16 +31,19 @@ export interface InkFill {
 
 /**
  * Fill style for a single color, or for two colors a horizontal gradient
- * across the canvas from the first one to the second.
+ * across the card (by default, the canvas) from the first one to the second.
+ *
+ * @param cardWidth - Width of the card, e.g. of landscape cards drawn sideways
  */
 export const getFillStyle = (
   ctx: CanvasRenderingContext2D,
   colors: readonly [string] | readonly [string, string],
+  cardWidth = ctx.canvas.width,
 ): string | CanvasGradient => {
   if (colors.length === 1) return colors[0];
 
   const [startColor, endColor] = colors;
-  const gradient = ctx.createLinearGradient(0, 0, ctx.canvas.width, 0);
+  const gradient = ctx.createLinearGradient(0, 0, cardWidth, 0);
   gradient.addColorStop(0.4, startColor);
   gradient.addColorStop(0.6, endColor);
   return gradient;
@@ -57,16 +60,17 @@ export const getInkFill = (
   colors: readonly [string] | readonly [string, string],
   inkLevel: InkLevel,
   strength: InkFillStrength = 'regular',
+  cardSize: { width: number; height: number } = ctx.canvas,
 ): InkFill | null => {
   if (inkLevel === 'low') return null;
   // Splurge only adds a black border to the high ink level
   const isHigh = inkLevel === 'high' || inkLevel === 'splurge';
   if (strength === 'light') {
-    return isHigh ? { style: getFillStyle(ctx, colors), opacity: LIGHT_INK_FILL_OPACITY } : null;
+    return isHigh ? { style: getFillStyle(ctx, colors, cardSize.width), opacity: LIGHT_INK_FILL_OPACITY } : null;
   }
-  if (isHigh) return { style: getFillStyle(ctx, colors), opacity: INK_FILL_OPACITY.high };
+  if (isHigh) return { style: getFillStyle(ctx, colors, cardSize.width), opacity: INK_FILL_OPACITY.high };
 
-  const dots = ctx.createPattern(getColoredDots(ctx, colors), 'no-repeat');
+  const dots = ctx.createPattern(getColoredDots(ctx, colors, cardSize), 'no-repeat');
   return dots && { style: dots, opacity: INK_FILL_OPACITY.medium };
 };
 
@@ -90,11 +94,14 @@ export const setDisplayScale = (canvas: HTMLCanvasElement, scale: number) => {
 };
 
 /**
- * A canvas as big as the context's, covered with dots in the colors, so a
- * pattern made from it lines up with the gradient of the colors.
+ * A canvas as big as the card, covered with dots in the colors, so a pattern
+ * made from it lines up with the gradient of the colors.
  */
-const getColoredDots = (ctx: CanvasRenderingContext2D, colors: readonly [string] | readonly [string, string]) => {
-  const { width, height } = ctx.canvas;
+const getColoredDots = (
+  ctx: CanvasRenderingContext2D,
+  colors: readonly [string] | readonly [string, string],
+  { width, height }: { width: number; height: number },
+) => {
   const dots = document.createElement('canvas');
   dots.width = width;
   dots.height = height;

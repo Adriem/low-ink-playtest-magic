@@ -46,7 +46,7 @@ const DualCard = ({
     },
     [ref],
   );
-  const { render, palette: defaultPalette } = getCardStyle(cardStyle);
+  const { render, palette: defaultPalette, isDrawnSideways } = getCardStyle(cardStyle);
   const paper = resolvePalette(defaultPalette, customPalette).PAPER;
   const [face1, face2] = faces;
 
@@ -69,11 +69,25 @@ const DualCard = ({
       ctx.fillStyle = paper;
       ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
-      drawRotatedCW(ctx, faceCanvas1, 0, 0, CARD_WIDTH, HALF_HEIGHT);
-      drawRotatedCW(ctx, faceCanvas2, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
+      // Faces go sideways in their half, turned counterclockwise, so they read
+      // in order with the card turned clockwise: the first one at the bottom,
+      // on the left. Faces already drawn sideways (e.g. battles, and later
+      // aftermath halves) are turned back, upright, and go on the right.
+      const [left, right] = isDrawnSideways(face1)
+        ? [
+            { face: face2, canvas: faceCanvas2 },
+            { face: face1, canvas: faceCanvas1 },
+          ]
+        : [
+            { face: face1, canvas: faceCanvas1 },
+            { face: face2, canvas: faceCanvas2 },
+          ];
+      const drawFace = (face: CardFace) => (isDrawnSideways(face) ? drawRotatedCW : drawRotatedCCW);
+      drawFace(left.face)(ctx, left.canvas, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
+      drawFace(right.face)(ctx, right.canvas, 0, 0, CARD_WIDTH, HALF_HEIGHT);
     });
     void finishRender(canvas);
-  }, [canvas, render, paper, face1, face2, inkLevel, artFidelity, customPalette]);
+  }, [canvas, render, isDrawnSideways, paper, face1, face2, inkLevel, artFidelity, customPalette]);
 
   return (
     <canvas
@@ -86,6 +100,27 @@ const DualCard = ({
   );
 };
 
+/**
+ * Draw a portrait canvas turned counterclockwise into a landscape area.
+ */
+const drawRotatedCCW = (
+  ctx: CanvasRenderingContext2D,
+  src: HTMLCanvasElement,
+  dx: number,
+  dy: number,
+  dw: number,
+  dh: number,
+) => {
+  ctx.save();
+  ctx.translate(dx, dy + dh);
+  ctx.rotate(-Math.PI / 2);
+  ctx.drawImage(src, 0, 0, src.width, src.height, 0, 0, dh, dw);
+  ctx.restore();
+};
+
+/**
+ * Draw a portrait canvas turned clockwise into a landscape area.
+ */
 const drawRotatedCW = (
   ctx: CanvasRenderingContext2D,
   src: HTMLCanvasElement,

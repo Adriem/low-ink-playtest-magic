@@ -8,11 +8,11 @@ export type ArtCrop = 'right-half' | 'left-half' | 'full';
 export type CardFace = {
   name: string;
   manaCost?: string;
-  faceLayout: 'regular' | 'planeswalker' | 'saga'; // TODO: Support battles (#46)
+  faceLayout: 'regular' | 'planeswalker' | 'saga' | 'battle';
   typeLine: string;
   oracleText: OracleText;
   colors: ColorSymbol[];
-  stats?: { power: string; toughness: string } | { loyalty: string };
+  stats?: { power: string; toughness: string } | { loyalty: string } | { defense: string };
   art: { assetUrl?: string; crop: ArtCrop };
 };
 
@@ -61,4 +61,8 @@ export const getPowerAndToughness = (cardFace: CardFace) => {
 
 export const getLoyalty = (cardFace: CardFace) => {
   return cardFace.stats && 'loyalty' in cardFace.stats ? cardFace.stats.loyalty : undefined;
+};
+
+export const getDefense = (cardFace: CardFace) => {
+  return cardFace.stats && 'defense' in cardFace.stats ? cardFace.stats.defense : undefined;
 };

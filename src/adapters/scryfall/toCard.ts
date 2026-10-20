@@ -77,12 +77,14 @@ const toColors = (colors: string[]) => {
 const getFaceLayout = (face: ScryfallCardFace): CardFace['faceLayout'] => {
   if (/\bSaga\b/i.test(face.type_line ?? '')) return 'saga';
   if (face.loyalty) return 'planeswalker';
+  if (face.defense) return 'battle';
   return 'regular';
 };
 
-const getStats = ({ power, toughness, loyalty }: ScryfallCardFace): CardFace['stats'] => {
+const getStats = ({ power, toughness, loyalty, defense }: ScryfallCardFace): CardFace['stats'] => {
   if (power != null && toughness != null) return { power, toughness };
   if (loyalty != null) return { loyalty };
+  if (defense != null) return { defense };
   return undefined;
 };
 

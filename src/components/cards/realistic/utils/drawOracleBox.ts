@@ -1,13 +1,13 @@
 import type { Palette } from '../../../../domain/colorTreatment';
 import {
-  CONTENT_WIDTH,
   ORACLE_FONT_SIZE,
-  ORACLE_HEIGHT,
   ORACLE_TEXT_PADDING_X,
   ORACLE_TEXT_PADDING_Y,
   ORACLE_TEXT_STATS_CLEARANCE,
-  ORACLE_Y,
   PINLINE_THICKNESS,
+  LANDSCAPE_ORACLE_TEXT_PADDING_Y,
+  CARD_LAYOUTS,
+  type Orientation,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText } from './drawOracleText';
@@ -25,6 +25,7 @@ export const drawOracleBox = (
     cardColorTreatment,
     inkLevel,
     layout,
+    orientation = 'portrait',
   }: {
     palette: Palette;
     cardOracleText?: OracleText;
@@ -33,12 +34,15 @@ export const drawOracleBox = (
     cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     layout: OracleLayout;
+    /** Which way the card is drawn: landscape cards (e.g. battles) are laid out sideways */
+    orientation?: Orientation;
   },
 ) => {
-  const x = layout === 'right-half' ? ctx.canvas.width / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
-  const y = ORACLE_Y;
-  const width = layout === 'full-width' ? CONTENT_WIDTH : CONTENT_WIDTH / 2;
-  const height = ORACLE_HEIGHT;
+  const cardLayout = CARD_LAYOUTS[orientation];
+  const x = layout === 'right-half' ? cardLayout.width / 2 : (cardLayout.width - cardLayout.contentWidth) / 2;
+  const y = cardLayout.oracleY;
+  const width = layout === 'full-width' ? cardLayout.contentWidth : cardLayout.contentWidth / 2;
+  const height = cardLayout.oracleHeight;
 
   drawFramedBox(ctx, {
     palette,
@@ -50,12 +54,16 @@ export const drawOracleBox = (
     inkLevel,
     inkFillStrength: 'light',
     shape: 'rectangle',
+    orientation,
   });
 
+  // Landscape cards have little room for their text, so it has less space around it
+  const isLandscape = orientation === 'landscape';
   const textPaddingX = ORACLE_TEXT_PADDING_X;
-  const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
-  const textPaddingBottom =
-    cardPower != null && cardToughness != null && layout !== 'left-half'
+  const textPaddingTop = isLandscape ? LANDSCAPE_ORACLE_TEXT_PADDING_Y : ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
+  const textPaddingBottom = isLandscape
+    ? LANDSCAPE_ORACLE_TEXT_PADDING_Y
+    : cardPower != null && cardToughness != null && layout !== 'left-half'
       ? ORACLE_TEXT_STATS_CLEARANCE
       : ORACLE_TEXT_PADDING_Y;
 
@@ -66,5 +74,6 @@ export const drawOracleBox = (
     y: y + PINLINE_THICKNESS + textPaddingTop,
     width: width - PINLINE_THICKNESS * 2 - textPaddingX * 2,
     height: height - PINLINE_THICKNESS * 2 - textPaddingTop - textPaddingBottom,
+    fromTop: isLandscape,
   });
 };

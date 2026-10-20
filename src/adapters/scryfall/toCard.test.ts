@@ -49,14 +49,16 @@ test.each([
   expect([card.mainFace.name, card.secondaryFace?.name]).toEqual(['A', 'B']);
 });
 
-test('tells planeswalkers and sagas apart from regular faces', () => {
+test('tells planeswalkers, sagas and battles apart from regular faces', () => {
   const planeswalker = toCard(scryfallCard({ name: 'Jace', type_line: 'Legendary Planeswalker — Jace', loyalty: '3' }));
+  const battle = toCard(scryfallCard({ name: 'Invasion of Ravnica', type_line: 'Battle — Siege', defense: '4' }));
   const sagaCreature = toCard(
     scryfallCard({ name: 'Summon: Titan', type_line: 'Enchantment Creature — Saga Giant', power: '7', toughness: '7' }),
   );
 
   expect(planeswalker.mainFace).toMatchObject({ faceLayout: 'planeswalker', stats: { loyalty: '3' } });
   expect(sagaCreature.mainFace).toMatchObject({ faceLayout: 'saga', stats: { power: '7', toughness: '7' } });
+  expect(battle.mainFace).toMatchObject({ faceLayout: 'battle', stats: { defense: '4' } });
 });
 
 describe('colors of faces', () => {

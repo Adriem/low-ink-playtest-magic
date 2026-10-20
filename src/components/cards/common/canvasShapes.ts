@@ -360,6 +360,67 @@ export const drawLoyaltyBox = (
   ctx.fillText(cardLoyalty, x, y - 12 * scale);
 };
 
+/**
+ * Draw the defense of a battle in an eight-pointed star, with its diagonal
+ * points further out than the others, like a square's corners.
+ *
+ * @param x - Middle of the star
+ * @param y - Bottom of the star, at its lowest point
+ */
+export const drawDefenseBox = (
+  ctx: CanvasRenderingContext2D,
+  {
+    cardDefense,
+    x,
+    y,
+    scale = 1,
+    fontFamily,
+    colors,
+  }: { cardDefense: string; x: number; y: number; scale?: number; fontFamily: string; colors: ShapeColors },
+) => {
+  const radius = 26 * scale;
+  const border = 3.5 * scale;
+  const centerY = y - radius;
+
+  // The border is a stroke clipped inside the star, so it's as wide along the spikes as anywhere
+  ctx.save();
+  traceDefenseStar(ctx, { x, y: centerY, radius });
+  ctx.fillStyle = colors.PAPER;
+  ctx.fill();
+  ctx.clip();
+  ctx.strokeStyle = colors.LINE;
+  ctx.lineWidth = border * 2;
+  ctx.lineJoin = 'miter';
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.font = `bold ${24 * scale}px ${fontFamily}`;
+  ctx.fillStyle = colors.TEXT;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(cardDefense, x, centerY + scale);
+  ctx.textBaseline = 'alphabetic';
+};
+
+/**
+ * Trace the star of a battle's defense around its center: points up, down and
+ * to the sides at the radius, diagonal points further out, and the dips
+ * between them closer in.
+ */
+const traceDefenseStar = (
+  ctx: CanvasRenderingContext2D,
+  { x, y, radius }: { x: number; y: number; radius: number },
+) => {
+  const radii = [radius, radius * 0.8, radius * 1.35, radius * 0.8];
+  ctx.beginPath();
+  for (let corner = 0; corner < 16; corner++) {
+    const angle = -Math.PI / 2 + (corner * Math.PI) / 8;
+    const cornerRadius = radii[corner % 4];
+    ctx.lineTo(x + cornerRadius * Math.cos(angle), y + cornerRadius * Math.sin(angle));
+  }
+  ctx.closePath();
+};
+
 export const drawSagaChapter = (
   ctx: CanvasRenderingContext2D,
   {

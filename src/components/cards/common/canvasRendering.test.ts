@@ -42,6 +42,22 @@ test('waits for the drawings that its drawings start, too', async () => {
   expect(drawArt).toHaveBeenCalledWith('art');
 });
 
+test('draws with the transform the context had when asked to draw', async () => {
+  const { canvas, ctx } = setupCanvas();
+  const image = deferred();
+  const transformsDrawnWith: string[] = [];
+
+  beginRender(canvas);
+  ctx.currentTransform = 'rotated';
+  void drawWhenLoaded(ctx, image.promise, () => transformsDrawnWith.push(ctx.currentTransform));
+  ctx.currentTransform = 'identity';
+  image.resolve('image');
+  await finishRender(canvas);
+
+  expect(transformsDrawnWith).toEqual(['rotated']);
+  expect(ctx.restore).toHaveBeenCalled();
+});
+
 test('a drawing that fails to load does not block the render', async () => {
   const { canvas, ctx } = setupCanvas();
 
@@ -107,7 +123,18 @@ describe('whenRendered', () => {
 });
 
 // jsdom has no canvas contexts, and drawWhenLoaded only needs the canvas
+// The context's transform is a plain value: what it's set to, until set again
 const setupCanvas = () => {
   const canvas = document.createElement('canvas');
-  return { canvas, ctx: { canvas } as CanvasRenderingContext2D };
+  const ctx = {
+    canvas,
+    currentTransform: 'identity',
+    getTransform: () => ctx.currentTransform,
+    setTransform: (transform: string) => {
+      ctx.currentTransform = transform;
+    },
+    save: vi.fn(),
+    restore: vi.fn(),
+  };
+  return { canvas, ctx: ctx as unknown as CanvasRenderingContext2D & { currentTransform: string } };
 };

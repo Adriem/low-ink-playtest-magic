@@ -43,18 +43,24 @@ export const drawArtImage = (
   if (!cardArtUrl || artFidelity === 'blank') return;
 
   void drawWhenLoaded(ctx, loadImage(cardArtUrl), (artImage) => {
-    if (!outline) {
+    if (!outline && ctx.getTransform().isIdentity) {
       drawFilteredArt(ctx, artImage, { cropArt, artFidelity, x, y, width, height });
       return;
     }
 
-    // Filters change every pixel of a rectangle, so rounded art is filtered on
-    // its own canvas, and clipped to its corners when drawn on the card
+    // Filters change every pixel of a rectangle on the canvas, whatever the
+    // context's transform, so rounded art, or art drawn sideways (e.g. on
+    // battles), is filtered on its own canvas, and clipped to its corners when
+    // drawn on the card
     const art = document.createElement('canvas');
     art.width = Math.ceil(width);
     art.height = Math.ceil(height);
     drawFilteredArt(get2dContext(art), artImage, { cropArt, artFidelity, x: 0, y: 0, width, height });
 
+    if (!outline) {
+      ctx.drawImage(art, x, y);
+      return;
+    }
     ctx.save();
     traceRectangle(ctx, { x, y, width, height }, outline.radii);
     ctx.clip();

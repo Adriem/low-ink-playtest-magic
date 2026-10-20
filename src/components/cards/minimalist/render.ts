@@ -1,5 +1,5 @@
 import { drawBattleOracleBox } from './utils/drawBattleOracleBox';
-import { drawLoyaltyBox } from '../common/canvasShapes';
+import { drawDefenseBox, drawLoyaltyBox } from '../common/canvasShapes';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
 import { drawSagaOracleBox } from './utils/drawSagaOracleBox';
@@ -31,7 +31,7 @@ import { get2dContext } from '../common/canvasRendering';
  */
 export const renderMinimalistCard = (
   canvas: HTMLCanvasElement,
-  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', customPalette }: CardRenderProps,
+  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', customPalette, unified }: CardRenderProps,
 ) => {
   const palette = resolvePalette(MINIMALIST_PALETTE, customPalette);
   const cardColorTreatment = getCardColorTreatment(face);
@@ -41,6 +41,9 @@ export const renderMinimalistCard = (
   const cardOracleText = face.oracleText;
   const powerAndToughness = getPowerAndToughness(face);
   const cardLoyalty = getLoyalty(face);
+  const cardDefense = getDefense(face);
+  // Battles turn their text sideways, to read when played, unless the whole card is already turned
+  const hasSidewaysText = face.faceLayout === 'battle' && !unified;
 
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -65,8 +68,8 @@ export const renderMinimalistCard = (
     });
   } else if (cardLoyalty) {
     drawPlaneswalkerOracleBox(ctx, { palette, cardOracleText, cardColorTreatment });
-  } else if (face.faceLayout === 'battle') {
-    drawBattleOracleBox(ctx, { palette, cardOracleText, cardColorTreatment, cardDefense: getDefense(face) });
+  } else if (hasSidewaysText) {
+    drawBattleOracleBox(ctx, { palette, cardOracleText, cardColorTreatment, cardDefense });
   } else {
     drawOracleBox(ctx, {
       palette,
@@ -74,6 +77,7 @@ export const renderMinimalistCard = (
       cardColorTreatment,
       cardPower: powerAndToughness?.power,
       cardToughness: powerAndToughness?.toughness,
+      cardDefense,
       layout: oracleLayout,
     });
   }
@@ -82,6 +86,17 @@ export const renderMinimalistCard = (
 
   if (powerAndToughness) {
     drawStatsBox(ctx, { palette, cardPower: powerAndToughness.power, cardToughness: powerAndToughness.toughness });
+  }
+
+  if (cardDefense && !hasSidewaysText) {
+    drawDefenseBox(ctx, {
+      cardDefense,
+      x: LOYALTY_BOX_X,
+      y: LOYALTY_BOX_Y,
+      scale: LOYALTY_BOX_SCALE,
+      fontFamily: DISPLAY_FONT_FAMILY,
+      colors: palette,
+    });
   }
 
   if (cardLoyalty) {

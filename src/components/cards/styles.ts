@@ -20,6 +20,8 @@ export interface CardRenderProps {
   artFidelity?: ArtFidelity;
   /** Colors of the card style's palette that replace its defaults, e.g. ones saved by the user */
   customPalette?: CustomPalette;
+  /** Drawn as a half of a unified card, which is already turned sideways to read it */
+  unified?: boolean;
 }
 
 /** Colors of a palette by name (e.g. `RED`), as hex values */

@@ -57,7 +57,7 @@ const DualCard = ({
 
     beginRender(canvas);
     const faceCanvases = [face1, face2].map((face) =>
-      renderFace(render, { face, inkLevel, artFidelity, customPalette }),
+      renderFace(render, { face, inkLevel, artFidelity, customPalette, unified: true }),
     );
 
     // Combining the faces is part of this render, so it's skipped if a newer

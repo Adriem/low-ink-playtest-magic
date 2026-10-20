@@ -1,8 +1,8 @@
+import type { MinimalistPalette } from '../palette';
 import { getFontSize } from '../../common/canvasText';
 import { fillMultilineText } from '../../common/oracleTextRenderer';
 import { fitTextInTwoLines } from './fitTextInTwoLines';
 import { DISPLAY_FONT_FAMILY } from '../config';
-import { MINIMALIST_PALETTE } from '../palette';
 
 // Titles are positioned for this font size; titles with a bigger font are
 // moved down by the difference so they don't overflow the top of the card
@@ -15,6 +15,7 @@ const TITLE_REFERENCE_FONT_SIZE = 34;
 export const drawTitleText = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     text,
     x,
     y,
@@ -23,6 +24,7 @@ export const drawTitleText = (
     line2MaxWidth,
     maxHeight,
   }: {
+    palette: MinimalistPalette;
     text: string;
     x: number;
     y: number;
@@ -33,7 +35,7 @@ export const drawTitleText = (
   },
 ) => {
   ctx.font = `bold ${fontSize}px ${DISPLAY_FONT_FAMILY}`;
-  ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   const titleLines = fitTextInTwoLines(ctx, { text, line1MaxWidth, line2MaxWidth, maxHeight });

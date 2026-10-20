@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { fitFontSizeInX } from '../../common/canvasText';
 import { splitSymbols } from '../../../../domain/symbols';
 import { calculateManaCostWidth, renderManaCost } from '../../common/manaCostRenderer';
@@ -16,18 +17,24 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawTitleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardName,
     cardColorTreatment,
     inkLevel,
     cardManaCost,
-  }: { cardName: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; cardManaCost?: string },
+  }: {
+    palette: Palette;
+    cardName: string;
+    cardColorTreatment: CardColorTreatment;
+    inkLevel?: InkLevel;
+    cardManaCost?: string;
+  },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const y = TITLE_Y;
@@ -42,6 +49,7 @@ export const drawTitleBox = (
   });
 
   drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -62,7 +70,7 @@ export const drawTitleBox = (
     : x + width - PINLINE_THICKNESS * 2 - CAPSULE_TEXT_INSET;
 
   ctx.font = `bold ${TITLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardName, titleEndX - textX);
   ctx.fillText(cardName, textX, innerCenterY + TITLE_TEXT_BASELINE_OFFSET);

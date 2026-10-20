@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { TYPELINE_FONT_SIZE, TYPELINE_HEIGHT, TYPELINE_WIDTH, TYPELINE_Y } from '../config';
 import { drawTypeLine } from './drawTypeLine';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
@@ -6,12 +7,14 @@ import type { InkLevel } from '../../styles';
 export const drawTypeBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardType,
     cardColorTreatment,
     inkLevel,
-  }: { cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
+  }: { palette: MinimalistPalette; cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel },
 ) => {
   drawTypeLine(ctx, {
+    palette,
     cardType,
     cardColorTreatment,
     inkLevel,

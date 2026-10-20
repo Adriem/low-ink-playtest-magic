@@ -1,39 +1,124 @@
-import type { ChangeEvent, Ref } from 'react';
+import { useState, type ChangeEvent, type Ref } from 'react';
+import type { CardStyle } from '../cards/styles';
 import { Popup } from '../popup';
 import {
   SETTING_NAMES,
   SETTINGS_DEFINITIONS,
   isSettingAvailable,
+  useDiscardPalettePreviews,
   useRestoreDefaultSettings,
   useSetting,
   type SettingName,
 } from './SettingsContext';
+import PaletteEditor from './PaletteEditor';
 
 import './SettingsPanel.css';
 
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
   const [cardStyle] = useSetting('cardVariant');
   const restoreDefaults = useRestoreDefaultSettings();
+  const discardPalettePreviews = useDiscardPalettePreviews();
+  // The card style whose palette is being edited, which replaces the settings
+  const [editedPalette, setEditedPalette] = useState<CardStyle | null>(null);
 
   const handleRestoreDefaultsClick = () => {
     restoreDefaults();
   };
 
+  const handlePaletteClick = (paletteCardStyle: CardStyle) => {
+    setEditedPalette(paletteCardStyle);
+  };
+
+  // Back from the palette editor, to the settings
+  const handleBack = () => {
+    setEditedPalette(null);
+  };
+
+  // The popup opens on the settings again, and the palette changes not saved are discarded
+  const handleClose = () => {
+    setEditedPalette(null);
+    discardPalettePreviews();
+  };
+
   return (
-    <Popup ref={ref}>
-      <form method="dialog">
-        {SETTING_NAMES.map((name) => (
+    <Popup ref={ref} hasCloseButton onBack={editedPalette ? handleBack : undefined} onClose={handleClose}>
+      {editedPalette ? (
+        <PaletteEditor cardStyle={editedPalette} />
+      ) : (
+        <SettingsForm
+          cardStyle={cardStyle}
+          onPaletteClick={handlePaletteClick}
+          onRestoreDefaultsClick={handleRestoreDefaultsClick}
+        />
+      )}
+    </Popup>
+  );
+};
+
+/**
+ * The settings, with a button to restore their defaults.
+ */
+const SettingsForm = ({
+  cardStyle,
+  onPaletteClick,
+  onRestoreDefaultsClick,
+}: {
+  cardStyle: CardStyle;
+  onPaletteClick: (cardStyle: CardStyle) => void;
+  onRestoreDefaultsClick: () => void;
+}) => {
+  return (
+    <form method="dialog">
+      {SETTING_NAMES.map((name) =>
+        name === 'cardVariant' ? (
+          <CardStyleFieldset key={name} onPaletteClick={onPaletteClick} />
+        ) : (
           // Settings that don't apply to the card style stay, disabled, so the panel keeps its size
           <SettingFieldset key={name} name={name} disabled={!isSettingAvailable(name, cardStyle)} />
-        ))}
-        <menu>
-          <button type="button" onClick={handleRestoreDefaultsClick}>
-            Restore defaults
+        ),
+      )}
+      <menu className="menu-centered">
+        <button type="button" onClick={onRestoreDefaultsClick}>
+          Restore defaults
+        </button>
+      </menu>
+    </form>
+  );
+};
+
+/**
+ * Radio buttons to pick the card style, one per line, each with a button to
+ * edit its palette.
+ */
+const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: CardStyle) => void }) => {
+  const definition = SETTINGS_DEFINITIONS.cardVariant;
+  const [value, setValue] = useSetting('cardVariant');
+
+  return (
+    <fieldset className="card-styles">
+      <legend>{definition.label}</legend>
+      {definition.options.map((option) => (
+        <div key={option.value} className="card-style">
+          <label>
+            <input
+              type="radio"
+              name="cardVariant"
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => setValue(option.value)}
+            />
+            {option.label}
+          </label>
+          <button
+            type="button"
+            aria-label={`Edit ${option.label} palette`}
+            onClick={() => onPaletteClick(option.value)}
+          >
+            Edit palette
           </button>
-          <button type="submit">Close</button>
-        </menu>
-      </form>
-    </Popup>
+        </div>
+      ))}
+    </fieldset>
   );
 };
 

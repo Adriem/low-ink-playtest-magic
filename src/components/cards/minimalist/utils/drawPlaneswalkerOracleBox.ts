@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { drawLoyaltyCost } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
@@ -12,7 +13,6 @@ import {
   SIDE_BORDER_WIDTH,
 } from '../config';
 import { getSideBorderEdges } from './sideBorder';
-import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
@@ -21,7 +21,11 @@ const LOYALTY_ABILITY_OFFSET = 45;
 
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
-  { cardOracleText, cardColorTreatment }: { cardOracleText?: OracleText; cardColorTreatment: CardColorTreatment },
+  {
+    palette,
+    cardOracleText,
+    cardColorTreatment,
+  }: { palette: MinimalistPalette; cardOracleText?: OracleText; cardColorTreatment: CardColorTreatment },
 ) => {
   const x = (ctx.canvas.width - CONTENT_WIDTH) / 2;
   const y = ORACLE_Y;
@@ -38,6 +42,7 @@ export const drawPlaneswalkerOracleBox = (
   const regularOracleWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
 
   drawPlaneswalkerOracleBorder(ctx, {
+    palette,
     cardColorTreatment,
     x: textX,
     y: textY - textPaddingTop,
@@ -45,7 +50,7 @@ export const drawPlaneswalkerOracleBox = (
   });
 
   ctx.font = `${ORACLE_FONT_SIZE}px ${DISPLAY_FONT_FAMILY}`;
-  ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
   // Loyalty abilities, and their modes, go after the loyalty costs
@@ -74,7 +79,7 @@ export const drawPlaneswalkerOracleBox = (
         y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1)) / 2,
         scale: 1.1,
         fontFamily: DISPLAY_FONT_FAMILY,
-        colors: MINIMALIST_PALETTE,
+        colors: palette,
       });
       ctx.restore();
     }
@@ -90,13 +95,14 @@ export const drawPlaneswalkerOracleBox = (
 const drawPlaneswalkerOracleBorder = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardColorTreatment,
     x,
     y,
     height,
-  }: { cardColorTreatment: CardColorTreatment; x: number; y: number; height: number },
+  }: { palette: MinimalistPalette; cardColorTreatment: CardColorTreatment; x: number; y: number; height: number },
 ) => {
-  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE));
+  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette));
 
   const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
 

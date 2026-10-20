@@ -1,4 +1,4 @@
-import type { CardRenderProps, InkLevel } from '../styles';
+import type { CardRenderProps, CustomPalette, InkLevel } from '../styles';
 import { get2dContext } from './canvasRendering';
 import type { CanvasPaint } from './canvasShapes';
 
@@ -6,6 +6,9 @@ import type { CanvasPaint } from './canvasShapes';
 const INK_FILL_OPACITY = { medium: 0.5, high: 0.35 };
 /** Opacity of the light ink fill of the text boxes (e.g. oracle and stats), from the high ink level */
 const LIGHT_INK_FILL_OPACITY = 0.15;
+
+/** A color like `#d30e0e` */
+const HEX_COLOR_REGEX = /^#[0-9a-f]{6}$/i;
 
 /** Space between the centers of the dots of the medium ink level, and their radius */
 const DOT_SPACING = 4;
@@ -143,4 +146,17 @@ export const drawInkFill = (ctx: CanvasRenderingContext2D, { opacity }: InkFill,
   ctx.globalAlpha = opacity;
   draw();
   ctx.restore();
+};
+
+/**
+ * A palette with the custom colors that replace its defaults: those of its
+ * colors that are valid hex colors (e.g. `#d30e0e`).
+ */
+export const resolvePalette = <P extends object>(defaults: P, customPalette: CustomPalette = {}): P => {
+  const palette = { ...defaults };
+  for (const name of Object.keys(defaults) as (keyof P & string)[]) {
+    const color = customPalette[name];
+    if (color != null && HEX_COLOR_REGEX.test(color)) palette[name] = color as P[keyof P & string];
+  }
+  return palette;
 };

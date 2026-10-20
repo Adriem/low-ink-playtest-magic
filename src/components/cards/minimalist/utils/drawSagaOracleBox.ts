@@ -1,3 +1,4 @@
+import type { MinimalistPalette } from '../palette';
 import { drawRectangle, drawSagaChapter } from '../../common/canvasShapes';
 import { getFontSize } from '../../common/canvasText';
 import { fillMultilineText, fitOracleLinesIntoBox, getOracleTextLength } from '../../common/oracleTextRenderer';
@@ -14,7 +15,6 @@ import {
   SIDE_BORDER_WIDTH,
 } from '../config';
 import { getSideBorderEdges } from './sideBorder';
-import { MINIMALIST_PALETTE } from '../palette';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import { getSagaParts, type OracleLine, type OracleText } from '../../../../domain/oracleText';
@@ -45,11 +45,13 @@ interface SagaSlot {
 export const drawSagaOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText = { lines: [] },
     cardColorTreatment,
     cardPower,
     cardToughness,
   }: {
+    palette: MinimalistPalette;
     cardOracleText?: OracleText;
     cardColorTreatment: CardColorTreatment;
     cardPower?: string;
@@ -122,7 +124,7 @@ export const drawSagaOracleBox = (
     textY +
     slotHeights.slice(0, sagaAbilities.length + chapters.length).reduce((sum, slotHeight) => sum + slotHeight, 0);
   const borderHeight = creatureAbilities.length > 0 ? chaptersEndY - borderTopY : height + 10;
-  drawSagaOracleBorder(ctx, { cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
+  drawSagaOracleBorder(ctx, { palette, cardColorTreatment, x: textX, y: borderTopY, height: borderHeight });
 
   // All the slots use the same font size: the largest at which every slot's text fits
   const fitParagraph = (line: OracleLine, width: number, slotHeight: number, fontSize: number) => {
@@ -136,7 +138,7 @@ export const drawSagaOracleBox = (
     }),
   );
 
-  ctx.fillStyle = MINIMALIST_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
 
   let currentY = textY;
   slots.forEach(({ line, labels, leftX, width, align = 'center', isChapter, isBottom }, index) => {
@@ -165,7 +167,7 @@ export const drawSagaOracleBox = (
           x: borderCenterX,
           y: firstIconY + labelIndex * SAGA_CHAPTER_ICON_SPACING,
           fontFamily: DISPLAY_FONT_FAMILY,
-          colors: MINIMALIST_PALETTE,
+          colors: palette,
         });
       });
     }
@@ -178,7 +180,7 @@ export const drawSagaOracleBox = (
         y: slotY + slotHeight - SAGA_CHAPTER_DIVIDER_HEIGHT / 2,
         width: dividerWidth,
         height: SAGA_CHAPTER_DIVIDER_HEIGHT,
-        fillStyle: MINIMALIST_PALETTE.LINE,
+        fillStyle: palette.LINE,
       });
     }
 
@@ -192,7 +194,7 @@ export const drawSagaOracleBox = (
       y: y + height,
       width: textWidth,
       height: PINLINE_THICKNESS,
-      fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
+      fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette)),
     });
   }
 };
@@ -200,13 +202,14 @@ export const drawSagaOracleBox = (
 const drawSagaOracleBorder = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardColorTreatment,
     x,
     y,
     height,
-  }: { cardColorTreatment: CardColorTreatment; x: number; y: number; height: number },
+  }: { palette: MinimalistPalette; cardColorTreatment: CardColorTreatment; x: number; y: number; height: number },
 ) => {
-  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE));
+  ctx.fillStyle = getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, palette));
 
   const { left: xOffsetL, right: xOffsetR } = getSideBorderEdges(x);
   const tipX = (xOffsetL + xOffsetR) / 2;

@@ -1,4 +1,4 @@
-import { getFillStyle, getInkFill, hasBlackBorder } from './canvasStyles';
+import { getFillStyle, getInkFill, hasBlackBorder, resolvePalette } from './canvasStyles';
 
 interface FakeGradient {
   stops: [number, string][];
@@ -33,6 +33,17 @@ test('gives cards a black border when asked, or on the splurge ink level', () =>
   expect(hasBlackBorder({ inkLevel: 'high' })).toBe(false);
   expect(hasBlackBorder({ blackBordered: true, inkLevel: 'low' })).toBe(true);
   expect(hasBlackBorder({ inkLevel: 'splurge' })).toBe(true);
+});
+
+test('replaces the colors of a palette with its custom colors, when they are hex colors of its own', () => {
+  const defaults = { RED: '#d30e0e', BLUE: '#2985e1', TEXT: '#000000' };
+
+  expect(resolvePalette(defaults)).toEqual(defaults);
+  expect(resolvePalette(defaults, { RED: '#ff0000', BLUE: 'blue', PINK: '#ffc0cb' })).toEqual({
+    RED: '#ff0000',
+    BLUE: '#2985e1',
+    TEXT: '#000000',
+  });
 });
 
 test('fills with a single color as it is', () => {

@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import {
   CONTENT_WIDTH,
   ORACLE_FONT_SIZE,
@@ -17,6 +18,7 @@ import type { OracleText } from '../../../../domain/oracleText';
 export const drawOracleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText = { lines: [] },
     cardPower,
     cardToughness,
@@ -24,6 +26,7 @@ export const drawOracleBox = (
     inkLevel,
     layout,
   }: {
+    palette: Palette;
     cardOracleText?: OracleText;
     cardPower?: string;
     cardToughness?: string;
@@ -38,6 +41,7 @@ export const drawOracleBox = (
   const height = ORACLE_HEIGHT;
 
   drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -56,6 +60,7 @@ export const drawOracleBox = (
       : ORACLE_TEXT_PADDING_Y;
 
   drawOracleText(ctx, {
+    palette,
     cardOracleText,
     x: x + PINLINE_THICKNESS + textPaddingX,
     y: y + PINLINE_THICKNESS + textPaddingTop,

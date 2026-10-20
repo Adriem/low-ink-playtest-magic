@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { fitFontSizeInX } from '../../common/canvasText';
 import { splitSymbols } from '../../../../domain/symbols';
 import { calculateManaCostWidth, renderManaCost } from '../../common/manaCostRenderer';
@@ -15,19 +16,20 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawSubCardTitleBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardName,
     cardManaCost,
     cardColorTreatment,
     inkLevel,
     position,
   }: {
+    palette: Palette;
     cardName: string;
     cardManaCost?: string;
     cardColorTreatment: CardColorTreatment;
@@ -49,6 +51,7 @@ export const drawSubCardTitleBox = (
   });
 
   const inner = drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -68,7 +71,7 @@ export const drawSubCardTitleBox = (
   const titleEndX = manaSymbols.length ? manaAnchorRight - manaCostWidth - SUBCARD_MANA_SYMBOL_EDGE_PADDING : textRight;
 
   ctx.font = `bold ${SUBCARD_TITLE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardName, titleEndX - textX);
   ctx.fillText(cardName, textX, innerCenterY + SUBCARD_TITLE_FONT_SIZE / 3);

@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { drawRectangle, drawSagaChapter, type Box } from '../../common/canvasShapes';
 import { distributeHeight } from '../../../../utils/layout';
 import { getSagaParts, type OracleLine, type OracleText } from '../../../../domain/oracleText';
@@ -17,7 +18,6 @@ import { drawArtImage } from './drawArtImage';
 import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText, drawTextInArea, getFittingFontSize } from './drawOracleText';
 import type { ArtCrop } from '../../../../domain/cards';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { ArtFidelity } from '../../styles';
 
@@ -50,6 +50,7 @@ interface SagaSlot {
 export const drawSagaOracleAndArtBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardOracleText = { lines: [] },
     cardArtUrl,
     cropArt,
@@ -57,6 +58,7 @@ export const drawSagaOracleAndArtBox = (
     cardColorTreatment,
     typelineY = SAGA_TYPELINE_Y,
   }: {
+    palette: Palette;
     cardOracleText?: OracleText;
     cardArtUrl?: string;
     cropArt?: ArtCrop;
@@ -71,14 +73,7 @@ export const drawSagaOracleAndArtBox = (
   const height = typelineY - y + SAGA_COLUMNS_TYPELINE_OVERLAP;
   const halfWidth = width / 2;
 
-  const inner = drawFramedBox(ctx, {
-    x,
-    y,
-    width,
-    height,
-    cardColorTreatment,
-    shape: 'rectangle',
-  });
+  const inner = drawFramedBox(ctx, { palette, x, y, width, height, cardColorTreatment, shape: 'rectangle' });
 
   // Separator between the text and the art, as thick as the frame's pinline
   drawRectangle(ctx, {
@@ -86,7 +81,7 @@ export const drawSagaOracleAndArtBox = (
     y: inner.y,
     width: PINLINE_THICKNESS,
     height: inner.height,
-    fillStyle: REALISTIC_PALETTE.LINE,
+    fillStyle: palette.LINE,
   });
 
   // Text column: from the frame's inner pinline to the separator
@@ -96,12 +91,13 @@ export const drawSagaOracleAndArtBox = (
     width: x + halfWidth - PINLINE_THICKNESS / 2 - (inner.x + PINLINE_THICKNESS),
     height: inner.height - PINLINE_THICKNESS * 2,
   };
-  const hasChapters = drawSagaChapters(ctx, cardOracleText, textColumn);
+  const hasChapters = drawSagaChapters(ctx, cardOracleText, textColumn, palette);
 
   // Sagas without recognizable chapters get their text as a regular oracle box
   if (!hasChapters) {
     const textPaddingTop = ORACLE_FONT_SIZE + ORACLE_TEXT_PADDING_Y;
     drawOracleText(ctx, {
+      palette,
       cardOracleText,
       x: x + PINLINE_THICKNESS + ORACLE_TEXT_PADDING_X,
       y: y + PINLINE_THICKNESS + textPaddingTop,
@@ -136,6 +132,7 @@ const drawSagaChapters = (
   ctx: CanvasRenderingContext2D,
   cardOracleText: OracleText,
   { x, y, width, height }: Box,
+  palette: Palette,
 ): boolean => {
   const { sagaAbilities, chapters, creatureAbilities } = getSagaParts(cardOracleText);
   if (chapters.length === 0) return false;
@@ -183,7 +180,7 @@ const drawSagaChapters = (
   slots.forEach(({ labels, align, isChapter }, index) => {
     const slotHeight = slotHeights[index];
 
-    drawTextInArea(ctx, { ...textAreas[index], y: slotY, align, fontSize });
+    drawTextInArea(ctx, { palette, ...textAreas[index], y: slotY, align, fontSize });
 
     // Line between this slot and the next one, when either is a chapter
     const nextSlot = slots[index + 1];
@@ -193,7 +190,7 @@ const drawSagaChapters = (
         y: slotY + slotHeight - CHAPTER_SEPARATOR_THICKNESS / 2,
         width,
         height: CHAPTER_SEPARATOR_THICKNESS,
-        fillStyle: REALISTIC_PALETTE.LINE,
+        fillStyle: palette.LINE,
       });
     }
 
@@ -205,7 +202,7 @@ const drawSagaChapters = (
           x: iconX,
           y: firstIconY + labelIndex * CHAPTER_ICON_SPACING,
           fontFamily: FONT_FAMILY,
-          colors: REALISTIC_PALETTE,
+          colors: palette,
         });
       });
     }

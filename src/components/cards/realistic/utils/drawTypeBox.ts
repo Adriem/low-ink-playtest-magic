@@ -1,3 +1,4 @@
+import type { Palette } from '../../../../domain/colorTreatment';
 import { fitFontSizeInX } from '../../common/canvasText';
 import {
   CAPSULE_TEXT_INSET,
@@ -11,24 +12,25 @@ import {
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';
-import { REALISTIC_PALETTE } from '../palette';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 
 export const drawTypeBox = (
   ctx: CanvasRenderingContext2D,
   {
+    palette,
     cardType = '',
     cardColorTreatment,
     inkLevel,
     y = TYPELINE_Y,
-  }: { cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; y?: number },
+  }: { palette: Palette; cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; y?: number },
 ) => {
   const x = (ctx.canvas.width - TITLE_WIDTH) / 2;
   const width = TITLE_WIDTH;
   const height = TYPELINE_HEIGHT;
 
   drawFramedBox(ctx, {
+    palette,
     x,
     y,
     width,
@@ -46,7 +48,7 @@ export const drawTypeBox = (
   const innerCenterY = y + height / 2;
 
   ctx.font = `bold ${TYPELINE_FONT_SIZE}px ${FONT_FAMILY}`;
-  ctx.fillStyle = REALISTIC_PALETTE.TEXT;
+  ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType, textRight - textX);
   ctx.fillText(cardType, textX, innerCenterY + TYPELINE_TEXT_BASELINE_OFFSET);

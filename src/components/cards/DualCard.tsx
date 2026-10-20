@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, drawWhenLoaded, finishRender, get2dContext } from './common/canvasRendering';
-import { setDisplayScale } from './common/canvasStyles';
+import { resolvePalette, setDisplayScale } from './common/canvasStyles';
 import type { CardFace } from '../../domain/cards';
 import {
   CARD_HEIGHT,
@@ -9,6 +9,7 @@ import {
   type ArtFidelity,
   type CardRenderer,
   type CardRenderProps,
+  type CustomPalette,
   type InkLevel,
 } from './styles';
 
@@ -27,12 +28,14 @@ const DualCard = ({
   faces,
   inkLevel,
   artFidelity,
+  customPalette,
   ref,
 }: {
   cardStyle: string;
   faces: [CardFace, CardFace];
   inkLevel?: InkLevel;
   artFidelity?: ArtFidelity;
+  customPalette?: CustomPalette;
   ref?: RefCallback<HTMLCanvasElement>;
 }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
@@ -43,7 +46,8 @@ const DualCard = ({
     },
     [ref],
   );
-  const { render, palette } = getCardStyle(cardStyle);
+  const { render, palette: defaultPalette } = getCardStyle(cardStyle);
+  const paper = resolvePalette(defaultPalette, customPalette).PAPER;
   const [face1, face2] = faces;
 
   useEffect(() => {
@@ -52,7 +56,9 @@ const DualCard = ({
     const ctx = get2dContext(canvas);
 
     beginRender(canvas);
-    const faceCanvases = [face1, face2].map((face) => renderFace(render, { face, inkLevel, artFidelity }));
+    const faceCanvases = [face1, face2].map((face) =>
+      renderFace(render, { face, inkLevel, artFidelity, customPalette }),
+    );
 
     // Combining the faces is part of this render, so it's skipped if a newer
     // render starts before the faces finish
@@ -60,14 +66,14 @@ const DualCard = ({
       const [faceCanvas1, faceCanvas2] = faceCanvases;
 
       ctx.clearRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
-      ctx.fillStyle = palette.PAPER;
+      ctx.fillStyle = paper;
       ctx.fillRect(0, 0, CARD_WIDTH, CARD_HEIGHT);
 
       drawRotatedCW(ctx, faceCanvas1, 0, 0, CARD_WIDTH, HALF_HEIGHT);
       drawRotatedCW(ctx, faceCanvas2, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
     });
     void finishRender(canvas);
-  }, [canvas, render, palette, face1, face2, inkLevel, artFidelity]);
+  }, [canvas, render, paper, face1, face2, inkLevel, artFidelity, customPalette]);
 
   return (
     <canvas
@@ -75,7 +81,7 @@ const DualCard = ({
       ref={handleCanvasRef}
       width={CARD_WIDTH}
       height={CARD_HEIGHT}
-      style={{ background: palette.PAPER }}
+      style={{ background: paper }}
     />
   );
 };

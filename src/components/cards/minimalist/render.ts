@@ -12,9 +12,9 @@ import { drawTypeBox } from './utils/drawTypeBox';
 import { DISPLAY_FONT_FAMILY, LOYALTY_BOX_SCALE, LOYALTY_BOX_X, LOYALTY_BOX_Y, TITLE_HEIGHT } from './config';
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
-import { MINIMALIST_PALETTE } from './palette';
 import type { CardRenderProps, InkLevel } from '../styles';
-import { hasBlackBorder } from '../common/canvasStyles';
+import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
+import { MINIMALIST_PALETTE, type MinimalistPalette } from './palette';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
@@ -24,8 +24,9 @@ import { get2dContext } from '../common/canvasRendering';
  */
 export const renderMinimalistCard = (
   canvas: HTMLCanvasElement,
-  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium' }: CardRenderProps,
+  { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', customPalette }: CardRenderProps,
 ) => {
+  const palette = resolvePalette(MINIMALIST_PALETTE, customPalette);
   const cardColorTreatment = getCardColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
@@ -37,11 +38,11 @@ export const renderMinimalistCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  drawOuterFrame(ctx, { blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
-  drawTitleBox(ctx, { cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
+  drawOuterFrame(ctx, { palette, blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
+  drawTitleBox(ctx, { palette, cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
 
   if (subFace && subFacePosition) {
-    drawSubCard(ctx, subFace, subFacePosition, inkLevel);
+    drawSubCard(ctx, subFace, subFacePosition, inkLevel, palette);
   }
 
   const oracleLayout =
@@ -49,18 +50,17 @@ export const renderMinimalistCard = (
 
   if (face.faceLayout === 'saga') {
     drawSagaOracleBox(ctx, {
+      palette,
       cardOracleText,
       cardColorTreatment,
       cardPower: powerAndToughness?.power,
       cardToughness: powerAndToughness?.toughness,
     });
   } else if (cardLoyalty) {
-    drawPlaneswalkerOracleBox(ctx, {
-      cardOracleText,
-      cardColorTreatment,
-    });
+    drawPlaneswalkerOracleBox(ctx, { palette, cardOracleText, cardColorTreatment });
   } else {
     drawOracleBox(ctx, {
+      palette,
       cardOracleText,
       cardColorTreatment,
       cardPower: powerAndToughness?.power,
@@ -69,10 +69,10 @@ export const renderMinimalistCard = (
     });
   }
 
-  drawTypeBox(ctx, { cardType: cardTypeLine, cardColorTreatment, inkLevel });
+  drawTypeBox(ctx, { palette, cardType: cardTypeLine, cardColorTreatment, inkLevel });
 
   if (powerAndToughness) {
-    drawStatsBox(ctx, { cardPower: powerAndToughness.power, cardToughness: powerAndToughness.toughness });
+    drawStatsBox(ctx, { palette, cardPower: powerAndToughness.power, cardToughness: powerAndToughness.toughness });
   }
 
   if (cardLoyalty) {
@@ -82,7 +82,7 @@ export const renderMinimalistCard = (
       y: LOYALTY_BOX_Y,
       scale: LOYALTY_BOX_SCALE,
       fontFamily: DISPLAY_FONT_FAMILY,
-      colors: MINIMALIST_PALETTE,
+      colors: palette,
     });
   }
 };
@@ -92,21 +92,20 @@ const drawSubCard = (
   subFace: CardFace,
   position: SubCardPosition,
   inkLevel: InkLevel,
+  palette: MinimalistPalette,
 ) => {
   const subColorTreatment = getCardColorTreatment(subFace);
 
-  drawSubCardTitleBox(ctx, {
-    cardName: subFace.name,
-    cardManaCost: subFace.manaCost,
-    position,
-  });
+  drawSubCardTitleBox(ctx, { palette, cardName: subFace.name, cardManaCost: subFace.manaCost, position });
   drawSubCardTypeBox(ctx, {
+    palette,
     cardType: subFace.typeLine,
     cardColorTreatment: subColorTreatment,
     inkLevel,
     position,
   });
   drawSubCardOracleBox(ctx, {
+    palette,
     cardOracleText: subFace.oracleText,
     cardColorTreatment: subColorTreatment,
     position,

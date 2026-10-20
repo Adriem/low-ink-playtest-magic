@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, drawWhenLoaded, finishRender, get2dContext } from './common/canvasRendering';
+import { setDisplayScale } from './common/canvasStyles';
 import type { CardFace } from '../../domain/cards';
 import {
   CARD_HEIGHT,
@@ -101,6 +102,8 @@ const renderFace = (render: CardRenderer, props: CardRenderProps): HTMLCanvasEle
   const faceCanvas = document.createElement('canvas');
   faceCanvas.width = CARD_WIDTH;
   faceCanvas.height = CARD_HEIGHT;
+  // The face is drawn rotated into half the card, as wide as the card is tall
+  setDisplayScale(faceCanvas, HALF_HEIGHT / CARD_WIDTH);
 
   beginRender(faceCanvas);
   render(faceCanvas, props);

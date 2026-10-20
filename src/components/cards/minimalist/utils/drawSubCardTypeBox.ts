@@ -1,6 +1,6 @@
 import { SUBCARD_TYPELINE_FONT_SIZE, SUBCARD_TYPELINE_HEIGHT, SUBCARD_TYPELINE_Y, TYPELINE_WIDTH } from '../config';
 import { drawTypeLine } from './drawTypeLine';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { SubCardPosition } from '../../../../domain/cards';
 import type { InkLevel } from '../../styles';
 
@@ -11,7 +11,7 @@ export const drawSubCardTypeBox = (
     cardColorTreatment,
     inkLevel,
     position,
-  }: { cardType?: string; cardColorTreatment: ColorTreatment; inkLevel?: InkLevel; position: SubCardPosition },
+  }: { cardType?: string; cardColorTreatment: CardColorTreatment; inkLevel?: InkLevel; position: SubCardPosition },
 ) => {
   const cardWidth = ctx.canvas.width;
   const typeBoxMarginX = (cardWidth - TYPELINE_WIDTH) / 2;

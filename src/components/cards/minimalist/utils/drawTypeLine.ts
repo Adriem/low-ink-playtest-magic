@@ -2,7 +2,7 @@ import { drawRoundedBox } from '../../common/canvasShapes';
 import { fitFontSizeInX, getFontSize } from '../../common/canvasText';
 import { PINLINE_THICKNESS, TEXT_FONT_FAMILY } from '../config';
 import { MINIMALIST_PALETTE } from '../palette';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { drawInkFill, getFillStyle, getInkFill } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
 
@@ -33,7 +33,7 @@ export const drawTypeLine = (
     inkLevel = 'low',
   }: {
     cardType?: string;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     x: number;
     y: number;
     width: number;
@@ -49,7 +49,7 @@ export const drawTypeLine = (
     width,
     height,
     lineWidth: 0,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
     flatSide,
   });
 
@@ -63,7 +63,7 @@ export const drawTypeLine = (
   const innerLine = { ...inner, lineWidth: TYPELINE_INNER_LINE_WIDTH, strokeStyle: MINIMALIST_PALETTE.PAPER };
   drawRoundedBox(ctx, { ...innerLine, fillStyle: MINIMALIST_PALETTE.PAPER });
 
-  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE), inkLevel);
+  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment.backgroundColors, MINIMALIST_PALETTE), inkLevel);
   if (inkFill) {
     // Filled where the box is white, so the fill doesn't cover the white line between the border and the box
     drawInkFill(ctx, inkFill, () => drawRoundedBox(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));
@@ -76,7 +76,9 @@ export const drawTypeLine = (
   const textWidth = width - TYPELINE_BOX_PADDING_X * 2;
 
   ctx.fillStyle =
-    cardColorTreatment === 'colorless' ? MINIMALIST_PALETTE.COLORLESS_TYPELINE_TEXT : MINIMALIST_PALETTE.TEXT;
+    cardColorTreatment.pinlineColors === 'colorless'
+      ? MINIMALIST_PALETTE.COLORLESS_TYPELINE_TEXT
+      : MINIMALIST_PALETTE.TEXT;
   ctx.textAlign = 'start';
   fitFontSizeInX(ctx, cardType.toUpperCase(), textWidth);
   const textY = y + height * TYPELINE_BASELINE_RATIO - (fontSize - getFontSize(ctx)) * TYPELINE_SHRINK_BASELINE_RATIO;

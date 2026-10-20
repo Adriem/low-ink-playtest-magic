@@ -1,6 +1,6 @@
 import { testFace } from '../testUtils';
 import type { ColorSymbol } from './colors';
-import { getColorTreatment, getPaletteColors, type Palette } from './colorTreatment';
+import { getCardColorTreatment, getColorTreatment, getPaletteColors, type Palette } from './colorTreatment';
 
 describe('getColorTreatment', () => {
   test.each([
@@ -33,9 +33,9 @@ describe('getColorTreatment', () => {
     expect(getColorTreatment(face(['G', 'G']))).toBe('green');
   });
 
-  test('more than two colors are multicolored', () => {
-    expect(getColorTreatment(face(['W', 'U', 'B']))).toBe('multi');
-    expect(getColorTreatment(face(['W', 'U', 'B', 'R', 'G']))).toBe('multi');
+  test('more than two colors are gold', () => {
+    expect(getColorTreatment(face(['W', 'U', 'B']))).toBe('gold');
+    expect(getColorTreatment(face(['W', 'U', 'B', 'R', 'G']))).toBe('gold');
   });
 
   test('colorless faces are artifacts, lands or colorless', () => {
@@ -45,8 +45,39 @@ describe('getColorTreatment', () => {
   });
 });
 
-const face = (colors: ColorSymbol[], typeLine = 'Creature') => {
-  return testFace({ name: 'Card', colors, typeLine });
+describe('getCardColorTreatment', () => {
+  test('two-color faces are gold, with pinlines in both colors', () => {
+    expect(getCardColorTreatment(face(['R', 'W'], 'Instant', '{R}{W}'))).toEqual({
+      pinlineColors: 'red-white',
+      backgroundColors: 'gold',
+    });
+  });
+
+  test('two-color faces are in both colors when every colored mana symbol of their cost is a hybrid of both', () => {
+    expect(getCardColorTreatment(face(['W', 'G'], 'Creature', '{1}{G/W}{G/W}'))).toEqual({
+      pinlineColors: 'green-white',
+      backgroundColors: 'green-white',
+    });
+    expect(getCardColorTreatment(face(['U', 'R'], 'Instant', '{U/R}{U/R/P}')).backgroundColors).toBe('blue-red');
+  });
+
+  test('two-color faces are gold with other colored mana symbols, or without any', () => {
+    expect(getCardColorTreatment(face(['R', 'W'], 'Instant', '{R/W}{W}')).backgroundColors).toBe('gold');
+    expect(getCardColorTreatment(face(['W', 'B'], 'Sorcery', '{2/W}{2/B}')).backgroundColors).toBe('gold');
+    expect(getCardColorTreatment(face(['B', 'G'], 'Land')).backgroundColors).toBe('gold');
+  });
+
+  test('other faces have the same colors throughout', () => {
+    expect(getCardColorTreatment(face(['R'], 'Instant', '{R}'))).toEqual({
+      pinlineColors: 'red',
+      backgroundColors: 'red',
+    });
+    expect(getCardColorTreatment(face(['W', 'U', 'B']))).toEqual({ pinlineColors: 'gold', backgroundColors: 'gold' });
+  });
+});
+
+const face = (colors: ColorSymbol[], typeLine = 'Creature', manaCost?: string) => {
+  return testFace({ name: 'Card', colors, typeLine, manaCost });
 };
 
 describe('getPaletteColors', () => {
@@ -57,7 +88,7 @@ describe('getPaletteColors', () => {
     RED: 'r',
     GREEN: 'g',
     COLORLESS: 'c',
-    MULTI: 'm',
+    GOLD: 'm',
     ARTIFACT: 'a',
     LAND: 'l',
     TEXT: 'text',
@@ -65,9 +96,9 @@ describe('getPaletteColors', () => {
     PAPER: 'paper',
   };
 
-  test('uses a single color of the palette for single colors, multicolored and colorless treatments', () => {
+  test('uses a single color of the palette for single colors, gold and colorless treatments', () => {
     expect(getPaletteColors('red', palette)).toEqual(['r']);
-    expect(getPaletteColors('multi', palette)).toEqual(['m']);
+    expect(getPaletteColors('gold', palette)).toEqual(['m']);
     expect(getPaletteColors('artifact', palette)).toEqual(['a']);
     expect(getPaletteColors('land', palette)).toEqual(['l']);
     expect(getPaletteColors('colorless', palette)).toEqual(['c']);

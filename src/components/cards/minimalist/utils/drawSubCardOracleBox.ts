@@ -10,7 +10,7 @@ import {
 } from '../config';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { MINIMALIST_PALETTE } from '../palette';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import type { OracleText } from '../../../../domain/oracleText';
 
@@ -23,7 +23,7 @@ export const drawSubCardOracleBox = (
     cardOracleText,
     cardColorTreatment,
     position,
-  }: { cardOracleText?: OracleText; cardColorTreatment: ColorTreatment; position: SubCardPosition },
+  }: { cardOracleText?: OracleText; cardColorTreatment: CardColorTreatment; position: SubCardPosition },
 ) => {
   const cardWidth = ctx.canvas.width;
   const textMarginX = (cardWidth - CONTENT_WIDTH) / 2;
@@ -54,7 +54,7 @@ export const drawSubCardOracleBox = (
 
 const drawOracleBorder = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, position, y }: { cardColorTreatment: ColorTreatment; position: SubCardPosition; y: number },
+  { cardColorTreatment, position, y }: { cardColorTreatment: CardColorTreatment; position: SubCardPosition; y: number },
 ) => {
   const x =
     position === 'right' ? ctx.canvas.width / 2 + PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
@@ -65,6 +65,6 @@ const drawOracleBorder = (
     y,
     width,
     height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
   });
 };

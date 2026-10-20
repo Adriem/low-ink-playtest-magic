@@ -10,7 +10,7 @@ import {
 import { drawFramedBox } from './drawFramedBox';
 import type { SubCardPosition } from '../../../../domain/cards';
 import { REALISTIC_PALETTE } from '../palette';
-import type { ColorTreatment } from '../../../../domain/colorTreatment';
+import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { OracleText } from '../../../../domain/oracleText';
 import type { InkLevel } from '../../styles';
 
@@ -23,7 +23,7 @@ export const drawSubCardOracleBox = (
     position,
   }: {
     cardOracleText?: OracleText;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     inkLevel?: InkLevel;
     position: SubCardPosition;
   },

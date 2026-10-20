@@ -1,7 +1,7 @@
 import { drawRectangle, drawRoundedBox, type Box } from '../../common/canvasShapes';
 import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS } from '../config';
 import { REALISTIC_PALETTE } from '../palette';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { drawInkFill, getFillStyle, getInkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';
 
@@ -41,7 +41,7 @@ export const drawFramedBox = (
     y: number;
     width: number;
     height: number;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     shape: 'capsule' | 'rectangle';
     flatSide?: 'left' | 'right' | null;
     innerHeightAdjustment?: number;
@@ -66,7 +66,7 @@ export const drawFramedBox = (
     width,
     height,
     lineWidth: 0,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, REALISTIC_PALETTE)),
     flatSide,
   });
   const innerLine = {
@@ -77,7 +77,12 @@ export const drawFramedBox = (
   };
   drawShape(ctx, { ...innerLine, fillStyle: REALISTIC_PALETTE.PAPER });
 
-  const inkFill = getInkFill(ctx, getPaletteColors(cardColorTreatment, REALISTIC_PALETTE), inkLevel, inkFillStrength);
+  const inkFill = getInkFill(
+    ctx,
+    getPaletteColors(cardColorTreatment.backgroundColors, REALISTIC_PALETTE),
+    inkLevel,
+    inkFillStrength,
+  );
   if (inkFill) {
     // Filled where the inner box is white, so the fill doesn't cover the inner line
     drawInkFill(ctx, inkFill, () => drawShape(ctx, { ...innerLine, strokeStyle: null, fillStyle: inkFill.style }));

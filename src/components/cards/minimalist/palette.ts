@@ -13,7 +13,7 @@ export const MINIMALIST_PALETTE = {
   BLACK: 'rgb(105, 92, 114)',
   RED: 'rgb(211, 14, 14)',
   GREEN: 'rgb(6, 147, 45)',
-  MULTI: 'rgb(239, 164, 0)',
+  GOLD: 'rgb(239, 164, 0)',
   ARTIFACT: 'rgb(160, 173, 185)',
   LAND: 'rgb(143, 120, 90)',
 

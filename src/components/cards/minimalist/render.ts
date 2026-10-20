@@ -11,7 +11,7 @@ import { drawTitleBox } from './utils/drawTitleBox';
 import { drawTypeBox } from './utils/drawTypeBox';
 import { DISPLAY_FONT_FAMILY, LOYALTY_BOX_SCALE, LOYALTY_BOX_X, LOYALTY_BOX_Y, TITLE_HEIGHT } from './config';
 import { getLoyalty, getPowerAndToughness, type CardFace, type SubCardPosition } from '../../../domain/cards';
-import { getColorTreatment } from '../../../domain/colorTreatment';
+import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import { MINIMALIST_PALETTE } from './palette';
 import type { CardRenderProps, InkLevel } from '../styles';
 import { hasBlackBorder } from '../common/canvasStyles';
@@ -26,7 +26,7 @@ export const renderMinimalistCard = (
   canvas: HTMLCanvasElement,
   { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium' }: CardRenderProps,
 ) => {
-  const cardColorTreatment = getColorTreatment(face);
+  const cardColorTreatment = getCardColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
   const cardTypeLine = face.typeLine;
@@ -93,7 +93,7 @@ const drawSubCard = (
   position: SubCardPosition,
   inkLevel: InkLevel,
 ) => {
-  const subColorTreatment = getColorTreatment(subFace);
+  const subColorTreatment = getCardColorTreatment(subFace);
 
   drawSubCardTitleBox(ctx, {
     cardName: subFace.name,

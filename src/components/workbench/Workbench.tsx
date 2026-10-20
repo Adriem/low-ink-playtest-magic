@@ -17,7 +17,7 @@ const COLOR_OPTIONS = [
   { value: 'B', label: 'black' },
   { value: 'R', label: 'red' },
   { value: 'G', label: 'green' },
-  { value: 'W,U,B,R,G', label: 'multi' },
+  { value: 'W,U,B,R,G', label: 'gold' },
   { value: 'R,G', label: 'gruul' },
   { value: 'U,R', label: 'izzet' },
   { value: 'W,B', label: 'orzhov' },

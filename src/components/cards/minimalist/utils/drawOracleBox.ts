@@ -12,7 +12,7 @@ import {
 } from '../config';
 import type { OracleLayout } from '../../styles';
 import { MINIMALIST_PALETTE } from '../palette';
-import { getPaletteColors, type ColorTreatment } from '../../../../domain/colorTreatment';
+import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { getFillStyle } from '../../common/canvasStyles';
 import type { OracleText } from '../../../../domain/oracleText';
 
@@ -28,7 +28,7 @@ export const drawOracleBox = (
     layout,
   }: {
     cardOracleText?: OracleText;
-    cardColorTreatment: ColorTreatment;
+    cardColorTreatment: CardColorTreatment;
     cardPower?: string;
     cardToughness?: string;
     layout: OracleLayout;
@@ -71,20 +71,20 @@ export const drawOracleBox = (
 
 const drawSubCardDivider = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, height }: { cardColorTreatment: ColorTreatment; height: number },
+  { cardColorTreatment, height }: { cardColorTreatment: CardColorTreatment; height: number },
 ) => {
   drawRectangle(ctx, {
     x: (ctx.canvas.width - PINLINE_THICKNESS) / 2,
     y: ORACLE_Y,
     width: PINLINE_THICKNESS,
     height: height,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
   });
 };
 
 const drawOracleBorder = (
   ctx: CanvasRenderingContext2D,
-  { cardColorTreatment, layout, y }: { cardColorTreatment: ColorTreatment; layout: OracleLayout; y: number },
+  { cardColorTreatment, layout, y }: { cardColorTreatment: CardColorTreatment; layout: OracleLayout; y: number },
 ) => {
   const x =
     layout === 'right-half' ? ctx.canvas.width / 2 - PINLINE_THICKNESS / 2 : (ctx.canvas.width - CONTENT_WIDTH) / 2;
@@ -95,6 +95,6 @@ const drawOracleBorder = (
     y,
     width,
     height: PINLINE_THICKNESS,
-    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment, MINIMALIST_PALETTE)),
+    fillStyle: getFillStyle(ctx, getPaletteColors(cardColorTreatment.pinlineColors, MINIMALIST_PALETTE)),
   });
 };

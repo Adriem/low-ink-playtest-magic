@@ -1,3 +1,4 @@
+import type { Orientation } from '../../../../domain/cards';
 import type { Palette } from '../../../../domain/colorTreatment';
 import {
   drawRectangle,
@@ -7,7 +8,7 @@ import {
   type CanvasPaint,
   type CornerRadius,
 } from '../../common/canvasShapes';
-import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, CARD_LAYOUTS, type Orientation } from '../config';
+import { CAPSULE_INNER_STROKE, PINLINE_THICKNESS, CARD_LAYOUTS } from '../config';
 import { getPaletteColors, type CardColorTreatment } from '../../../../domain/colorTreatment';
 import { drawInkFill, getFillStyle, getInkFill, type InkFill, type InkFillStrength } from '../../common/canvasStyles';
 import type { InkLevel } from '../../styles';

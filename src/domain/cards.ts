@@ -2,13 +2,23 @@ import { ColorSymbol, isColorSymbol } from './colors';
 import type { OracleText } from './oracleText';
 import { getSymbolValue, splitSymbols } from './symbols';
 
-/** Part of the art image a face shows: split cards have both arts side by side in a single image */
-export type ArtCrop = 'right-half' | 'left-half' | 'full';
+/**
+ * Part of the art image a face shows, from and to fractions of its width:
+ * split cards have the arts of both faces side by side in a single image.
+ */
+export type ArtCrop = { from: number; to: number };
+
+/** The whole art image */
+export const FULL_ART_CROP: ArtCrop = { from: 0, to: 1 };
+
+/** Which way a face is printed: battles and the first half of aftermath cards are printed sideways */
+export type Orientation = 'portrait' | 'landscape';
 
 export type CardFace = {
   name: string;
   manaCost?: string;
   faceLayout: 'regular' | 'planeswalker' | 'saga' | 'battle';
+  orientation: Orientation;
   typeLine: string;
   oracleText: OracleText;
   colors: ColorSymbol[];

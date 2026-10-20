@@ -1,3 +1,4 @@
+import { FULL_ART_CROP } from '../../domain/cards';
 import { toCard } from './toCard';
 import type { ScryfallCard } from './types';
 
@@ -26,11 +27,12 @@ test('maps a single-faced card to a card with its main face', () => {
       name: 'Colossal Dreadmaw',
       manaCost: '{4}{G}{G}',
       faceLayout: 'regular',
+      orientation: 'portrait',
       typeLine: 'Creature — Dinosaur',
       oracleText: { lines: [{ text: 'Trample' }] },
       colors: ['G'],
       stats: { power: '6', toughness: '6' },
-      art: { assetUrl: 'dreadmaw.jpg', crop: 'full' },
+      art: { assetUrl: 'dreadmaw.jpg', crop: FULL_ART_CROP },
     },
   });
 });
@@ -59,6 +61,25 @@ test('tells planeswalkers, sagas and battles apart from regular faces', () => {
   expect(planeswalker.mainFace).toMatchObject({ faceLayout: 'planeswalker', stats: { loyalty: '3' } });
   expect(sagaCreature.mainFace).toMatchObject({ faceLayout: 'saga', stats: { power: '7', toughness: '7' } });
   expect(battle.mainFace).toMatchObject({ faceLayout: 'battle', stats: { defense: '4' } });
+});
+
+test('lays out battles and the first half of aftermath cards in landscape, as they are printed sideways', () => {
+  const battle = toCard(scryfallCard({ name: 'Invasion of Ravnica', type_line: 'Battle — Siege', defense: '4' }));
+  const aftermath = toCard(
+    scryfallCard({
+      name: 'Cut // Ribbons',
+      layout: 'split',
+      keywords: ['Aftermath'],
+      card_faces: [{ name: 'Cut' }, { name: 'Ribbons' }],
+    }),
+  );
+  const split = toCard(
+    scryfallCard({ name: 'Fire // Ice', layout: 'split', card_faces: [{ name: 'Fire' }, { name: 'Ice' }] }),
+  );
+
+  expect(battle.mainFace.orientation).toBe('landscape');
+  expect([aftermath.mainFace.orientation, aftermath.secondaryFace?.orientation]).toEqual(['landscape', 'portrait']);
+  expect([split.mainFace.orientation, split.secondaryFace?.orientation]).toEqual(['portrait', 'portrait']);
 });
 
 describe('colors of faces', () => {
@@ -123,12 +144,12 @@ describe('art of faces', () => {
     );
 
     expect([card.mainFace.art, card.secondaryFace?.art]).toEqual([
-      { assetUrl: 'fire-ice.jpg', crop: 'left-half' },
-      { assetUrl: 'fire-ice.jpg', crop: 'right-half' },
+      { assetUrl: 'fire-ice.jpg', crop: { from: 0, to: 0.5 } },
+      { assetUrl: 'fire-ice.jpg', crop: { from: 0.5, to: 1 } },
     ]);
   });
 
-  test('keeps the whole art for aftermath cards, whose arts are not halves', () => {
+  test('gives each half of an aftermath card its art, the first one wider', () => {
     const card = toCard(
       scryfallCard({
         name: 'Dusk // Dawn',
@@ -138,7 +159,10 @@ describe('art of faces', () => {
       }),
     );
 
-    expect([card.mainFace.art.crop, card.secondaryFace?.art.crop]).toEqual(['full', 'full']);
+    expect([card.mainFace.art.crop, card.secondaryFace?.art.crop]).toEqual([
+      { from: 0, to: 0.61 },
+      { from: 0.615, to: 1 },
+    ]);
   });
 
   test('uses the art of each face when it has its own', () => {
@@ -154,8 +178,8 @@ describe('art of faces', () => {
     );
 
     expect([card.mainFace.art, card.secondaryFace?.art]).toEqual([
-      { assetUrl: 'front.jpg', crop: 'full' },
-      { assetUrl: 'back.jpg', crop: 'full' },
+      { assetUrl: 'front.jpg', crop: FULL_ART_CROP },
+      { assetUrl: 'back.jpg', crop: FULL_ART_CROP },
     ]);
   });
 });

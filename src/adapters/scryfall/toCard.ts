@@ -1,4 +1,4 @@
-import { computeCardColors, type ArtCrop, type Card, type CardFace } from '../../domain/cards';
+import { computeCardColors, FULL_ART_CROP, type ArtCrop, type Card, type CardFace } from '../../domain/cards';
 import { isColorSymbol } from '../../domain/colors';
 import type { CardAbility, OracleLine, OracleText } from '../../domain/oracleText';
 import type { ScryfallCard, ScryfallCardFace } from './types';
@@ -7,6 +7,19 @@ const SUBCARD_LAYOUTS: Record<string, Card['layout']> = {
   adventure: 'subcard-left',
   prepare: 'subcard-right',
 };
+
+// Split cards have the arts of both faces side by side in a single image,
+// first face on the left: a half each, except on aftermath cards, whose first
+// art is wider (it takes the card's width), meeting the second one at 627px
+// of 1024, with a thin line between them
+const SPLIT_CARD_ART_CROPS: [ArtCrop, ArtCrop] = [
+  { from: 0, to: 0.5 },
+  { from: 0.5, to: 1 },
+];
+const AFTERMATH_ART_CROPS: [ArtCrop, ArtCrop] = [
+  { from: 0, to: 0.61 },
+  { from: 0.615, to: 1 },
+];
 
 /**
  * The card of the press for a card from Scryfall.
@@ -50,6 +63,7 @@ const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: numbe
     name: face.name,
     manaCost: face.mana_cost,
     faceLayout: getFaceLayout(face),
+    orientation: getOrientation(card, face, faceIndex),
     typeLine: face.type_line ?? '',
     oracleText: toOracleText(face.oracle_text),
     colors: toColors(colors),
@@ -61,13 +75,23 @@ const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: numbe
   };
 };
 
-// Split cards have the art of both faces side by side in a single image,
-// first face on the left. Aftermath cards are excluded: their arts don't take
-// half of the image each.
 const getArtCrop = (card: ScryfallCard, faceIndex: number): ArtCrop => {
-  const hasSideBySideArt = card.layout === 'split' && !card.keywords?.includes('Aftermath');
-  if (!hasSideBySideArt) return 'full';
-  return faceIndex === 0 ? 'left-half' : 'right-half';
+  if (card.layout !== 'split') return FULL_ART_CROP;
+  return (isAftermath(card) ? AFTERMATH_ART_CROPS : SPLIT_CARD_ART_CROPS)[faceIndex];
+};
+
+/**
+ * Battles are printed sideways, and so is the first half of aftermath cards,
+ * as wide as the card, above the aftermath half.
+ */
+const getOrientation = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: number): CardFace['orientation'] => {
+  if (face.defense != null) return 'landscape';
+  if (isAftermath(card) && faceIndex === 0) return 'landscape';
+  return 'portrait';
+};
+
+const isAftermath = (card: ScryfallCard) => {
+  return card.layout === 'split' && (card.keywords?.includes('Aftermath') ?? false);
 };
 
 const toColors = (colors: string[]) => {

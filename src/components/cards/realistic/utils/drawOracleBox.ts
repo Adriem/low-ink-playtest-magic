@@ -1,3 +1,4 @@
+import type { Orientation } from '../../../../domain/cards';
 import type { Palette } from '../../../../domain/colorTreatment';
 import {
   ORACLE_FONT_SIZE,
@@ -7,7 +8,6 @@ import {
   PINLINE_THICKNESS,
   LANDSCAPE_ORACLE_TEXT_PADDING_Y,
   CARD_LAYOUTS,
-  type Orientation,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { drawOracleText } from './drawOracleText';

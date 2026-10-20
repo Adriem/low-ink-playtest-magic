@@ -1,3 +1,4 @@
+import type { Orientation } from '../../../domain/cards';
 export const FONT_FAMILY = 'Serif';
 
 export const TITLE_Y = 32;
@@ -81,9 +82,6 @@ export const LANDSCAPE_ORACLE_TEXT_PADDING_Y = 6;
 // Center of the bottom of the planeswalker loyalty box
 export const LOYALTY_BOX_X = 439;
 export const LOYALTY_BOX_Y = 664;
-
-/** Which way a card is drawn: landscape ones (e.g. battles) are drawn sideways in the card */
-export type Orientation = 'portrait' | 'landscape';
 
 /** Size of a card, and where its boxes go */
 export interface CardLayout {

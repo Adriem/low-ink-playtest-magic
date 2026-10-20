@@ -71,7 +71,7 @@ export const drawArtImage = (
 };
 
 /**
- * Draw the art in an area, cropped to its half for split cards, and filtered
+ * Draw the art in an area, cropped to the face's part for split cards, and filtered
  * for its fidelity.
  */
 const drawFilteredArt = (
@@ -79,10 +79,10 @@ const drawFilteredArt = (
   artImage: HTMLImageElement,
   { cropArt, artFidelity, x, y, width, height }: { cropArt?: ArtCrop; artFidelity: ArtFidelity } & Box,
 ) => {
-  if (cropArt && cropArt !== 'full') {
-    const halfWidth = artImage.naturalWidth / 2;
-    const sourceX = cropArt === 'right-half' ? halfWidth : 0;
-    ctx.drawImage(artImage, sourceX, 0, halfWidth, artImage.naturalHeight, x, y, width, height);
+  if (cropArt && (cropArt.from !== 0 || cropArt.to !== 1)) {
+    const sourceX = artImage.naturalWidth * cropArt.from;
+    const sourceWidth = artImage.naturalWidth * (cropArt.to - cropArt.from);
+    ctx.drawImage(artImage, sourceX, 0, sourceWidth, artImage.naturalHeight, x, y, width, height);
   } else {
     ctx.drawImage(artImage, x, y, width, height);
   }

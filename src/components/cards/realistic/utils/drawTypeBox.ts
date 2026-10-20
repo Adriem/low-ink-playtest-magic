@@ -1,3 +1,4 @@
+import type { Orientation } from '../../../../domain/cards';
 import type { Palette } from '../../../../domain/colorTreatment';
 import { fitFontSizeInX } from '../../common/canvasText';
 import {
@@ -8,7 +9,6 @@ import {
   TYPELINE_HEIGHT,
   TYPELINE_TEXT_BASELINE_OFFSET,
   CARD_LAYOUTS,
-  type Orientation,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
 import { hasCardBackground } from './drawOuterFrame';

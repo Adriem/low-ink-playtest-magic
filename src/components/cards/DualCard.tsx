@@ -71,17 +71,19 @@ const DualCard = ({
 
       // Faces go sideways in their half, turned counterclockwise, so they read
       // in order with the card turned clockwise: the first one at the bottom,
-      // on the left. Faces already drawn sideways (e.g. battles, and later
-      // aftermath halves) are turned back, upright, and go on the right.
-      const [left, right] = isDrawnSideways(face1)
-        ? [
-            { face: face2, canvas: faceCanvas2 },
-            { face: face1, canvas: faceCanvas1 },
-          ]
-        : [
-            { face: face1, canvas: faceCanvas1 },
-            { face: face2, canvas: faceCanvas2 },
-          ];
+      // on the left. Landscape faces (e.g. battles, and the first half of
+      // aftermath cards) go on the right, on top, and the ones already drawn
+      // sideways are turned back, upright.
+      const [left, right] =
+        face1.orientation === 'landscape'
+          ? [
+              { face: face2, canvas: faceCanvas2 },
+              { face: face1, canvas: faceCanvas1 },
+            ]
+          : [
+              { face: face1, canvas: faceCanvas1 },
+              { face: face2, canvas: faceCanvas2 },
+            ];
       const drawFace = (face: CardFace) => (isDrawnSideways(face) ? drawRotatedCW : drawRotatedCCW);
       drawFace(left.face)(ctx, left.canvas, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
       drawFace(right.face)(ctx, right.canvas, 0, 0, CARD_WIDTH, HALF_HEIGHT);

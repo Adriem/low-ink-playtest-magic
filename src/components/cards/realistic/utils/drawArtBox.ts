@@ -1,10 +1,10 @@
 import type { Palette } from '../../../../domain/colorTreatment';
-import { CARD_LAYOUTS, type Orientation } from '../config';
+import { CARD_LAYOUTS } from '../config';
 import { ART_INSET } from '../planeswalkerLayout';
 import { drawArtImage } from './drawArtImage';
 import { drawFramedBox, type CornerRadii } from './drawFramedBox';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
-import type { ArtCrop } from '../../../../domain/cards';
+import type { ArtCrop, Orientation } from '../../../../domain/cards';
 import type { ArtFidelity } from '../../styles';
 
 export const drawArtBox = (

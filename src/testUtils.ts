@@ -1,4 +1,4 @@
-import type { Card, CardFace } from './domain/cards';
+import { FULL_ART_CROP, type Card, type CardFace } from './domain/cards';
 
 export interface Deferred<T> {
   promise: Promise<T>;
@@ -21,10 +21,11 @@ export const deferred = <T = unknown>(): Deferred<T> => {
 export const testFace = (face: Partial<CardFace> & { name: string }): CardFace => {
   return {
     faceLayout: 'regular',
+    orientation: 'portrait',
     typeLine: '',
     colors: [],
     oracleText: { lines: [] },
-    art: { crop: 'full' },
+    art: { crop: FULL_ART_CROP },
     ...face,
   };
 };

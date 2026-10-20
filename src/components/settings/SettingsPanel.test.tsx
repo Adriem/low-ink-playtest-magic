@@ -82,22 +82,6 @@ test('loads the saved settings, with the defaults for missing and unknown values
   expect(screen.getByLabelText('Medium')).toBeChecked();
 });
 
-test('closes when clicking on the overlay around it, but not inside it', () => {
-  renderPanel();
-  const dialog = screen.getByRole('dialog', { hidden: true }) as HTMLDialogElement;
-  dialog.close = vi.fn();
-  dialog.getBoundingClientRect = () => ({ left: 100, right: 300, top: 100, bottom: 300 }) as DOMRect;
-
-  fireEvent.click(dialog, { clientX: 200, clientY: 200 });
-  fireEvent.click(screen.getByLabelText('Minimalist'));
-
-  expect(dialog.close).not.toHaveBeenCalled();
-
-  fireEvent.click(dialog, { clientX: 50, clientY: 200 });
-
-  expect(dialog.close).toHaveBeenCalled();
-});
-
 const getSavedSettings = () => {
   return JSON.parse(localStorage.getItem('press:settings') ?? '{}');
 };

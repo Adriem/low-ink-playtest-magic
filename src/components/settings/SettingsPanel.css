@@ -1,15 +1,3 @@
-.settings-panel::backdrop {
-  background: rgba(0, 0, 0, 0.4);
-}
-
-/* The close button goes on the right */
-.settings-panel menu {
-  display: flex;
-  justify-content: flex-end;
-  margin: 1em 0 0;
-  padding: 0;
-}
-
 /* The slider takes the whole width */
 .setting-slider input[type='range'] {
   display: block;

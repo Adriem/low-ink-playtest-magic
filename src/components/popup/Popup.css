@@ -1,0 +1,25 @@
+.popup {
+  min-width: 320px;
+  box-sizing: border-box;
+}
+
+/* On phones, popups take most of the screen's width instead */
+@media (max-width: 400px) {
+  .popup {
+    min-width: 0;
+    width: 90%;
+  }
+}
+
+.popup::backdrop {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* The buttons go on the right */
+.popup menu {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin: 1em 0 0;
+  padding: 0;
+}

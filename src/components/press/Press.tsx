@@ -10,7 +10,7 @@ import SheetSlot from './SheetSlot';
 import { useSetting } from '../settings';
 
 import './Press.css';
-import { exportToPDF } from '../../adapters/jspdf';
+import { exportToPDF, type PdfExportOptions } from '../../adapters/jspdf';
 import { whenRendered } from '../cards/common/canvasRendering';
 import { useCardCollection } from '../../hooks/useCardCollection';
 import { useCardSheet } from '../../hooks/useCardSheet';
@@ -60,10 +60,10 @@ const Press = () => {
   }, [clearCollection]);
 
   // The canvases of the cards in the sheets, in order (loading cards have none)
-  const handleExport = () => {
+  const handleExport = (options: PdfExportOptions) => {
     const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
 
-    void exportCardsToPdf(canvases);
+    void exportCardsToPdf(canvases, options);
   };
 
   return (
@@ -121,11 +121,11 @@ const Press = () => {
  * Export the cards to a PDF once they're completely drawn, so images still
  * loading aren't missing from it.
  */
-const exportCardsToPdf = async (canvases: HTMLCanvasElement[]) => {
+const exportCardsToPdf = async (canvases: HTMLCanvasElement[], options: PdfExportOptions) => {
   const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
   if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
 
-  exportToPDF(canvases);
+  exportToPDF(canvases, options);
 };
 
 const loadPersistedCards = () => {

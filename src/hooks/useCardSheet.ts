@@ -4,12 +4,9 @@ import { groupCardsIntoSheets, type CollectionCard, type SheetConfig } from '../
 /**
  * Memoized {@link groupCardsIntoSheets}.
  */
-export const useCardSheet = (
-  cards: CollectionCard[],
-  { sheetSize, splitCardTreatment, doubleFacedCardTreatment }: SheetConfig = {},
-) => {
+export const useCardSheet = (cards: CollectionCard[], { sheetSize, doubleFacedCardTreatment }: SheetConfig = {}) => {
   return useMemo(
-    () => groupCardsIntoSheets(cards, { sheetSize, splitCardTreatment, doubleFacedCardTreatment }),
-    [cards, sheetSize, splitCardTreatment, doubleFacedCardTreatment],
+    () => groupCardsIntoSheets(cards, { sheetSize, doubleFacedCardTreatment }),
+    [cards, sheetSize, doubleFacedCardTreatment],
   );
 };

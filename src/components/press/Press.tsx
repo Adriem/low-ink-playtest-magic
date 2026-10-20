@@ -25,7 +25,6 @@ const RENDER_TIMEOUT_MS = 10000;
 
 const Press = () => {
   const [cardVariant] = useSetting('cardVariant');
-  const [splitCardTreatment] = useSetting('splitCardTreatment');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const [inkLevel] = useSetting('inkLevel');
   const customPalette = useCardPalette(cardVariant);
@@ -34,10 +33,7 @@ const Press = () => {
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,
   });
-  const cardSheets = useCardSheet(cardCollection, {
-    splitCardTreatment,
-    doubleFacedCardTreatment,
-  });
+  const cardSheets = useCardSheet(cardCollection, { doubleFacedCardTreatment });
   // Keys of the items of each sheet, by sheet
   const sheetKeys = cardSheets.map((sheet, sheetNumber) =>
     sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),

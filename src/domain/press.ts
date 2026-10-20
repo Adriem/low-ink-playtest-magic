@@ -11,7 +11,7 @@ export type LoadingCard = {
 /** A card in the press, or the placeholder of one being fetched */
 export type CollectionCard = Card | LoadingCard;
 
-/** Whether split or double-faced cards are kept as a single card or split into one card per face */
+/** Whether double-faced cards are kept as a single card or split into one card per face */
 export type CardTreatment = 'unified' | 'separate';
 
 /** Which face of its card a sheet item shows: all of it, its main face or its secondary face */
@@ -45,7 +45,6 @@ export const CARDS_PER_SHEET = 9;
 export type SheetConfig = {
   /** Amount of cards in each sheet */
   sheetSize?: number;
-  splitCardTreatment?: CardTreatment;
   doubleFacedCardTreatment?: CardTreatment;
 };
 
@@ -54,19 +53,15 @@ export const isLoadingCard = (card: CollectionCard): card is LoadingCard => {
 };
 
 /**
- * Group the cards of a collection into sheets. Depending on the settings,
- * split and double-faced cards are kept as a single card or split into one
- * card per face.
+ * Group the cards of a collection into sheets. Split cards are kept as a
+ * single card, and double-faced cards too or split into one card per face,
+ * depending on the settings.
  */
 export const groupCardsIntoSheets = (
   cards: CollectionCard[],
-  {
-    sheetSize = CARDS_PER_SHEET,
-    splitCardTreatment = 'separate',
-    doubleFacedCardTreatment = 'separate',
-  }: SheetConfig = {},
+  { sheetSize = CARDS_PER_SHEET, doubleFacedCardTreatment = 'separate' }: SheetConfig = {},
 ): SheetItem[][] => {
-  const config = { sheetSize, splitCardTreatment, doubleFacedCardTreatment };
+  const config = { sheetSize, doubleFacedCardTreatment };
   const items = cards.flatMap((card, collectionIndex) => toSheetItems(card, collectionIndex, config));
   return chunk(items, sheetSize);
 };
@@ -103,7 +98,8 @@ const toSheetItems = (card: CollectionCard, collectionIndex: number, config: Req
 };
 
 const getTreatment = (card: Card, config: Required<SheetConfig>): CardTreatment => {
-  if (card.layout === 'split') return config.splitCardTreatment;
+  // Both halves of split cards are on the front of the card, so they're never separated
+  if (card.layout === 'split') return 'unified';
   if (card.layout === 'double-faced') return config.doubleFacedCardTreatment;
   return 'separate';
 };

@@ -16,7 +16,6 @@ test('shows a group of options for each setting, with the defaults selected', ()
 
   expect(screen.getByRole('group', { name: 'Card style', hidden: true })).toBeInTheDocument();
   expect(screen.getByLabelText('Realistic')).toBeChecked();
-  expect(screen.getByRole('group', { name: 'Split card treatment', hidden: true })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: 'Double-Faced card treatment', hidden: true })).toBeInTheDocument();
   expect(screen.getByLabelText('Medium')).toBeChecked();
 });
@@ -96,7 +95,6 @@ test('restores the default of every setting', async () => {
   expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toHaveAttribute('aria-valuetext', '4');
   expect(getSavedSettings()).toEqual({
     cardVariant: 'realistic',
-    splitCardTreatment: 'unified',
     doubleFacedCardTreatment: 'separate',
     inkLevel: 'medium',
     artFidelity: 'posterized',

@@ -60,16 +60,14 @@ describe('groupCardsIntoSheets', () => {
     expect(item).toMatchObject({ kind: 'faces', faces: [doubleFacedCard.mainFace, doubleFacedCard.secondaryFace] });
   });
 
-  test('applies the split card treatment to split cards', () => {
-    expect(names(groupCardsIntoSheets([splitCard], { splitCardTreatment: 'separate' }))).toEqual([['Fire', 'Ice']]);
-    expect(names(groupCardsIntoSheets([splitCard], { splitCardTreatment: 'unified' }))).toEqual([['Fire // Ice']]);
+  test('keeps both halves of split cards together, whatever the double-faced card treatment', () => {
+    const [[item]] = groupCardsIntoSheets([splitCard], { doubleFacedCardTreatment: 'separate' });
+
+    expect(item).toMatchObject({ kind: 'faces', faces: [splitCard.mainFace, splitCard.secondaryFace] });
   });
 
   test('draws the secondary face of cards with a sub-card as the sub-card, whatever the treatments', () => {
-    const [[item]] = groupCardsIntoSheets([adventureCard], {
-      splitCardTreatment: 'unified',
-      doubleFacedCardTreatment: 'unified',
-    });
+    const [[item]] = groupCardsIntoSheets([adventureCard], { doubleFacedCardTreatment: 'unified' });
 
     expect(item).toMatchObject({
       kind: 'face',

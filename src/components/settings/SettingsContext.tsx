@@ -7,7 +7,6 @@ import { isRecord } from '../../utils/object';
 /** The value of each setting */
 export interface Settings {
   cardVariant: CardStyle;
-  splitCardTreatment: CardTreatment;
   doubleFacedCardTreatment: CardTreatment;
   inkLevel: InkLevel;
   artFidelity: ArtFidelity;
@@ -47,11 +46,6 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
       { value: 'minimalist', label: 'Minimalist' },
     ],
     default: 'realistic',
-  },
-  splitCardTreatment: {
-    label: 'Split card treatment',
-    options: TREATMENT_OPTIONS,
-    default: 'unified',
   },
   doubleFacedCardTreatment: {
     label: 'Double-Faced card treatment',
@@ -191,7 +185,6 @@ const loadPalettes = (): Record<CardStyle, CustomPalette> => {
 const getDefaultSettings = (): Settings => {
   return {
     cardVariant: SETTINGS_DEFINITIONS.cardVariant.default,
-    splitCardTreatment: SETTINGS_DEFINITIONS.splitCardTreatment.default,
     doubleFacedCardTreatment: SETTINGS_DEFINITIONS.doubleFacedCardTreatment.default,
     inkLevel: SETTINGS_DEFINITIONS.inkLevel.default,
     artFidelity: SETTINGS_DEFINITIONS.artFidelity.default,
@@ -206,7 +199,6 @@ const loadInitialSettings = (): Settings => {
   const saved = loadFromStorage<Record<string, unknown>>(localStorage, SETTINGS_STORAGE_KEY, {}, isRecord);
   return {
     cardVariant: getSavedSetting(saved, 'cardVariant'),
-    splitCardTreatment: getSavedSetting(saved, 'splitCardTreatment'),
     doubleFacedCardTreatment: getSavedSetting(saved, 'doubleFacedCardTreatment'),
     inkLevel: getSavedSetting(saved, 'inkLevel'),
     artFidelity: getSavedSetting(saved, 'artFidelity'),

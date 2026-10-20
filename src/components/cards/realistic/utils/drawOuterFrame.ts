@@ -1,4 +1,5 @@
-import { CARD_LAYOUTS, type CardLayout, type Orientation } from '../config';
+import type { Orientation } from '../../../../domain/cards';
+import { CARD_LAYOUTS, type CardLayout } from '../config';
 import type { Palette } from '../../../../domain/colorTreatment';
 import { drawRectangle } from '../../common/canvasShapes';
 import { drawInkFill, getInkFill } from '../../common/canvasStyles';

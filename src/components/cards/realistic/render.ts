@@ -59,8 +59,8 @@ export const renderRealisticCard = (
   const ctx = get2dContext(canvas);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  if (face.faceLayout === 'battle') {
-    drawBattle(ctx, { face, palette, cardColorTreatment, blackBordered, inkLevel, artFidelity });
+  if (face.orientation === 'landscape') {
+    drawLandscapeCard(ctx, { face, palette, cardColorTreatment, blackBordered, inkLevel, artFidelity });
     return;
   }
 
@@ -161,10 +161,10 @@ export const renderRealisticCard = (
 };
 
 /**
- * Draw a battle: a landscape card, laid out sideways and turned
- * counterclockwise into the canvas.
+ * Draw a landscape card (e.g. a battle, or the first half of an aftermath
+ * card), laid out sideways and turned counterclockwise into the canvas.
  */
-const drawBattle = (
+const drawLandscapeCard = (
   ctx: CanvasRenderingContext2D,
   {
     face,

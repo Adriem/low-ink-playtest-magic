@@ -71,8 +71,9 @@ const DualCard = ({
 
       // Faces go sideways in their half, turned counterclockwise, so they read
       // in order with the card turned clockwise: the first one at the bottom,
-      // on the left. Faces already drawn sideways (e.g. battles, and later
-      // aftermath halves) are turned back, upright, and go on the right.
+      // on the left. Faces already drawn sideways (e.g. realistic battles, and
+      // the first half of realistic aftermath cards) are turned back, upright,
+      // and go on the right, on top.
       const [left, right] = isDrawnSideways(face1)
         ? [
             { face: face2, canvas: faceCanvas2 },

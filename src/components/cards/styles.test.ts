@@ -16,8 +16,8 @@ describe('getCardStyle', () => {
     expect(getCardStyle('minimalist')).toMatchObject({ render: renderMinimalistCard, palette: MINIMALIST_PALETTE });
   });
 
-  test('draws battles sideways in the realistic style only', () => {
-    const battle = testFace({ name: 'Invasion of Ravnica', faceLayout: 'battle', stats: { defense: '4' } });
+  test('draws landscape faces sideways in the realistic style only', () => {
+    const battle = testFace({ name: 'Invasion of Ravnica', faceLayout: 'battle', orientation: 'landscape' });
     const creature = testFace({ name: 'Colossal Dreadmaw' });
 
     expect(getCardStyle('realistic').isDrawnSideways(battle)).toBe(true);

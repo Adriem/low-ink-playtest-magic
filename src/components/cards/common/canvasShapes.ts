@@ -322,13 +322,14 @@ export const drawLoyaltyBox = (
   const topArcProps = { x, y: y - 52 * scale, radius: 11 * scale };
   const rightArcProps = { x: x + 60 * scale, y: y - 19 * scale, radius: 29 * scale };
 
-  ctx.fillStyle = colors.LINE;
   ctx.beginPath();
   ctx.moveTo(x, y);
   ctx.arc(leftArcProps.x, leftArcProps.y, leftArcProps.radius, 0.075 * Math.PI, 1.765 * Math.PI, true);
   ctx.arc(topArcProps.x, topArcProps.y, topArcProps.radius, 0.9 * Math.PI, 0.1 * Math.PI, true);
   ctx.arc(rightArcProps.x, rightArcProps.y, rightArcProps.radius, 1.225 * Math.PI, 0.925 * Math.PI, true);
   ctx.closePath();
+  strokeOutline(ctx, { scale, colors });
+  ctx.fillStyle = colors.LINE;
   ctx.fill();
 
   ctx.fillStyle = colors.PAPER;
@@ -362,6 +363,9 @@ export const drawLoyaltyBox = (
   ctx.fillText(cardLoyalty, x, y - 12 * scale);
 };
 
+/** Width of the white outline around loyalty and defense boxes, so they stand out over what's under them */
+const BOX_OUTLINE_WIDTH = 3;
+
 /** Height of the defense box of battles, at scale 1: from the bottom point of its star to the top one */
 export const DEFENSE_BOX_HEIGHT = 52;
 
@@ -390,6 +394,7 @@ export const drawDefenseBox = (
   // The border is a stroke clipped inside the star, so it's as wide along the spikes as anywhere
   ctx.save();
   traceDefenseStar(ctx, { x, y: centerY, radius });
+  strokeOutline(ctx, { scale, colors });
   ctx.fillStyle = colors.PAPER;
   ctx.fill();
   ctx.clip();
@@ -487,4 +492,17 @@ const traceHexagonPath = (
   ctx.lineTo(x - horizontalHalf, y + verticalHalf);
   ctx.lineTo(x - horizontalHalf, y - verticalHalf);
   ctx.closePath();
+};
+
+/**
+ * Stroke a white outline around the shape traced, under what's drawn in it
+ * next, so only its outer half shows.
+ */
+const strokeOutline = (ctx: CanvasRenderingContext2D, { scale, colors }: { scale: number; colors: ShapeColors }) => {
+  ctx.save();
+  ctx.strokeStyle = colors.PAPER;
+  ctx.lineWidth = BOX_OUTLINE_WIDTH * 2 * scale;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+  ctx.restore();
 };

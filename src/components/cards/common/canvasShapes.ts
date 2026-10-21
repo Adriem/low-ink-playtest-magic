@@ -40,6 +40,8 @@ export type CornerRadius = number | { horizontal: number; vertical: number };
 
 /** Font size of the number in loyalty cost icons, at their default scale */
 export const LOYALTY_COST_FONT_SIZE = 22;
+/** Half the width of loyalty cost icons, at their default scale, e.g. to put something after them */
+export const LOYALTY_COST_HALF_WIDTH = 26;
 
 const LOYALTY_COST_SHAPES: Record<'plus' | 'minus' | 'zero', LoyaltyCostShape> = {
   plus: {

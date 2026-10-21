@@ -15,6 +15,7 @@ export interface CardRenderProps {
   face: CardFace;
   subFace?: CardFace;
   subFacePosition?: SubCardPosition;
+  /** With a black border around the card's content, as wide as the canvas around it */
   blackBordered?: boolean;
   inkLevel?: InkLevel;
   artFidelity?: ArtFidelity;
@@ -30,10 +31,10 @@ export type CustomPalette = Partial<Record<string, string>>;
 /**
  * How much ink to spend on a card: `low` leaves its boxes blank, `medium`
  * fills the title and type boxes with a dot pattern in the colors of the card,
- * `high` fills them with the colors of the card (and the text boxes lightly),
- * and `splurge` also gives the card a black border.
+ * and `high` fills them with the colors of the card (and the text boxes
+ * lightly).
  */
-export type InkLevel = 'low' | 'medium' | 'high' | 'splurge';
+export type InkLevel = 'low' | 'medium' | 'high';
 
 /**
  * How the art of a card is drawn: `blank` leaves the art box blank,
@@ -53,6 +54,8 @@ interface CardStyleDefinition {
   palette: Palette;
   /** Whether a face is drawn sideways, turned counterclockwise into the card (e.g. realistic landscape faces) */
   isDrawnSideways: (face: CardFace) => boolean;
+  /** Whether unified cards draw a line between their halves, for faces that have no frame to tell them apart */
+  separatesHalves: boolean;
 }
 
 const CARD_STYLES: Record<CardStyle, CardStyleDefinition> = {
@@ -60,9 +63,15 @@ const CARD_STYLES: Record<CardStyle, CardStyleDefinition> = {
     render: renderRealisticCard,
     palette: DEFAULT_PALETTES.realistic,
     isDrawnSideways: (face) => face.orientation === 'landscape',
+    separatesHalves: false,
   },
   // Minimalist landscape faces keep their title and type line upright, so the card reads in hand
-  minimalist: { render: renderMinimalistCard, palette: DEFAULT_PALETTES.minimalist, isDrawnSideways: () => false },
+  minimalist: {
+    render: renderMinimalistCard,
+    palette: DEFAULT_PALETTES.minimalist,
+    isDrawnSideways: () => false,
+    separatesHalves: true,
+  },
 };
 
 export const DEFAULT_CARD_STYLE: CardStyle = 'realistic';

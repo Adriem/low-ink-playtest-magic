@@ -7,6 +7,12 @@
   max-width: 750px;
 }
 
+/* Corners of the cards' button and overlay, as rounded as the cards' canvases
+   (see cardFrame.ts), which are drawn at half their size */
+.press-page.rounded-corners {
+  --card-corner-radius: 10px;
+}
+
 .press-sheet {
   overflow: auto;
 }

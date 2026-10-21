@@ -1,4 +1,4 @@
-import type { CardRenderProps, CustomPalette, InkLevel } from '../styles';
+import type { CustomPalette, InkLevel } from '../styles';
 import { get2dContext } from './canvasRendering';
 import type { CanvasPaint } from './canvasShapes';
 
@@ -63,8 +63,7 @@ export const getInkFill = (
   cardSize: { width: number; height: number } = ctx.canvas,
 ): InkFill | null => {
   if (inkLevel === 'low') return null;
-  // Splurge only adds a black border to the high ink level
-  const isHigh = inkLevel === 'high' || inkLevel === 'splurge';
+  const isHigh = inkLevel === 'high';
   if (strength === 'light') {
     return isHigh ? { style: getFillStyle(ctx, colors, cardSize.width), opacity: LIGHT_INK_FILL_OPACITY } : null;
   }
@@ -75,13 +74,11 @@ export const getInkFill = (
 };
 
 /**
- * Whether a card has a black border: when asked, or on the splurge ink level.
+ * Color of the canvas behind the card's content: black for black-bordered
+ * cards, which leaves a black edge around the content, else the paper color.
  */
-export const hasBlackBorder = ({
-  blackBordered = false,
-  inkLevel,
-}: Pick<CardRenderProps, 'blackBordered' | 'inkLevel'>): boolean => {
-  return blackBordered || inkLevel === 'splurge';
+export const getCanvasColor = (palette: { PAPER: string; LINE: string }, blackBordered = false): string => {
+  return blackBordered ? palette.LINE : palette.PAPER;
 };
 
 /**

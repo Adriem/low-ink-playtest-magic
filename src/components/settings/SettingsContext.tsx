@@ -10,7 +10,18 @@ export interface Settings {
   doubleFacedCardTreatment: CardTreatment;
   inkLevel: InkLevel;
   artFidelity: ArtFidelity;
+  cardBorder: CardBorder;
+  cardCorners: CardCorners;
 }
+
+/**
+ * Border of the cards: none, a black outline over their edges, or a full black
+ * border around their content
+ */
+export type CardBorder = 'none' | 'outline' | 'full';
+
+/** Whether the cards have rounded or square corners */
+export type CardCorners = 'rounded' | 'square';
 
 export type SettingName = keyof Settings;
 
@@ -27,8 +38,14 @@ export interface SettingDefinition<T extends string> {
   default: T;
   /** Shown, but not available yet */
   disabled?: boolean;
-  /** How the options are picked: radio buttons (the default), or a slider through them in order */
-  control?: 'radio' | 'slider';
+  /**
+   * How the options are picked: radio buttons (the default), a slider through
+   * them in order, or a checkbox, unchecked for the first option and checked
+   * for the second
+   */
+  control?: 'radio' | 'slider' | 'checkbox';
+  /** Setting whose group the setting's checkbox is shown in, below its options */
+  group?: SettingName;
   /** Card styles the setting applies to, and is enabled for: all of them, if not given */
   cardStyles?: CardStyle[];
 }
@@ -58,7 +75,6 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
       { value: 'low', label: 'Low' },
       { value: 'medium', label: 'Medium' },
       { value: 'high', label: 'High' },
-      { value: 'splurge', label: 'Splurge' },
     ],
     default: 'medium',
   },
@@ -76,6 +92,25 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     control: 'slider',
     // The minimalist style has no art
     cardStyles: ['realistic'],
+  },
+  cardBorder: {
+    label: 'Card border',
+    options: [
+      { value: 'none', label: 'None' },
+      { value: 'outline', label: 'Outline' },
+      { value: 'full', label: 'Full' },
+    ],
+    default: 'outline',
+  },
+  cardCorners: {
+    label: 'Rounded corners',
+    group: 'cardBorder',
+    control: 'checkbox',
+    options: [
+      { value: 'square', label: 'Square' },
+      { value: 'rounded', label: 'Rounded' },
+    ],
+    default: 'rounded',
   },
 };
 
@@ -188,6 +223,8 @@ const getDefaultSettings = (): Settings => {
     doubleFacedCardTreatment: SETTINGS_DEFINITIONS.doubleFacedCardTreatment.default,
     inkLevel: SETTINGS_DEFINITIONS.inkLevel.default,
     artFidelity: SETTINGS_DEFINITIONS.artFidelity.default,
+    cardBorder: SETTINGS_DEFINITIONS.cardBorder.default,
+    cardCorners: SETTINGS_DEFINITIONS.cardCorners.default,
   };
 };
 
@@ -202,6 +239,8 @@ const loadInitialSettings = (): Settings => {
     doubleFacedCardTreatment: getSavedSetting(saved, 'doubleFacedCardTreatment'),
     inkLevel: getSavedSetting(saved, 'inkLevel'),
     artFidelity: getSavedSetting(saved, 'artFidelity'),
+    cardBorder: getSavedSetting(saved, 'cardBorder'),
+    cardCorners: getSavedSetting(saved, 'cardCorners'),
   };
 };
 

@@ -33,13 +33,14 @@ const COLOR_OPTIONS = [
 
 const Workbench = () => {
   const [opacity, setOpacity] = useState(0);
-  const [blackBordered, setBlackBordered] = useState(false);
   const [cardColors, setCardColors] = useState<ColorSymbol[] | null>(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
   const [cardVariant, setCardVariant] = useSetting('cardVariant');
   const [inkLevel, setInkLevel] = useSetting('inkLevel');
   const customPalette = useCardPalette(cardVariant);
   const [artFidelity, setArtFidelity] = useSetting('artFidelity');
+  const [cardBorder] = useSetting('cardBorder');
+  const [cardCorners] = useSetting('cardCorners');
 
   const { card, referenceImageUrl, loading, error } = useCardData(cardName);
   // The colors picked override the face's, and the other half's of split cards, to try the color treatments
@@ -65,9 +66,6 @@ const Workbench = () => {
   const handleColorChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.target;
     setCardColors(value === '' ? null : value === 'none' ? [] : value.split(',').filter(isColorSymbol));
-  };
-  const handleBorderChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    return setBlackBordered(e.target.value === 'black');
   };
   const handleReferenceChange = (e: ChangeEvent<HTMLInputElement>) => {
     return setOpacity(parseFloat(e.target.value));
@@ -98,6 +96,9 @@ const Workbench = () => {
                 inkLevel={inkLevel}
                 customPalette={customPalette}
                 artFidelity={artFidelity}
+                blackBordered={cardBorder === 'full'}
+                outlined={cardBorder === 'outline'}
+                roundedCorners={cardCorners === 'rounded'}
               />
             ) : (
               <Card
@@ -105,7 +106,9 @@ const Workbench = () => {
                 face={face}
                 subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
                 subFacePosition={getSubCardPosition(card)}
-                blackBordered={blackBordered}
+                blackBordered={cardBorder === 'full'}
+                outlined={cardBorder === 'outline'}
+                roundedCorners={cardCorners === 'rounded'}
                 inkLevel={inkLevel}
                 customPalette={customPalette}
                 artFidelity={artFidelity}
@@ -140,13 +143,6 @@ const Workbench = () => {
                   {option.label}
                 </option>
               ))}
-            </select>
-          </div>
-          <div className="workbench-field">
-            <label htmlFor="cardBorder">Border</label>
-            <select id="cardBorder" value={blackBordered ? 'black' : 'white'} onChange={handleBorderChange}>
-              <option value="white">White border</option>
-              <option value="black">Black border</option>
             </select>
           </div>
           <div className="workbench-field">

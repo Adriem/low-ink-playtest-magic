@@ -36,3 +36,13 @@
   margin-top: 0.75em;
   text-align: center;
 }
+
+/* Checkboxes of a group, on a line of their own, below its options and a separator */
+.setting-separator {
+  margin: 0.5em 0;
+  border: none;
+  border-top: 1px solid #ddd;
+}
+.setting-checkbox {
+  display: block;
+}

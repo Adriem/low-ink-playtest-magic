@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type Ref } from 'react';
+import { useState, type ChangeEvent, type ReactNode, type Ref } from 'react';
 import type { CardStyle } from '../cards/styles';
 import { Popup } from '../popup';
 import {
@@ -69,12 +69,14 @@ const SettingsForm = ({
 }) => {
   return (
     <form method="dialog">
-      {SETTING_NAMES.map((name) =>
+      {SETTING_NAMES.filter((name) => !SETTINGS_DEFINITIONS[name].group).map((name) =>
         name === 'cardVariant' ? (
           <CardStyleFieldset key={name} onPaletteClick={onPaletteClick} />
         ) : (
           // Settings that don't apply to the card style stay, disabled, so the panel keeps its size
-          <SettingFieldset key={name} name={name} disabled={!isSettingAvailable(name, cardStyle)} />
+          <SettingFieldset key={name} name={name} disabled={!isSettingAvailable(name, cardStyle)}>
+            <GroupedSettings name={name} cardStyle={cardStyle} />
+          </SettingFieldset>
         ),
       )}
       <menu className="menu-centered">
@@ -83,6 +85,24 @@ const SettingsForm = ({
         </button>
       </menu>
     </form>
+  );
+};
+
+/**
+ * Checkboxes of the settings shown in the group of a setting, below its
+ * options and a separator. Nothing for settings without any.
+ */
+const GroupedSettings = ({ name, cardStyle }: { name: SettingName; cardStyle: CardStyle }) => {
+  const groupedNames = SETTING_NAMES.filter((groupedName) => SETTINGS_DEFINITIONS[groupedName].group === name);
+  if (groupedNames.length === 0) return null;
+
+  return (
+    <>
+      <hr className="setting-separator" />
+      {groupedNames.map((groupedName) => (
+        <SettingCheckbox key={groupedName} name={groupedName} disabled={!isSettingAvailable(groupedName, cardStyle)} />
+      ))}
+    </>
   );
 };
 
@@ -124,8 +144,18 @@ const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: Car
 
 /**
  * Controls to pick the value of a setting: radio buttons, or a slider.
+ *
+ * @param props.children - Controls of other settings shown in its group, below its radio buttons
  */
-const SettingFieldset = <Name extends SettingName>({ name, disabled = false }: { name: Name; disabled?: boolean }) => {
+const SettingFieldset = <Name extends SettingName>({
+  name,
+  disabled = false,
+  children,
+}: {
+  name: Name;
+  disabled?: boolean;
+  children?: ReactNode;
+}) => {
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
 
@@ -146,7 +176,35 @@ const SettingFieldset = <Name extends SettingName>({ name, disabled = false }: {
           {option.label}
         </label>
       ))}
+      {children}
     </fieldset>
+  );
+};
+
+/**
+ * A checkbox to switch a setting between its two options: unchecked for the
+ * first one, checked for the second.
+ */
+const SettingCheckbox = <Name extends SettingName>({ name, disabled }: { name: Name; disabled: boolean }) => {
+  const definition = SETTINGS_DEFINITIONS[name];
+  const [value, setValue] = useSetting(name);
+  const [unchecked, checked] = definition.options;
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setValue((event.target.checked ? checked : unchecked).value);
+  };
+
+  return (
+    <label className="setting-checkbox">
+      <input
+        type="checkbox"
+        name={name}
+        checked={value === checked.value}
+        disabled={disabled || definition.disabled}
+        onChange={handleChange}
+      />
+      {definition.label}
+    </label>
   );
 };
 

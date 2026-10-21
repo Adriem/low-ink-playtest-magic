@@ -25,6 +25,11 @@ describe('getCardStyle', () => {
     expect(getCardStyle('minimalist').isDrawnSideways(battle)).toBe(false);
   });
 
+  test('separates the halves of unified cards in the minimalist style only, whose faces have no frame', () => {
+    expect(getCardStyle('minimalist').separatesHalves).toBe(true);
+    expect(getCardStyle('realistic').separatesHalves).toBe(false);
+  });
+
   test('uses the realistic style for unknown styles', () => {
     expect(getCardStyle('baroque')).toBe(getCardStyle('realistic'));
   });

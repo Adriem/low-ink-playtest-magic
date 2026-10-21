@@ -37,10 +37,10 @@ test('picks the ink level', async () => {
   expect(screen.getByLabelText('High')).toBeChecked();
   expect(getSavedSettings().inkLevel).toBe('high');
 
-  await user.click(screen.getByLabelText('Splurge'));
+  await user.click(screen.getByLabelText('High'));
 
-  expect(screen.getByLabelText('Splurge')).toBeChecked();
-  expect(getSavedSettings().inkLevel).toBe('splurge');
+  expect(screen.getByLabelText('High')).toBeChecked();
+  expect(getSavedSettings().inkLevel).toBe('high');
 });
 
 test('picks the art fidelity with a slider through its levels', () => {
@@ -81,10 +81,35 @@ test('loads the saved settings, with the defaults for missing and unknown values
   expect(screen.getByLabelText('Medium')).toBeChecked();
 });
 
+test('picks the border of the cards: none, a black outline or a full black border', async () => {
+  renderPanel();
+
+  expect(screen.getByRole('group', { name: 'Card border', hidden: true })).toBeInTheDocument();
+  expect(screen.getByLabelText('Outline')).toBeChecked();
+
+  await user.click(screen.getByLabelText('Full'));
+
+  expect(screen.getByLabelText('Full')).toBeChecked();
+  expect(getSavedSettings().cardBorder).toBe('full');
+});
+
+test('rounds the corners of the cards with a checkbox, in the card border group', async () => {
+  renderPanel();
+  const corners = screen.getByLabelText('Rounded corners');
+
+  expect(screen.getByRole('group', { name: 'Card border', hidden: true })).toContainElement(corners);
+  expect(corners).toBeChecked();
+
+  await user.click(corners);
+
+  expect(corners).not.toBeChecked();
+  expect(getSavedSettings().cardCorners).toBe('square');
+});
+
 test('restores the default of every setting', async () => {
   localStorage.setItem(
     'press:settings',
-    JSON.stringify({ cardVariant: 'minimalist', inkLevel: 'splurge', artFidelity: 'contours' }),
+    JSON.stringify({ cardVariant: 'minimalist', inkLevel: 'high', artFidelity: 'contours' }),
   );
   renderPanel();
 
@@ -98,6 +123,8 @@ test('restores the default of every setting', async () => {
     doubleFacedCardTreatment: 'separate',
     inkLevel: 'medium',
     artFidelity: 'posterized',
+    cardBorder: 'outline',
+    cardCorners: 'rounded',
   });
 });
 

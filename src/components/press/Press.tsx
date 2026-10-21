@@ -29,6 +29,8 @@ const Press = () => {
   const [inkLevel] = useSetting('inkLevel');
   const customPalette = useCardPalette(cardVariant);
   const [artFidelity] = useSetting('artFidelity');
+  const [cardCorners] = useSetting('cardCorners');
+  const [cardBorder] = useSetting('cardBorder');
   const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,
@@ -69,7 +71,7 @@ const Press = () => {
       {cardSheets.length > 0 && <PressActions onClear={handleClear} onExport={handleExport} />}
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
         {cardSheets.map((sheet, sheetNumber) => (
-          <section key={sheetNumber} className="press-page">
+          <section key={sheetNumber} className={`press-page ${cardCorners}-corners`}>
             <div className="press-sheet">
               {sheet.map((item, position) => (
                 <SheetSlot
@@ -86,6 +88,9 @@ const Press = () => {
                     <DualCard
                       cardStyle={cardVariant}
                       faces={item.faces}
+                      blackBordered={cardBorder === 'full'}
+                      outlined={cardBorder === 'outline'}
+                      roundedCorners={cardCorners === 'rounded'}
                       inkLevel={inkLevel}
                       customPalette={customPalette}
                       artFidelity={artFidelity}
@@ -97,6 +102,9 @@ const Press = () => {
                       face={item.face}
                       subFace={item.subFace}
                       subFacePosition={item.subFacePosition}
+                      blackBordered={cardBorder === 'full'}
+                      outlined={cardBorder === 'outline'}
+                      roundedCorners={cardCorners === 'rounded'}
                       inkLevel={inkLevel}
                       customPalette={customPalette}
                       artFidelity={artFidelity}

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type RefCallback } from 'react';
 import { beginRender, drawWhenLoaded, finishRender, get2dContext } from './common/canvasRendering';
 import { resolvePalette, setDisplayScale } from './common/canvasStyles';
+import { drawCardFrame, type CardFrame } from './common/cardFrame';
 import type { CardFace } from '../../domain/cards';
 import {
   CARD_HEIGHT,
@@ -14,6 +15,8 @@ import {
 } from './styles';
 
 const HALF_HEIGHT = CARD_HEIGHT / 2;
+/** Width of the line between the halves, for card styles that separate them */
+const HALVES_SEPARATOR_WIDTH = 4;
 
 /**
  * Card with two faces drawn side by side, rotated, in a single card canvas.
@@ -21,18 +24,24 @@ const HALF_HEIGHT = CARD_HEIGHT / 2;
  * have finished drawing their images.
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
+ * @param props.outlined - With a line over the card's edges (not each face's)
+ * @param props.roundedCorners - With rounded corners (not each face's), transparent outside them
  * @param props.ref - Called with the canvas, e.g. to export it
  */
 const DualCard = ({
   cardStyle,
   faces,
+  blackBordered,
   inkLevel,
   artFidelity,
   customPalette,
+  outlined,
+  roundedCorners,
   ref,
-}: {
+}: CardFrame & {
   cardStyle: string;
   faces: [CardFace, CardFace];
+  blackBordered?: boolean;
   inkLevel?: InkLevel;
   artFidelity?: ArtFidelity;
   customPalette?: CustomPalette;
@@ -46,8 +55,8 @@ const DualCard = ({
     },
     [ref],
   );
-  const { render, palette: defaultPalette, isDrawnSideways } = getCardStyle(cardStyle);
-  const paper = resolvePalette(defaultPalette, customPalette).PAPER;
+  const { render, palette: defaultPalette, isDrawnSideways, separatesHalves } = getCardStyle(cardStyle);
+  const { PAPER: paper, LINE: line } = resolvePalette(defaultPalette, customPalette);
   const [face1, face2] = faces;
 
   useEffect(() => {
@@ -57,7 +66,7 @@ const DualCard = ({
 
     beginRender(canvas);
     const faceCanvases = [face1, face2].map((face) =>
-      renderFace(render, { face, inkLevel, artFidelity, customPalette, unified: true }),
+      renderFace(render, { face, blackBordered, inkLevel, artFidelity, customPalette, unified: true }),
     );
 
     // Combining the faces is part of this render, so it's skipped if a newer
@@ -86,19 +95,31 @@ const DualCard = ({
       const drawFace = (face: CardFace) => (isDrawnSideways(face) ? drawRotatedCW : drawRotatedCCW);
       drawFace(left.face)(ctx, left.canvas, 0, HALF_HEIGHT, CARD_WIDTH, HALF_HEIGHT);
       drawFace(right.face)(ctx, right.canvas, 0, 0, CARD_WIDTH, HALF_HEIGHT);
+      if (separatesHalves) {
+        ctx.fillStyle = line;
+        ctx.fillRect(0, HALF_HEIGHT - HALVES_SEPARATOR_WIDTH / 2, CARD_WIDTH, HALVES_SEPARATOR_WIDTH);
+      }
+      drawCardFrame(ctx, { outlined, roundedCorners }, line);
     });
     void finishRender(canvas);
-  }, [canvas, render, isDrawnSideways, paper, face1, face2, inkLevel, artFidelity, customPalette]);
+  }, [
+    canvas,
+    render,
+    isDrawnSideways,
+    separatesHalves,
+    paper,
+    line,
+    face1,
+    face2,
+    blackBordered,
+    inkLevel,
+    artFidelity,
+    customPalette,
+    outlined,
+    roundedCorners,
+  ]);
 
-  return (
-    <canvas
-      className="card"
-      ref={handleCanvasRef}
-      width={CARD_WIDTH}
-      height={CARD_HEIGHT}
-      style={{ background: paper }}
-    />
-  );
+  return <canvas className="card" ref={handleCanvasRef} width={CARD_WIDTH} height={CARD_HEIGHT} />;
 };
 
 /**

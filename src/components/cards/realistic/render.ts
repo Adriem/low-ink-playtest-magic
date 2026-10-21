@@ -1,7 +1,7 @@
 import { drawDefenseBox } from '../common/canvasShapes';
 import { drawArtBox } from './utils/drawArtBox';
 import { drawOracleBox } from './utils/drawOracleBox';
-import { drawOuterFrame } from './utils/drawOuterFrame';
+import { drawCardBackground } from './utils/drawCardBackground';
 import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
 import { drawStatsBox } from './utils/drawStatsBox';
 import { drawSubCardOracleBox } from './utils/drawSubCardOracleBox';
@@ -22,7 +22,7 @@ import {
 } from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import type { ArtFidelity, CardRenderProps, InkLevel } from '../styles';
-import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
+import { getCanvasColor, resolvePalette } from '../common/canvasStyles';
 import { REALISTIC_PALETTE } from './palette';
 import type { CardColorTreatment, Palette } from '../../../domain/colorTreatment';
 import { drawWhenLoaded, get2dContext, loadImage } from '../common/canvasRendering';
@@ -57,19 +57,15 @@ export const renderRealisticCard = (
   const { assetUrl: cardArtUrl, crop: cropArt } = face.art;
 
   const ctx = get2dContext(canvas);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = getCanvasColor(palette, blackBordered);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   if (face.orientation === 'landscape') {
     drawLandscapeCard(ctx, { face, palette, cardColorTreatment, blackBordered, inkLevel, artFidelity });
     return;
   }
 
-  drawOuterFrame(ctx, {
-    palette,
-    blackBordered: hasBlackBorder({ blackBordered, inkLevel }),
-    inkLevel,
-    cardColorTreatment,
-  });
+  drawCardBackground(ctx, { palette, inkLevel, blackBordered, cardColorTreatment });
   // Planeswalkers have their title higher, whatever their art
   const titleY = cardLoyalty ? getPlaneswalkerLayout().titleY : undefined;
   drawTitleBox(ctx, { palette, cardName, cardManaCost, cardColorTreatment, inkLevel, y: titleY });
@@ -190,13 +186,7 @@ const drawLandscapeCard = (
   ctx.translate(0, ctx.canvas.height);
   ctx.rotate(-Math.PI / 2);
 
-  drawOuterFrame(ctx, {
-    palette,
-    blackBordered: hasBlackBorder({ blackBordered, inkLevel }),
-    inkLevel,
-    cardColorTreatment,
-    orientation,
-  });
+  drawCardBackground(ctx, { palette, inkLevel, blackBordered, cardColorTreatment, orientation });
   drawTitleBox(ctx, {
     palette,
     cardName: face.name,

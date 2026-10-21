@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="3 7 94 94">
+  <!-- A card, with its title and art boxes. Black on white, inverted in dark mode -->
+  <style>
+    .ink { fill: black; stroke: black; }
+    .paper { fill: white; stroke: black; }
+    @media (prefers-color-scheme: dark) {
+      .ink { fill: white; stroke: white; }
+      .paper { fill: black; stroke: white; }
+    }
+  </style>
+
+    <rect class="paper" x="13.5" y="12" width="73" height="84" rx="6.5" stroke-width="10" />
+    <rect x="26.5" y="25" width="47" height="15" rx="4" class="ink" stroke-width="0" />
+    <rect x="26.5" y="50" width="47" height="30" rx="4" class="ink" stroke-width="0" />
+</svg>

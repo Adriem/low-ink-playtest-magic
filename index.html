@@ -2,17 +2,41 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="/favicon.ico" />
+    <!--
+      The favicon: an SVG, inverted in dark mode, where SVG favicons are supported, else PNGs for each mode
+      and an ICO, exported from it with https://favicon.io/svg-favicon/ (in light and dark mode)
+    -->
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16" media="(prefers-color-scheme: light)" />
+    <link
+      rel="icon"
+      href="/favicon-32x32-dark.png"
+      type="image/png"
+      sizes="32x32"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link
+      rel="icon"
+      href="/favicon-16x16-dark.png"
+      type="image/png"
+      sizes="16x16"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
-    <meta name="description" content="Web site created using create-react-app" />
-    <link rel="apple-touch-icon" href="/logo192.png" />
+    <meta
+      name="description"
+      content="Create ready-to-print, low-ink Magic: The Gathering playtest cards. Printer ink is expensive; playtesting shouldn't be."
+    />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
     <link rel="manifest" href="/manifest.json" />
-    <title>React App</title>
+    <title>Low-ink Playtest MTG</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

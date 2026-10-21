@@ -1,9 +1,9 @@
+import { drawCardBackground } from './utils/drawCardBackground';
 import { drawBattleOracleBox } from './utils/drawBattleOracleBox';
 import { drawDefenseBox, drawLoyaltyBox } from '../common/canvasShapes';
 import { drawOracleBox } from './utils/drawOracleBox';
 import { drawPlaneswalkerOracleBox } from './utils/drawPlaneswalkerOracleBox';
 import { drawSagaOracleBox } from './utils/drawSagaOracleBox';
-import { drawOuterFrame } from './utils/drawOuterFrame';
 import { drawStatsBox } from './utils/drawStatsBox';
 import { drawSubCardOracleBox } from './utils/drawSubCardOracleBox';
 import { drawSubCardTitleBox } from './utils/drawSubCardTitleBox';
@@ -20,7 +20,7 @@ import {
 } from '../../../domain/cards';
 import { getCardColorTreatment } from '../../../domain/colorTreatment';
 import type { CardRenderProps, InkLevel } from '../styles';
-import { hasBlackBorder, resolvePalette } from '../common/canvasStyles';
+import { getCanvasColor, resolvePalette } from '../common/canvasStyles';
 import { MINIMALIST_PALETTE, type MinimalistPalette } from './palette';
 import { get2dContext } from '../common/canvasRendering';
 
@@ -46,9 +46,10 @@ export const renderMinimalistCard = (
   const hasSidewaysText = face.faceLayout === 'battle' && !unified;
 
   const ctx = get2dContext(canvas);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = getCanvasColor(palette, blackBordered);
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  if (blackBordered) drawCardBackground(ctx, { palette });
 
-  drawOuterFrame(ctx, { palette, blackBordered: hasBlackBorder({ blackBordered, inkLevel }) });
   drawTitleBox(ctx, { palette, cardName, cardManaCost, maxHeight: TITLE_HEIGHT });
 
   if (subFace && subFacePosition) {

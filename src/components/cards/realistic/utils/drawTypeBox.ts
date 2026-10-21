@@ -11,7 +11,7 @@ import {
   CARD_LAYOUTS,
 } from '../config';
 import { drawFramedBox } from './drawFramedBox';
-import { hasCardBackground } from './drawOuterFrame';
+import { hasCardBackground } from './drawCardBackground';
 import type { CardColorTreatment } from '../../../../domain/colorTreatment';
 import type { InkLevel } from '../../styles';
 

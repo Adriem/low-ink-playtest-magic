@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState, type RefCallback } from 'react';
-import { beginRender, finishRender } from './common/canvasRendering';
+import { beginRender, finishRender, get2dContext } from './common/canvasRendering';
+import { drawCardFrame, type CardFrame } from './common/cardFrame';
 import { resolvePalette } from './common/canvasStyles';
 import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './styles';
 
@@ -8,6 +9,8 @@ import { CARD_HEIGHT, CARD_WIDTH, getCardStyle, type CardRenderProps } from './s
  * rendered (`data-rendered`) once all its images have been drawn.
  *
  * @param props.cardStyle - e.g. `realistic` or `minimalist`
+ * @param props.outlined - With a line over the card's edges
+ * @param props.roundedCorners - With rounded corners, transparent outside them
  * @param props.ref - Called with the canvas, e.g. to export it
  */
 const Card = ({
@@ -19,8 +22,10 @@ const Card = ({
   inkLevel,
   artFidelity,
   customPalette,
+  outlined,
+  roundedCorners,
   ref,
-}: CardRenderProps & { cardStyle: string; ref?: RefCallback<HTMLCanvasElement> }) => {
+}: CardRenderProps & CardFrame & { cardStyle: string; ref?: RefCallback<HTMLCanvasElement> }) => {
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null);
   const handleCanvasRef = useCallback(
     (element: HTMLCanvasElement | null) => {
@@ -30,25 +35,31 @@ const Card = ({
     [ref],
   );
   const { render, palette: defaultPalette } = getCardStyle(cardStyle);
-  const paper = resolvePalette(defaultPalette, customPalette).PAPER;
+  const line = resolvePalette(defaultPalette, customPalette).LINE;
 
   useEffect(() => {
     if (canvas == null) return;
 
     beginRender(canvas);
     render(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette });
+    drawCardFrame(get2dContext(canvas), { outlined, roundedCorners }, line);
     void finishRender(canvas);
-  }, [canvas, render, face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette]);
+  }, [
+    canvas,
+    render,
+    line,
+    face,
+    subFace,
+    subFacePosition,
+    blackBordered,
+    inkLevel,
+    artFidelity,
+    customPalette,
+    outlined,
+    roundedCorners,
+  ]);
 
-  return (
-    <canvas
-      className="card"
-      ref={handleCanvasRef}
-      width={CARD_WIDTH}
-      height={CARD_HEIGHT}
-      style={{ background: paper }}
-    />
-  );
+  return <canvas className="card" ref={handleCanvasRef} width={CARD_WIDTH} height={CARD_HEIGHT} />;
 };
 
 export default Card;

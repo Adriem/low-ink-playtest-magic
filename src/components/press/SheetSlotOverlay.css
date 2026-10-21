@@ -9,7 +9,7 @@
   align-items: center;
   justify-content: center;
   background: rgba(30, 100, 220, 0.45);
-  border-radius: 11px;
+  border-radius: var(--card-corner-radius, 0);
   opacity: 0;
   pointer-events: none;
   transition:
@@ -17,10 +17,10 @@
     background-color 0.2s;
 }
 .sheet-slot-overlay.main-face {
-  border-radius: 11px 0 0 11px;
+  border-radius: var(--card-corner-radius, 0) 0 0 var(--card-corner-radius, 0);
 }
 .sheet-slot-overlay.secondary-face {
-  border-radius: 0 11px 11px 0;
+  border-radius: 0 var(--card-corner-radius, 0) var(--card-corner-radius, 0) 0;
 }
 .sheet-slot-overlay.open {
   opacity: 1;

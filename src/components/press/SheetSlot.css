@@ -1,7 +1,6 @@
 .sheet-slot {
   width: 250px;
   height: 350px;
-  background-color: lightgray;
   position: relative;
   float: left;
 }
@@ -15,7 +14,7 @@
   z-index: 1;
   padding: 0;
   border: none;
-  border-radius: 11px;
+  border-radius: var(--card-corner-radius, 0);
   background: transparent;
   cursor: pointer;
 }

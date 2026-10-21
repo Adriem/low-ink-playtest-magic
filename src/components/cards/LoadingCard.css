@@ -6,6 +6,9 @@
   gap: 1rem;
   width: 100%;
   height: 100%;
+  /* Gray only while loading: behind cards, it would show through their rounded corners */
+  background-color: lightgray;
+  border-radius: var(--card-corner-radius, 0);
   color: #444;
   text-align: center;
 }

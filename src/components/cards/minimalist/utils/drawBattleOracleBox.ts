@@ -1,5 +1,5 @@
 import type { MinimalistPalette } from '../palette';
-import { drawDefenseBox, drawRectangle } from '../../common/canvasShapes';
+import { DEFENSE_BOX_HEIGHT, drawDefenseBox, drawRectangle } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
@@ -17,11 +17,8 @@ import type { OracleText } from '../../../../domain/oracleText';
 
 /** Space around the text, in the box turned sideways */
 const TEXT_PADDING = { x: 14, y: 6 };
-/**
- * Where the defense box is, in the box turned sideways: mostly past its bottom
- * (in the right margin of the card), clear of the text
- */
-const DEFENSE_POSITION = { fromRight: 45, belowBox: 38 };
+/** How far the defense box is from the right of the box turned sideways, at its bottom */
+const DEFENSE_FROM_RIGHT = 45;
 
 /**
  * Draw the oracle box of a battle: where other cards have theirs, under their
@@ -68,11 +65,14 @@ export const drawBattleOracleBox = (
   ctx.fillStyle = palette.TEXT;
   ctx.textAlign = 'start';
 
+  // The text and the defense box take the box's height, as wide as other oracle boxes, the
+  // defense box at the bottom and the text above it
+  const defenseHeight = cardDefense ? DEFENSE_BOX_HEIGHT + TEXT_PADDING.y : 0;
   const paragraphs = fitOracleLinesIntoBox(
     ctx,
     cardOracleText?.lines ?? [],
     sidewaysWidth - TEXT_PADDING.x * 2,
-    sidewaysHeight - TEXT_PADDING.y * 2,
+    sidewaysHeight - TEXT_PADDING.y * 2 - defenseHeight,
   );
   let currentY = TEXT_PADDING.y + ctx.measureText(':').fontBoundingBoxAscent;
   for (const paragraph of paragraphs) {
@@ -83,8 +83,8 @@ export const drawBattleOracleBox = (
   if (cardDefense) {
     drawDefenseBox(ctx, {
       cardDefense,
-      x: sidewaysWidth - DEFENSE_POSITION.fromRight,
-      y: sidewaysHeight + DEFENSE_POSITION.belowBox,
+      x: sidewaysWidth - DEFENSE_FROM_RIGHT,
+      y: sidewaysHeight,
       fontFamily: DISPLAY_FONT_FAMILY,
       colors: palette,
     });

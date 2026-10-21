@@ -40,6 +40,8 @@ export type CornerRadius = number | { horizontal: number; vertical: number };
 
 /** Font size of the number in loyalty cost icons, at their default scale */
 export const LOYALTY_COST_FONT_SIZE = 22;
+/** Half the width of loyalty cost icons, at their default scale, e.g. to put something after them */
+export const LOYALTY_COST_HALF_WIDTH = 26;
 
 const LOYALTY_COST_SHAPES: Record<'plus' | 'minus' | 'zero', LoyaltyCostShape> = {
   plus: {
@@ -360,6 +362,9 @@ export const drawLoyaltyBox = (
   ctx.fillText(cardLoyalty, x, y - 12 * scale);
 };
 
+/** Height of the defense box of battles, at scale 1: from the bottom point of its star to the top one */
+export const DEFENSE_BOX_HEIGHT = 52;
+
 /**
  * Draw the defense of a battle in an eight-pointed star, with its diagonal
  * points further out than the others, like a square's corners.
@@ -378,7 +383,7 @@ export const drawDefenseBox = (
     colors,
   }: { cardDefense: string; x: number; y: number; scale?: number; fontFamily: string; colors: ShapeColors },
 ) => {
-  const radius = 26 * scale;
+  const radius = (DEFENSE_BOX_HEIGHT / 2) * scale;
   const border = 3.5 * scale;
   const centerY = y - radius;
 

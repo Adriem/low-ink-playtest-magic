@@ -4,6 +4,7 @@ import {
   drawLoyaltyCost,
   getLoyaltyCostNumberOffset,
   LOYALTY_COST_FONT_SIZE,
+  LOYALTY_COST_HALF_WIDTH,
 } from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
@@ -28,8 +29,6 @@ const LOYALTY_PINLINE_WIDTH = 27;
 const BOTTOM_PINLINE_WIDTH = PINLINE_THICKNESS * 2.5;
 /** How far left of the text box's edge the loyalty costs are centered, so they overlap it a little */
 const LOYALTY_COST_OFFSET = 10;
-/** Half the width of a loyalty cost's icon, to put the colon after it */
-const LOYALTY_COST_HALF_WIDTH = 26;
 /** Space around the colon after a loyalty cost */
 const LOYALTY_COLON_GAP = 3;
 /** Space above the text */

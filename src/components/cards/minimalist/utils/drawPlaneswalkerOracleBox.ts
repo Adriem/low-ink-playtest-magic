@@ -1,5 +1,10 @@
 import type { MinimalistPalette } from '../palette';
-import { drawLoyaltyCost } from '../../common/canvasShapes';
+import {
+  drawLoyaltyCost,
+  getLoyaltyCostNumberOffset,
+  LOYALTY_COST_FONT_SIZE,
+  LOYALTY_COST_HALF_WIDTH,
+} from '../../common/canvasShapes';
 import { fillMultilineText, fitOracleLinesIntoBox } from '../../common/oracleTextRenderer';
 import {
   CONTENT_WIDTH,
@@ -17,7 +22,14 @@ import { getPaletteColors, type CardColorTreatment } from '../../../../domain/co
 import { getFillStyle } from '../../common/canvasStyles';
 import { isLoyaltyAbility, type OracleText } from '../../../../domain/oracleText';
 
-const LOYALTY_ABILITY_OFFSET = 45;
+/** How big the loyalty cost icons are, relative to their default size */
+const LOYALTY_COST_SCALE = 1.1;
+/** Space around the colon after a loyalty cost */
+const LOYALTY_COLON_GAP = 3;
+/** How far below the colon's baseline the numbers of loyalty costs go: where minus costs have them */
+const MINUS_COST_NUMBER_OFFSET = getLoyaltyCostNumberOffset('−1', LOYALTY_COST_SCALE);
+/** How much higher plus costs go than that, as their icon's arrow points up */
+const PLUS_COST_RAISE = 2;
 
 export const drawPlaneswalkerOracleBox = (
   ctx: CanvasRenderingContext2D,
@@ -38,8 +50,14 @@ export const drawPlaneswalkerOracleBox = (
   const textHeight = height - textPaddingTop;
 
   const paddedX = textX + SIDE_BORDER_PADDING;
-  const loyaltyAbilityWidth = textWidth - SIDE_BORDER_PADDING - LOYALTY_ABILITY_OFFSET;
   const regularOracleWidth = textWidth - SIDE_BORDER_PADDING - SIDE_BORDER_WIDTH * 1.5;
+
+  // Loyalty costs are followed by a colon as big as their numbers, and then their ability
+  const colonFont = `${LOYALTY_COST_FONT_SIZE * LOYALTY_COST_SCALE}px ${DISPLAY_FONT_FAMILY}`;
+  ctx.font = colonFont;
+  const colonX = paddedX + LOYALTY_COST_HALF_WIDTH * LOYALTY_COST_SCALE + LOYALTY_COLON_GAP;
+  const abilityX = colonX + ctx.measureText(':').width + LOYALTY_COLON_GAP * 2;
+  const loyaltyAbilityWidth = textX + textWidth - abilityX;
 
   drawPlaneswalkerOracleBorder(ctx, {
     palette,
@@ -67,20 +85,30 @@ export const drawPlaneswalkerOracleBox = (
     const loyaltyCost = isLoyaltyAbility(paragraph.line) && !paragraph.isMode ? paragraph.line.loyaltyCost : undefined;
 
     if (isAbility) {
-      fillMultilineText(ctx, paragraph.lines, paddedX + LOYALTY_ABILITY_OFFSET, currentY);
+      fillMultilineText(ctx, paragraph.lines, abilityX, currentY);
     }
 
     if (loyaltyCost) {
-      // The loyalty cost changes the font and alignment, which the next paragraphs need
+      const middleY = currentY + (paragraph.lineHeight * (paragraph.lines.length - 1)) / 2;
+      // The loyalty cost and its colon change the font and alignment, which the next paragraphs need
       ctx.save();
       drawLoyaltyCost(ctx, {
         loyaltyCost,
         x: paddedX,
-        y: currentY + (paragraph.lineHeight * (paragraph.lines.length - 1)) / 2,
-        scale: 1.1,
+        // Every cost's number goes where minus costs have it, a bit below the colon's baseline
+        y:
+          middleY +
+          MINUS_COST_NUMBER_OFFSET -
+          getLoyaltyCostNumberOffset(loyaltyCost, LOYALTY_COST_SCALE) -
+          (loyaltyCost.startsWith('+') ? PLUS_COST_RAISE : 0),
+        scale: LOYALTY_COST_SCALE,
         fontFamily: DISPLAY_FONT_FAMILY,
         colors: palette,
       });
+      ctx.font = colonFont;
+      ctx.fillStyle = palette.TEXT;
+      ctx.textAlign = 'start';
+      ctx.fillText(':', colonX, middleY);
       ctx.restore();
     }
 

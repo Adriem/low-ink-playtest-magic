@@ -1,4 +1,5 @@
 import { useCallback, useState, type FormEvent, type KeyboardEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import './CardSearchForm.css';
 
@@ -21,6 +22,7 @@ type SearchModeChangeHandler = (multipleSearch: boolean) => void;
  * @param props.onAddCards - Called with the card names to add, in order
  */
 const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => void }) => {
+  const { t } = useTranslation();
   const [multipleSearch, setMultipleSearch] = useState(false);
 
   const handleSubmit = useCallback(
@@ -43,7 +45,7 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
         const invalidEntry = entries.find(({ quantity }) => quantity < 1);
 
         if (invalidEntry) {
-          cardList.setCustomValidity(`"${invalidEntry.line}": the quantity must be between 1 and ${MAX_QUANTITY}`);
+          cardList.setCustomValidity(t('search_form.invalid_quantity', { line: invalidEntry.line, max: MAX_QUANTITY }));
           cardList.reportValidity();
           return;
         }
@@ -58,7 +60,7 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
       // The input starts over after adding the cards, so it's ready for the next ones
       getField(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
     },
-    [multipleSearch, onAddCards],
+    [multipleSearch, onAddCards, t],
   );
 
   const handleSearchModeChange = useCallback((multiple: boolean) => {
@@ -110,10 +112,12 @@ const repeatCardName = (cardName: string, quantity: number) => {
  * Fields to add a single card by name.
  */
 const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchModeChangeHandler }) => {
+  const { t } = useTranslation();
+
   return (
     <>
-      <input className="card-name-input" name="cardName" placeholder="e.g. Colossal Dreadmaw" />
-      <input className="submit-card-search single" type="submit" value="Add" />
+      <input className="card-name-input" name="cardName" placeholder={t('search_form.placeholder')} />
+      <input className="submit-card-search single" type="submit" value={t('search_form.add')} />
       <SearchModeToggle multipleSearch={false} onChange={onSearchModeChange} />
     </>
   );
@@ -123,6 +127,8 @@ const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMo
  * Fields to add a list of cards, one per line.
  */
 const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchModeChangeHandler }) => {
+  const { t } = useTranslation();
+
   // Editing the card list clears the error about an invalid quantity
   const handleInput = useCallback((event: FormEvent<HTMLTextAreaElement>) => {
     event.currentTarget.setCustomValidity('');
@@ -144,11 +150,11 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
         className="card-name-input"
         name="cardNamesList"
         rows={4}
-        placeholder="e.g. Colossal Dreadmaw"
+        placeholder={t('search_form.placeholder')}
         onKeyDown={handleKeyDown}
         onInput={handleInput}
       />
-      <input className="submit-card-search multiple" type="submit" value="Add cards" />
+      <input className="submit-card-search multiple" type="submit" value={t('search_form.add_cards')} />
       <SearchModeToggle multipleSearch onChange={onSearchModeChange} />
     </>
   );
@@ -166,9 +172,11 @@ const SearchModeToggle = ({
   multipleSearch: boolean;
   onChange: SearchModeChangeHandler;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="search-mode" role="radiogroup" aria-labelledby="search-mode-label">
-      <span id="search-mode-label">Search mode:</span>
+      <span id="search-mode-label">{t('search_form.search_mode')}</span>
       <label>
         <input
           type="radio"
@@ -177,11 +185,11 @@ const SearchModeToggle = ({
           checked={!multipleSearch}
           onChange={() => onChange(false)}
         />
-        single card
+        {t('search_form.single_card')}
       </label>
       <label>
         <input type="radio" name="searchMode" value="list" checked={multipleSearch} onChange={() => onChange(true)} />
-        card list
+        {t('search_form.card_list')}
       </label>
     </div>
   );

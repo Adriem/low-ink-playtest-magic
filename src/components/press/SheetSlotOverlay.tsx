@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { OverlayFocus, OverlayMode } from './CardOverlayContext';
 import type { SheetFace } from '../../domain/press';
 
@@ -150,24 +151,28 @@ const OverlayControls = ({
 };
 
 const MoveSubmenuButton = ({ hidden, onClick }: { hidden: boolean; onClick: () => void }) => {
+  const { t } = useTranslation();
+
   return (
     <OverlayButton className="sheet-slot-overlay-start-move" hidden={hidden} onClick={onClick}>
-      <i className="fa fa-arrows-alt-h" /> Move...
+      <i className="fa fa-arrows-alt-h" /> {t('card_overlay.move')}
     </OverlayButton>
   );
 };
 
 const MoveButtons = ({ hidden, canMoveUp, canMoveDown, onMoveUp, onMoveDown }: MoveButtonsProps) => {
+  const { t } = useTranslation();
+
   return (
     <>
       {canMoveUp && (
         <OverlayButton className="sheet-slot-overlay-move-up" hidden={hidden} onClick={onMoveUp}>
-          <i className="fa fa-arrow-left" /> Move up
+          <i className="fa fa-arrow-left" /> {t('card_overlay.move_up')}
         </OverlayButton>
       )}
       {canMoveDown && (
         <OverlayButton className="sheet-slot-overlay-move-down" hidden={hidden} onClick={onMoveDown}>
-          <i className="fa fa-arrow-right" /> Move down
+          <i className="fa fa-arrow-right" /> {t('card_overlay.move_down')}
         </OverlayButton>
       )}
     </>
@@ -189,6 +194,7 @@ const DeleteButton = ({
   onClick: () => void;
   onDangerChange: (danger: boolean) => void;
 }) => {
+  const { t } = useTranslation();
   const dangerHandlers =
     mode === 'menu'
       ? {
@@ -204,23 +210,27 @@ const DeleteButton = ({
 
   return (
     <OverlayButton className="sheet-slot-overlay-delete" hidden={hidden} onClick={onClick} {...dangerHandlers}>
-      <i className="fa fa-trash" /> Delete
+      <i className="fa fa-trash" /> {t('card_overlay.delete')}
     </OverlayButton>
   );
 };
 
 const DismissButton = ({ hidden, onClick }: { hidden: boolean; onClick: ClickHandler }) => {
+  const { t } = useTranslation();
+
   return (
     <OverlayButton className="sheet-slot-overlay-dismiss" hidden={hidden} onClick={onClick}>
-      Dismiss
+      {t('card_overlay.dismiss')}
     </OverlayButton>
   );
 };
 
 const CloseButton = ({ hidden, onClick }: { hidden: boolean; onClick: ClickHandler }) => {
+  const { t } = useTranslation();
+
   return (
     <OverlayButton className="sheet-slot-overlay-close" hidden={hidden} onClick={onClick}>
-      Close
+      {t('card_overlay.close')}
     </OverlayButton>
   );
 };

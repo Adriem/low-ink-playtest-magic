@@ -32,6 +32,7 @@ const SETTINGS_STORAGE_KEY = 'press:settings';
 const PALETTE_STORAGE_KEY_PREFIX = 'press:palette:';
 
 export interface SettingDefinition<T extends string> {
+  /** Key of the setting's name in the texts of the app (`src/i18n`), as are its options' labels */
   label: string;
   options: { value: T; label: string }[];
   /** Value of the default option */
@@ -51,42 +52,42 @@ export interface SettingDefinition<T extends string> {
 }
 
 const TREATMENT_OPTIONS: SettingDefinition<CardTreatment>['options'] = [
-  { value: 'unified', label: 'Unified' },
-  { value: 'separate', label: 'Separate' },
+  { value: 'unified', label: 'settings.double_faced_card_treatment.options.unified' },
+  { value: 'separate', label: 'settings.double_faced_card_treatment.options.separate' },
 ];
 
 export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Settings[Name]> } = {
   cardVariant: {
-    label: 'Card style',
+    label: 'settings.card_variant.label',
     options: [
-      { value: 'realistic', label: 'Realistic' },
-      { value: 'minimalist', label: 'Minimalist' },
+      { value: 'realistic', label: 'settings.card_variant.options.realistic' },
+      { value: 'minimalist', label: 'settings.card_variant.options.minimalist' },
     ],
     default: 'realistic',
   },
   doubleFacedCardTreatment: {
-    label: 'Double-Faced card treatment',
+    label: 'settings.double_faced_card_treatment.label',
     options: TREATMENT_OPTIONS,
     default: 'separate',
   },
   inkLevel: {
-    label: 'Ink level',
+    label: 'settings.ink_level.label',
     options: [
-      { value: 'low', label: 'Low' },
-      { value: 'medium', label: 'Medium' },
-      { value: 'high', label: 'High' },
+      { value: 'low', label: 'settings.ink_level.options.low' },
+      { value: 'medium', label: 'settings.ink_level.options.medium' },
+      { value: 'high', label: 'settings.ink_level.options.high' },
     ],
     default: 'medium',
   },
   artFidelity: {
-    label: 'Art fidelity',
+    label: 'settings.art_fidelity.label',
     options: [
-      { value: 'blank', label: '1' },
-      { value: 'contours', label: '2' },
-      { value: 'mid-tones', label: '3' },
-      { value: 'posterized', label: '4' },
-      { value: 'grayscale', label: '5' },
-      { value: 'no-filter', label: '6' },
+      { value: 'blank', label: 'settings.art_fidelity.options.blank' },
+      { value: 'contours', label: 'settings.art_fidelity.options.contours' },
+      { value: 'mid-tones', label: 'settings.art_fidelity.options.mid_tones' },
+      { value: 'posterized', label: 'settings.art_fidelity.options.posterized' },
+      { value: 'grayscale', label: 'settings.art_fidelity.options.grayscale' },
+      { value: 'no-filter', label: 'settings.art_fidelity.options.no_filter' },
     ],
     default: 'posterized',
     control: 'slider',
@@ -94,21 +95,21 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     cardStyles: ['realistic'],
   },
   cardBorder: {
-    label: 'Card border',
+    label: 'settings.card_border.label',
     options: [
-      { value: 'none', label: 'None' },
-      { value: 'outline', label: 'Outline' },
-      { value: 'full', label: 'Full' },
+      { value: 'none', label: 'settings.card_border.options.none' },
+      { value: 'outline', label: 'settings.card_border.options.outline' },
+      { value: 'full', label: 'settings.card_border.options.full' },
     ],
     default: 'outline',
   },
   cardCorners: {
-    label: 'Rounded corners',
+    label: 'settings.card_corners.label',
     group: 'cardBorder',
     control: 'checkbox',
     options: [
-      { value: 'square', label: 'Square' },
-      { value: 'rounded', label: 'Rounded' },
+      { value: 'square', label: 'settings.card_corners.options.square' },
+      { value: 'rounded', label: 'settings.card_corners.options.rounded' },
     ],
     default: 'rounded',
   },

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SettingsPanel } from '../settings';
 import type { PdfExportOptions } from '../../adapters/jspdf';
 import ExportPanel from './ExportPanel';
@@ -16,6 +17,7 @@ const PressActions = ({
   onClear: () => void;
   onExport: (options: PdfExportOptions) => void;
 }) => {
+  const { t } = useTranslation();
   const settingsDialogRef = useRef<HTMLDialogElement>(null);
   const exportDialogRef = useRef<HTMLDialogElement>(null);
 
@@ -33,13 +35,13 @@ const PressActions = ({
         <div className="press-actions-bar">
           <div className="container">
             <button type="button" className="clear" onClick={onClear}>
-              Clear
+              {t('press_actions.clear')}
             </button>
             <button type="button" onClick={handleSettingsClick}>
-              Settings
+              {t('press_actions.settings')}
             </button>
             <button type="button" className="export big-button" onClick={handleExportClick}>
-              EXPORT
+              {t('press_actions.export')}
             </button>
           </div>
         </div>

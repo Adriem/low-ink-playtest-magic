@@ -1,4 +1,5 @@
 import type { FocusEvent, KeyboardEvent, MouseEvent, PointerEvent, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { SheetFace } from '../../domain/press';
 import { isKeyboardClick } from '../../utils/events';
 import { useCardOverlayContext } from './CardOverlayContext';
@@ -27,6 +28,7 @@ const SheetSlot = ({
   cardName: string;
   children: ReactNode;
 }) => {
+  const { t } = useTranslation();
   const {
     overlay,
     hoveredCollectionIndexRef,
@@ -106,7 +108,7 @@ const SheetSlot = ({
       <button
         type="button"
         className="sheet-slot-card-button"
-        aria-label={`Actions for ${cardName}`}
+        aria-label={t('card_overlay.actions_for', { cardName })}
         aria-expanded={open && overlay.mode === 'menu'}
         ref={isMainFace ? registerCardButton : undefined}
         tabIndex={isMainFace ? 0 : -1}

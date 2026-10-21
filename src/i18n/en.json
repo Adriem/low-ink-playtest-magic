@@ -1,0 +1,128 @@
+{
+  "search_form": {
+    "placeholder": "e.g. Colossal Dreadmaw",
+    "add": "Add",
+    "add_cards": "Add cards",
+    "search_mode": "Search mode:",
+    "single_card": "single card",
+    "card_list": "card list",
+    "invalid_quantity": "\"{{line}}\": the quantity must be between 1 and {{max}}"
+  },
+  "press": {
+    "page_number": "Page {{page}} of {{pages}}",
+    "card_load_error": "Could not load \"{{cardName}}\": {{message}}",
+    "back_to_top": "Back to top"
+  },
+  "press_actions": {
+    "clear": "Clear",
+    "settings": "Settings",
+    "export": "EXPORT"
+  },
+  "export_panel": {
+    "page_size": "Page size",
+    "page_sizes": {
+      "a4": "A4",
+      "letter": "Letter"
+    },
+    "file_name": "File name",
+    "cancel": "Cancel",
+    "export": "Export"
+  },
+  "card_overlay": {
+    "actions_for": "Actions for {{cardName}}",
+    "move": "Move...",
+    "move_up": "Move up",
+    "move_down": "Move down",
+    "delete": "Delete",
+    "dismiss": "Dismiss",
+    "close": "Close"
+  },
+  "loading_card": "Loading card details",
+  "popup": {
+    "back": "← Back",
+    "close": "Close"
+  },
+  "settings": {
+    "restore_defaults": "Restore defaults",
+    "edit_palette": "Edit palette",
+    "edit_palette_of": "Edit {{cardStyle}} palette",
+    "card_variant": {
+      "label": "Card style",
+      "options": {
+        "realistic": "Realistic",
+        "minimalist": "Minimalist"
+      }
+    },
+    "double_faced_card_treatment": {
+      "label": "Double-Faced card treatment",
+      "options": {
+        "unified": "Unified",
+        "separate": "Separate"
+      }
+    },
+    "ink_level": {
+      "label": "Ink level",
+      "options": {
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High"
+      }
+    },
+    "art_fidelity": {
+      "label": "Art fidelity",
+      "options": {
+        "blank": "1",
+        "contours": "2",
+        "mid_tones": "3",
+        "posterized": "4",
+        "grayscale": "5",
+        "no_filter": "6"
+      }
+    },
+    "card_border": {
+      "label": "Card border",
+      "options": {
+        "none": "None",
+        "outline": "Outline",
+        "full": "Full"
+      }
+    },
+    "card_corners": {
+      "label": "Rounded corners",
+      "options": {
+        "square": "Square",
+        "rounded": "Rounded"
+      }
+    }
+  },
+  "palette_editor": {
+    "title": "{{cardStyle}} palette",
+    "changed": "Changed",
+    "restore_defaults": "Restore defaults",
+    "discard_changes": "Discard changes",
+    "save": "Save",
+    "colors": {
+      "text": "Text",
+      "line": "Lines",
+      "paper": "Paper",
+      "colorless": "Colorless",
+      "white": "White",
+      "blue": "Blue",
+      "black": "Black",
+      "red": "Red",
+      "green": "Green",
+      "gold": "Gold",
+      "artifact": "Artifact",
+      "land": "Land",
+      "colorless_typeline_text": "Colorless type line text"
+    }
+  },
+  "footer": {
+    "copyright": "© {{year}} {{holder}}",
+    "found_issues": "Found any issues?",
+    "report_here": "Report here"
+  },
+  "errors": {
+    "symbology": "Could not fetch symbology. Reason: {{reason}}"
+  }
+}

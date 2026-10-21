@@ -10,6 +10,7 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
     "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom/vitest"]
   },
   "include": ["src"]

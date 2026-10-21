@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type FormEvent, type MouseEvent, type Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import { DEFAULT_PDF_EXPORT_OPTIONS, type PageSize, type PdfExportOptions } from '../../adapters/jspdf';
 import { loadFromStorage, saveToStorage } from '../../utils/storage';
 import { isRecord } from '../../utils/object';
@@ -9,9 +10,10 @@ import './ExportPanel.css';
 /** Local storage key the last export options are saved in, as a JSON object */
 const EXPORT_OPTIONS_STORAGE_KEY = 'press:exportOptions';
 
+/** Page sizes, with the keys of their labels in the texts of the app */
 const PAGE_SIZE_OPTIONS: { value: PageSize; label: string }[] = [
-  { value: 'a4', label: 'A4' },
-  { value: 'letter', label: 'Letter' },
+  { value: 'a4', label: 'export_panel.page_sizes.a4' },
+  { value: 'letter', label: 'export_panel.page_sizes.letter' },
 ];
 
 /**
@@ -25,6 +27,7 @@ const ExportPanel = ({
   ref?: Ref<HTMLDialogElement>;
   onExport: (options: PdfExportOptions) => void;
 }) => {
+  const { t } = useTranslation();
   const [options, setOptions] = useState(loadExportOptions);
 
   const handlePageSizeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -50,7 +53,7 @@ const ExportPanel = ({
     <Popup ref={ref} className="export-panel">
       <form onSubmit={handleSubmit}>
         <fieldset>
-          <legend>Page size</legend>
+          <legend>{t('export_panel.page_size')}</legend>
           {PAGE_SIZE_OPTIONS.map((option) => (
             <label key={option.value}>
               <input
@@ -60,15 +63,15 @@ const ExportPanel = ({
                 checked={options.pageSize === option.value}
                 onChange={handlePageSizeChange}
               />
-              {option.label}
+              {t(option.label)}
             </label>
           ))}
         </fieldset>
         <fieldset className="file-name">
-          <legend>File name</legend>
+          <legend>{t('export_panel.file_name')}</legend>
           <input
             type="text"
-            aria-label="File name"
+            aria-label={t('export_panel.file_name')}
             placeholder={DEFAULT_PDF_EXPORT_OPTIONS.fileName}
             value={options.fileName}
             onChange={handleFileNameChange}
@@ -77,10 +80,10 @@ const ExportPanel = ({
         </fieldset>
         <menu>
           <button type="button" onClick={handleCancelClick}>
-            Cancel
+            {t('export_panel.cancel')}
           </button>
           <button type="submit" className="export">
-            Export
+            {t('export_panel.export')}
           </button>
         </menu>
       </form>

@@ -1,4 +1,5 @@
 import { useEffect, useState, type RefObject } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import './BackToTopButton.css';
 
@@ -9,6 +10,7 @@ import './BackToTopButton.css';
  * @param props.watched - Element the button is shown without
  */
 const BackToTopButton = ({ watched }: { watched: RefObject<Element | null> }) => {
+  const { t } = useTranslation();
   const [isWatchedVisible, setIsWatchedVisible] = useState(true);
 
   useEffect(() => {
@@ -28,7 +30,7 @@ const BackToTopButton = ({ watched }: { watched: RefObject<Element | null> }) =>
 
   return (
     <button type="button" className="back-to-top big-button" onClick={handleClick}>
-      Back to top
+      {t('press.back_to_top')}
     </button>
   );
 };

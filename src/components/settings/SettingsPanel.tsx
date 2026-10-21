@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent, type ReactNode, type Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CardStyle } from '../cards/styles';
 import { Popup } from '../popup';
 import {
@@ -67,6 +68,8 @@ const SettingsForm = ({
   onPaletteClick: (cardStyle: CardStyle) => void;
   onRestoreDefaultsClick: () => void;
 }) => {
+  const { t } = useTranslation();
+
   return (
     <form method="dialog" className="settings-form">
       {SETTING_NAMES.filter((name) => !SETTINGS_DEFINITIONS[name].group).map((name) =>
@@ -81,7 +84,7 @@ const SettingsForm = ({
       )}
       <menu className="menu-centered">
         <button type="button" onClick={onRestoreDefaultsClick}>
-          Restore defaults
+          {t('settings.restore_defaults')}
         </button>
       </menu>
     </form>
@@ -111,12 +114,13 @@ const GroupedSettings = ({ name, cardStyle }: { name: SettingName; cardStyle: Ca
  * edit its palette.
  */
 const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: CardStyle) => void }) => {
+  const { t } = useTranslation();
   const definition = SETTINGS_DEFINITIONS.cardVariant;
   const [value, setValue] = useSetting('cardVariant');
 
   return (
     <fieldset className="card-styles">
-      <legend>{definition.label}</legend>
+      <legend>{t(definition.label)}</legend>
       {definition.options.map((option) => (
         <div key={option.value} className="card-style">
           <label>
@@ -127,14 +131,14 @@ const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: Car
               checked={value === option.value}
               onChange={() => setValue(option.value)}
             />
-            {option.label}
+            {t(option.label)}
           </label>
           <button
             type="button"
-            aria-label={`Edit ${option.label} palette`}
+            aria-label={t('settings.edit_palette_of', { cardStyle: t(option.label) })}
             onClick={() => onPaletteClick(option.value)}
           >
-            Edit palette
+            {t('settings.edit_palette')}
           </button>
         </div>
       ))}
@@ -156,6 +160,7 @@ const SettingFieldset = <Name extends SettingName>({
   disabled?: boolean;
   children?: ReactNode;
 }) => {
+  const { t } = useTranslation();
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
 
@@ -163,7 +168,7 @@ const SettingFieldset = <Name extends SettingName>({
 
   return (
     <fieldset disabled={disabled || definition.disabled}>
-      <legend>{definition.label}</legend>
+      <legend>{t(definition.label)}</legend>
       {definition.options.map((option) => (
         <label key={option.value} className="setting-option">
           <input
@@ -173,7 +178,7 @@ const SettingFieldset = <Name extends SettingName>({
             checked={value === option.value}
             onChange={() => setValue(option.value)}
           />
-          {option.label}
+          {t(option.label)}
         </label>
       ))}
       {children}
@@ -186,6 +191,7 @@ const SettingFieldset = <Name extends SettingName>({
  * first one, checked for the second.
  */
 const SettingCheckbox = <Name extends SettingName>({ name, disabled }: { name: Name; disabled: boolean }) => {
+  const { t } = useTranslation();
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
   const [unchecked, checked] = definition.options;
@@ -203,7 +209,7 @@ const SettingCheckbox = <Name extends SettingName>({ name, disabled }: { name: N
         disabled={disabled || definition.disabled}
         onChange={handleChange}
       />
-      {definition.label}
+      {t(definition.label)}
     </label>
   );
 };
@@ -212,6 +218,7 @@ const SettingCheckbox = <Name extends SettingName>({ name, disabled }: { name: N
  * Slider through the options of a setting, in order.
  */
 const SettingSlider = <Name extends SettingName>({ name, disabled }: { name: Name; disabled: boolean }) => {
+  const { t } = useTranslation();
   const definition = SETTINGS_DEFINITIONS[name];
   const [value, setValue] = useSetting(name);
   const index = definition.options.findIndex((option) => option.value === value);
@@ -222,15 +229,15 @@ const SettingSlider = <Name extends SettingName>({ name, disabled }: { name: Nam
 
   return (
     <fieldset className="setting-slider" disabled={disabled || definition.disabled}>
-      <legend>{definition.label}</legend>
+      <legend>{t(definition.label)}</legend>
       <input
         type="range"
         min={0}
         max={definition.options.length - 1}
         step={1}
         value={index}
-        aria-label={definition.label}
-        aria-valuetext={definition.options[index]?.label}
+        aria-label={t(definition.label)}
+        aria-valuetext={definition.options[index] && t(definition.options[index].label)}
         onChange={handleChange}
       />
     </fieldset>

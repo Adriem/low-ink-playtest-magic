@@ -1,4 +1,5 @@
 import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
@@ -32,6 +33,7 @@ const COLOR_OPTIONS = [
 ];
 
 const Workbench = () => {
+  const { t } = useTranslation();
   const [opacity, setOpacity] = useState(0);
   const [cardColors, setCardColors] = useState<ColorSymbol[] | null>(null);
   const [cardName, setCardName] = useState('Colossal Dreadmaw');
@@ -130,7 +132,7 @@ const Workbench = () => {
             <select id="cardVariant" value={cardVariant} onChange={handleStyleChange}>
               {SETTINGS_DEFINITIONS.cardVariant.options.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label)}
                 </option>
               ))}
             </select>
@@ -140,7 +142,7 @@ const Workbench = () => {
             <select id="cardColors" defaultValue="" onChange={handleColorChange}>
               {COLOR_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label)}
                 </option>
               ))}
             </select>
@@ -150,7 +152,7 @@ const Workbench = () => {
             <select id="inkLevel" value={inkLevel} onChange={handleInkLevelChange}>
               {SETTINGS_DEFINITIONS.inkLevel.options.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label)}
                 </option>
               ))}
             </select>
@@ -165,7 +167,7 @@ const Workbench = () => {
             >
               {SETTINGS_DEFINITIONS.artFidelity.options.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.label)}
                 </option>
               ))}
             </select>

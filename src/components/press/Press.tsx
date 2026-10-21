@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
@@ -18,6 +19,7 @@ import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
 import { loadFromStorage, saveToStorage } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
+import i18n from '../../i18n';
 
 const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 
@@ -25,6 +27,7 @@ const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 const RENDER_TIMEOUT_MS = 10000;
 
 const Press = () => {
+  const { t } = useTranslation();
   // The back to top button shows once the search form is scrolled away
   const searchFormRef = useRef<HTMLDivElement>(null);
   const [cardVariant] = useSetting('cardVariant');
@@ -122,7 +125,7 @@ const Press = () => {
               </div>
             </div>
             <footer className="press-page-footer">
-              Page {sheetNumber + 1} of {cardSheets.length}
+              {t('press.page_number', { page: sheetNumber + 1, pages: cardSheets.length })}
             </footer>
           </section>
         ))}
@@ -149,7 +152,7 @@ const loadPersistedCards = () => {
 
 // TODO: Replace alert with a toast notification
 const handleCardLoadError = (cardName: string, error: Error) => {
-  window.alert(`Could not load "${cardName}": ${error.message}`);
+  window.alert(i18n.t('press.card_load_error', { cardName, message: error.message }));
 };
 
 // Cards keep their key while moved around, so their canvases aren't drawn again

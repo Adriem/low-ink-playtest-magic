@@ -1,4 +1,5 @@
 import type { MouseEvent, ReactNode, Ref } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import './Popup.css';
 
@@ -26,6 +27,7 @@ const Popup = ({
   onClose?: () => void;
   children: ReactNode;
 }) => {
+  const { t } = useTranslation();
   // Clicks on the overlay around the dialog target the dialog itself, outside its box
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
     const dialog = event.currentTarget;
@@ -48,11 +50,11 @@ const Popup = ({
         <div className="popup-controls">
           {onBack && (
             <button type="button" className="link-button" onClick={onBack}>
-              ← Back
+              {t('popup.back')}
             </button>
           )}
           {hasCloseButton && (
-            <button type="button" className="popup-close" aria-label="Close" onClick={handleCloseClick}>
+            <button type="button" className="popup-close" aria-label={t('popup.close')} onClick={handleCloseClick}>
               ×
             </button>
           )}

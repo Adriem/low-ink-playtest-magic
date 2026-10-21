@@ -1,9 +1,18 @@
+/* Space between the settings */
+.settings-form fieldset + fieldset {
+  margin-top: 0.75rem;
+}
+
+/* Space between the options of a setting, which go side by side */
+.setting-option + .setting-option {
+  margin-left: 1rem;
+}
+
 /* The slider takes the whole width */
 .setting-slider input[type='range'] {
   display: block;
   width: 100%;
   margin: 0;
-  box-sizing: border-box;
 }
 
 /* Each card style on its own line, with its palette button on the right */

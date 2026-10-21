@@ -30,15 +30,19 @@ const PressActions = ({
   return (
     <>
       <div className="press-actions">
-        <button type="button" className="clear" onClick={onClear}>
-          Clear
-        </button>
-        <button type="button" onClick={handleSettingsClick}>
-          Settings
-        </button>
-        <button type="button" className="export" onClick={handleExportClick}>
-          EXPORT
-        </button>
+        <div className="press-actions-bar">
+          <div className="container">
+            <button type="button" className="clear" onClick={onClear}>
+              Clear
+            </button>
+            <button type="button" onClick={handleSettingsClick}>
+              Settings
+            </button>
+            <button type="button" className="export big-button" onClick={handleExportClick}>
+              EXPORT
+            </button>
+          </div>
+        </div>
       </div>
       <SettingsPanel ref={settingsDialogRef} />
       <ExportPanel ref={exportDialogRef} onExport={onExport} />

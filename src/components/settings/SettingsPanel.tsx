@@ -68,7 +68,7 @@ const SettingsForm = ({
   onRestoreDefaultsClick: () => void;
 }) => {
   return (
-    <form method="dialog">
+    <form method="dialog" className="settings-form">
       {SETTING_NAMES.filter((name) => !SETTINGS_DEFINITIONS[name].group).map((name) =>
         name === 'cardVariant' ? (
           <CardStyleFieldset key={name} onPaletteClick={onPaletteClick} />
@@ -165,7 +165,7 @@ const SettingFieldset = <Name extends SettingName>({
     <fieldset disabled={disabled || definition.disabled}>
       <legend>{definition.label}</legend>
       {definition.options.map((option) => (
-        <label key={option.value}>
+        <label key={option.value} className="setting-option">
           <input
             type="radio"
             name={name}

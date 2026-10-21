@@ -10,5 +10,5 @@ vi.mock('./adapters/scryfall', () => ({
 test('renders the card search form', () => {
   render(<App />);
   expect(screen.getByPlaceholderText(/colossal dreadmaw/i)).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
 });

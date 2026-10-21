@@ -11,7 +11,7 @@ test('adds a single card by name', async () => {
   const onAddCards = setupForm();
 
   await user.type(screen.getByPlaceholderText(/colossal dreadmaw/i), '  Lightning Bolt ');
-  await user.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.click(screen.getByRole('button', { name: 'Add' }));
 
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
 });
@@ -21,7 +21,7 @@ test('clears the card name after adding it', async () => {
   const input = screen.getByPlaceholderText(/colossal dreadmaw/i);
 
   await user.type(input, 'Lightning Bolt');
-  await user.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.click(screen.getByRole('button', { name: 'Add' }));
 
   expect(input).toHaveValue('');
 });
@@ -29,7 +29,7 @@ test('clears the card name after adding it', async () => {
 test('does not add anything for an empty name', async () => {
   const onAddCards = setupForm();
 
-  await user.click(screen.getByRole('button', { name: 'Add card' }));
+  await user.click(screen.getByRole('button', { name: 'Add' }));
 
   expect(onAddCards).not.toHaveBeenCalled();
 });
@@ -61,14 +61,14 @@ test('switches between single card and card list modes', async () => {
   setupForm();
 
   expect(screen.getByLabelText('single card')).toBeChecked();
-  expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
 
   await user.click(screen.getByLabelText('card list'));
   expect(screen.getByLabelText('card list')).toBeChecked();
   expect(screen.getByRole('button', { name: 'Add cards' })).toBeInTheDocument();
 
   await user.click(screen.getByLabelText('single card'));
-  expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
 });
 
 describe('card list shortcut', () => {

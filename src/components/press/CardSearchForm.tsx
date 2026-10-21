@@ -113,7 +113,7 @@ const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMo
   return (
     <>
       <input className="card-name-input" name="cardName" placeholder="e.g. Colossal Dreadmaw" />
-      <input className="submit-card-search single" type="submit" value="Add card" />
+      <input className="submit-card-search single" type="submit" value="Add" />
       <SearchModeToggle multipleSearch={false} onChange={onSearchModeChange} />
     </>
   );
@@ -143,20 +143,13 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
       <textarea
         className="card-name-input"
         name="cardNamesList"
+        rows={4}
         placeholder="e.g. Colossal Dreadmaw"
         onKeyDown={handleKeyDown}
         onInput={handleInput}
       />
-      {/* Invisible copy of the submit button that keeps the toggle centered */}
-      <input
-        className="submit-card-search multiple ghost"
-        type="button"
-        value="Add cards"
-        tabIndex={-1}
-        aria-hidden="true"
-      />
-      <SearchModeToggle multipleSearch onChange={onSearchModeChange} />
       <input className="submit-card-search multiple" type="submit" value="Add cards" />
+      <SearchModeToggle multipleSearch onChange={onSearchModeChange} />
     </>
   );
 };
@@ -174,11 +167,7 @@ const SearchModeToggle = ({
   onChange: SearchModeChangeHandler;
 }) => {
   return (
-    <div
-      className={`search-mode ${multipleSearch ? 'list' : 'single'}`}
-      role="radiogroup"
-      aria-labelledby="search-mode-label"
-    >
+    <div className="search-mode" role="radiogroup" aria-labelledby="search-mode-label">
       <span id="search-mode-label">Search mode:</span>
       <label>
         <input

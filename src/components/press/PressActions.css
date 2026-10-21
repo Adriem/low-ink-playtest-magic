@@ -1,10 +1,34 @@
+/* Stuck to the top of the screen while scrolling through the sheets, over the
+   cards and their overlays (z-index 99). A scroll-state container, to style
+   its bar while it's stuck */
 .press-actions {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin-bottom: 1rem;
+  container-type: scroll-state;
+}
+
+/* Across the whole screen, so the cards don't show on its sides */
+.press-actions-bar {
+  padding: 0.5rem 0;
+  background: white;
+}
+
+/* A line under the bar while it's stuck (where scroll-state queries are
+   supported: Chrome and Edge 133+). A shadow, so the bar keeps its height */
+@container scroll-state(stuck: top) {
+  .press-actions-bar {
+    box-shadow: 0 2px 0 black;
+  }
+}
+
+/* The actions, as wide as the press */
+.press-actions-bar > .container {
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 0.5rem;
-  max-width: 750px;
-  margin: 0 auto 1rem;
 }
 
 .press-actions .clear {
@@ -15,7 +39,6 @@
 
 .press-actions .export {
   font-weight: bold;
-  padding: 0.5em 1em;
 }
 
 dialog:not([open]) {

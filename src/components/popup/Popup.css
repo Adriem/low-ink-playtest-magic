@@ -1,6 +1,5 @@
 .popup {
   min-width: 320px;
-  box-sizing: border-box;
 }
 
 /* On phones, popups take most of the screen's width instead */

@@ -1,10 +1,6 @@
-/* A sheet of cards and its footer. Three 250px slots per row. On narrower
-   screens the page shrinks with the screen and the slots wrap, so the page
-   never gets wider than the screen (which makes mobile browsers zoom out the
-   whole page) */
+/* A sheet of cards and its footer, as wide as the screen */
 .press-page {
-  margin: 0 auto 5rem;
-  max-width: 750px;
+  margin-bottom: 5rem;
 }
 
 /* Corners of the cards' button and overlay, as rounded as the cards' canvases
@@ -13,13 +9,22 @@
   --card-corner-radius: 10px;
 }
 
-.press-sheet {
-  overflow: auto;
+/* On screens narrower than the sheet and its 20px margins, the sheet scrolls
+   sideways, margins included, so the page never gets wider than the screen
+   (which makes mobile browsers zoom out the whole page). On wider ones, it's
+   centered */
+.press-sheet-scroller {
+  overflow-x: auto;
+  padding: 0 20px;
 }
-.press-sheet:before {
-  content: '';
-  clear: both;
-  display: table;
+
+/* The cards of a sheet in a 3x3 grid of 250x350 slots, as in a page of the exported PDF */
+.press-sheet {
+  display: grid;
+  grid-template-columns: repeat(3, 250px);
+  grid-auto-rows: 350px;
+  width: max-content;
+  margin: 0 auto;
 }
 
 .press-page-footer {

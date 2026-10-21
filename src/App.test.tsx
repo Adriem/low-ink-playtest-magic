@@ -15,5 +15,5 @@ test('renders the footer, with where to report issues', () => {
 test('renders the card search form', () => {
   render(<App />);
   expect(screen.getByPlaceholderText(/colossal dreadmaw/i)).toBeInTheDocument();
-  expect(screen.getByRole('button', { name: 'Add card' })).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
 });

@@ -4,36 +4,48 @@
   max-width: 40rem;
   margin: 8rem auto 5rem;
 }
+/* Less room around it on phones, where the screen is short too */
+@media (max-width: 449px) {
+  .card-search-form {
+    margin: 3rem auto 2rem;
+  }
+}
 
+/* Takes the rest of the line, shrinking as much as needed for the button to fit */
 .card-search-form input.card-name-input {
   flex: 1;
-  min-width: min(20rem, 100%);
+  min-width: 0;
 }
 
+.card-search-form .submit-card-search.single {
+  white-space: nowrap;
+}
+/* Wider beyond phones, where there's room for them */
+@media (min-width: 450px) {
+  .card-search-form .submit-card-search {
+    min-width: 85px;
+  }
+}
+
+/* As wide as the form, and only taller or shorter when resized */
 .card-search-form textarea.card-name-input {
   width: 100%;
+  resize: vertical;
 }
 
+/* On its own line, on the right, below the text area */
 .card-search-form .submit-card-search.multiple {
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 0 auto;
 }
 
-.card-search-form .submit-card-search.ghost {
-  visibility: hidden;
-}
-
+/* On its own line, centered, below the fields */
 .card-search-form .search-mode {
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 1rem;
-  margin: 0.5rem;
-}
-.card-search-form .search-mode.single {
   width: 100%;
-}
-.card-search-form .search-mode.list {
-  flex: 1;
+  margin: 0.5rem 0;
 }
 
 .card-search-form .search-mode label {

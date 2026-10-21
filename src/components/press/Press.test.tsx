@@ -102,7 +102,7 @@ test('shows a placeholder while a card is loading', () => {
   );
 
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightning Bolt' } });
-  fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Add' }));
 
   expect(screen.getByRole('status')).toHaveTextContent('Loading card details');
 });
@@ -119,7 +119,7 @@ test('shows a card that loads while a card added before it is still loading', as
 
   const addCard = (cardName: string) => {
     fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: cardName } });
-    fireEvent.click(screen.getByRole('button', { name: 'Add card' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
   };
   addCard('Lightning Bolt');
   addCard('Colossal Dreadmaw');

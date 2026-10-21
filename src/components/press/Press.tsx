@@ -1,8 +1,9 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import LoadingCard from '../cards/LoadingCard';
+import BackToTopButton from './BackToTopButton';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
 import PressActions from './PressActions';
@@ -24,6 +25,8 @@ const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
 const RENDER_TIMEOUT_MS = 10000;
 
 const Press = () => {
+  // The back to top button shows once the search form is scrolled away
+  const searchFormRef = useRef<HTMLDivElement>(null);
   const [cardVariant] = useSetting('cardVariant');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const [inkLevel] = useSetting('inkLevel');
@@ -67,52 +70,56 @@ const Press = () => {
 
   return (
     <>
-      <CardSearchForm onAddCards={handleAddCards} />
+      <div ref={searchFormRef} className="container">
+        <CardSearchForm onAddCards={handleAddCards} />
+      </div>
       {cardSheets.length > 0 && <PressActions onClear={handleClear} onExport={handleExport} />}
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
         {cardSheets.map((sheet, sheetNumber) => (
           <section key={sheetNumber} className={`press-page ${cardCorners}-corners`}>
-            <div className="press-sheet">
-              {sheet.map((item, position) => (
-                <SheetSlot
-                  key={sheetKeys[sheetNumber][position]}
-                  collectionIndex={item.collectionIndex}
-                  face={item.kind === 'face' ? item.sheetFace : 'single'}
-                  cardName={
-                    item.kind === 'loading' ? 'loading card' : item.kind === 'face' ? item.face.name : item.card.name
-                  }
-                >
-                  {item.kind === 'loading' ? (
-                    <LoadingCard />
-                  ) : item.kind === 'faces' ? (
-                    <DualCard
-                      cardStyle={cardVariant}
-                      faces={item.faces}
-                      blackBordered={cardBorder === 'full'}
-                      outlined={cardBorder === 'outline'}
-                      roundedCorners={cardCorners === 'rounded'}
-                      inkLevel={inkLevel}
-                      customPalette={customPalette}
-                      artFidelity={artFidelity}
-                      ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
-                    />
-                  ) : (
-                    <Card
-                      cardStyle={cardVariant}
-                      face={item.face}
-                      subFace={item.subFace}
-                      subFacePosition={item.subFacePosition}
-                      blackBordered={cardBorder === 'full'}
-                      outlined={cardBorder === 'outline'}
-                      roundedCorners={cardCorners === 'rounded'}
-                      inkLevel={inkLevel}
-                      customPalette={customPalette}
-                      artFidelity={artFidelity}
-                      ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
-                    />
-                  )}
-                </SheetSlot>
-              ))}
+            <div className="press-sheet-scroller">
+              <div className="press-sheet">
+                {sheet.map((item, position) => (
+                  <SheetSlot
+                    key={sheetKeys[sheetNumber][position]}
+                    collectionIndex={item.collectionIndex}
+                    face={item.kind === 'face' ? item.sheetFace : 'single'}
+                    cardName={
+                      item.kind === 'loading' ? 'loading card' : item.kind === 'face' ? item.face.name : item.card.name
+                    }
+                  >
+                    {item.kind === 'loading' ? (
+                      <LoadingCard />
+                    ) : item.kind === 'faces' ? (
+                      <DualCard
+                        cardStyle={cardVariant}
+                        faces={item.faces}
+                        blackBordered={cardBorder === 'full'}
+                        outlined={cardBorder === 'outline'}
+                        roundedCorners={cardCorners === 'rounded'}
+                        inkLevel={inkLevel}
+                        customPalette={customPalette}
+                        artFidelity={artFidelity}
+                        ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
+                      />
+                    ) : (
+                      <Card
+                        cardStyle={cardVariant}
+                        face={item.face}
+                        subFace={item.subFace}
+                        subFacePosition={item.subFacePosition}
+                        blackBordered={cardBorder === 'full'}
+                        outlined={cardBorder === 'outline'}
+                        roundedCorners={cardCorners === 'rounded'}
+                        inkLevel={inkLevel}
+                        customPalette={customPalette}
+                        artFidelity={artFidelity}
+                        ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
+                      />
+                    )}
+                  </SheetSlot>
+                ))}
+              </div>
             </div>
             <footer className="press-page-footer">
               Page {sheetNumber + 1} of {cardSheets.length}
@@ -120,6 +127,7 @@ const Press = () => {
           </section>
         ))}
       </CardOverlayProvider>
+      <BackToTopButton watched={searchFormRef} />
     </>
   );
 };

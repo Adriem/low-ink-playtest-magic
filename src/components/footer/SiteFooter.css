@@ -1,0 +1,17 @@
+/* At the bottom of the page, small, centered and in gray */
+.site-footer {
+  max-width: 750px;
+  margin: 0 auto;
+  padding: 1.5rem 20px;
+  text-align: center;
+  font-size: 0.875rem;
+  color: gray;
+}
+
+.site-footer p {
+  margin: 0.25rem 0;
+}
+
+.site-footer a {
+  color: inherit;
+}

@@ -7,6 +7,11 @@ vi.mock('./adapters/scryfall', () => ({
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
+test('renders the footer, with where to report issues', () => {
+  render(<App />);
+  expect(screen.getByRole('link', { name: 'Report here' })).toBeInTheDocument();
+});
+
 test('renders the card search form', () => {
   render(<App />);
   expect(screen.getByPlaceholderText(/colossal dreadmaw/i)).toBeInTheDocument();

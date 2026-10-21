@@ -1,7 +1,8 @@
 import { useMemo, useState, type ChangeEvent, type FormEvent } from 'react';
 import Card from '../cards/Card';
+import DualCard from '../cards/DualCard';
 import type { ArtFidelity, CardStyle, InkLevel } from '../cards/styles';
-import { getSubCardPosition } from '../../domain/cards';
+import { getSubCardPosition, type CardFace } from '../../domain/cards';
 import { isColorSymbol, type ColorSymbol } from '../../domain/colors';
 import useCardData from './useCardData';
 import Reference from './Reference';
@@ -41,9 +42,10 @@ const Workbench = () => {
   const [artFidelity, setArtFidelity] = useSetting('artFidelity');
 
   const { card, referenceImageUrl, loading, error } = useCardData(cardName);
-  // The colors picked override the face's, to try the color treatments
-  const face = useMemo(
-    () => card && (cardColors ? { ...card.mainFace, colors: cardColors } : card.mainFace),
+  // The colors picked override the face's, and the other half's of split cards, to try the color treatments
+  const face = useMemo(() => card && withColors(card.mainFace, cardColors), [card, cardColors]);
+  const splitHalf = useMemo(
+    () => card?.layout === 'split' && card.secondaryFace && withColors(card.secondaryFace, cardColors),
     [card, cardColors],
   );
 
@@ -88,16 +90,27 @@ const Workbench = () => {
               <Reference imageUrl={referenceImageUrl} />
             </div>
 
-            <Card
-              cardStyle={cardVariant}
-              face={face}
-              subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
-              subFacePosition={getSubCardPosition(card)}
-              blackBordered={blackBordered}
-              inkLevel={inkLevel}
-              customPalette={customPalette}
-              artFidelity={artFidelity}
-            />
+            {/* Split cards have both halves on their front, so they're drawn together, as in the press */}
+            {splitHalf ? (
+              <DualCard
+                cardStyle={cardVariant}
+                faces={[face, splitHalf]}
+                inkLevel={inkLevel}
+                customPalette={customPalette}
+                artFidelity={artFidelity}
+              />
+            ) : (
+              <Card
+                cardStyle={cardVariant}
+                face={face}
+                subFace={getSubCardPosition(card) ? card.secondaryFace : undefined}
+                subFacePosition={getSubCardPosition(card)}
+                blackBordered={blackBordered}
+                inkLevel={inkLevel}
+                customPalette={customPalette}
+                artFidelity={artFidelity}
+              />
+            )}
           </div>
         )}
       </div>
@@ -177,6 +190,13 @@ const Workbench = () => {
       </div>
     </>
   );
+};
+
+/**
+ * A face with the colors picked instead of its own, if any.
+ */
+const withColors = (face: CardFace, colors: ColorSymbol[] | null): CardFace => {
+  return colors ? { ...face, colors } : face;
 };
 
 export default Workbench;

@@ -10,7 +10,6 @@
   },
   "press": {
     "page_number": "Page {{page}} of {{pages}}",
-    "card_load_error": "Could not load \"{{cardName}}\": {{message}}",
     "back_to_top": "Back to top"
   },
   "press_actions": {
@@ -146,5 +145,10 @@
     "description": "The press broke while showing your cards. Reloading may fix it. If it doesn't, resetting deletes your card list and settings, and starts over.",
     "reload": "Reload",
     "reset": "Reset and reload"
+  },
+  "card_load_errors": {
+    "message_one": "Couldn't add this card. Check its spelling, or try again:",
+    "message_other": "Couldn't add these {{count}} cards. Check their spelling, or try again:",
+    "dismiss": "Dismiss"
   }
 }

@@ -134,6 +134,52 @@ test('shows a placeholder while a card is loading', () => {
   expect(screen.getByRole('status')).toHaveTextContent('Loading card details');
 });
 
+test('reports the cards that could not be added all at once, until the next ones are added', async () => {
+  vi.mocked(fetchCard).mockImplementation((cardName) =>
+    cardName === 'Colossal Dreadmaw' ? Promise.resolve(singleCard) : Promise.reject(new Error('Not found')),
+  );
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
+
+  fireEvent.click(screen.getByLabelText('card list'));
+  fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
+    target: { value: 'Lightnig Bolt\nColossal Dreadmaw\n2 Counterspel' },
+  });
+  fireEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+
+  const notice = await screen.findByRole('alert');
+  await waitFor(() => expect(notice).toHaveTextContent("Couldn't add these 2 cards"));
+  expect(
+    within(notice)
+      .getAllByRole('listitem')
+      .map((item) => item.textContent),
+  ).toEqual(['Lightnig Bolt', 'Counterspel']);
+  expect(await screen.findByText('Colossal Dreadmaw')).toBeInTheDocument();
+
+  fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Colossal Dreadmaw' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Add cards' }));
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+});
+
+test('dismisses the cards that could not be added', async () => {
+  vi.mocked(fetchCard).mockRejectedValue(new Error('Not found'));
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
+
+  fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightnig Bolt' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent("Couldn't add this card");
+
+  fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }));
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+});
+
 test('shows a card that loads while a card added before it is still loading', async () => {
   vi.mocked(fetchCard).mockImplementation((cardName) =>
     cardName === 'Lightning Bolt' ? new Promise(() => {}) : Promise.resolve(singleCard),

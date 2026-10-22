@@ -46,6 +46,18 @@ test('adds a list of cards in order, ignoring empty lines', async () => {
   expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt', 'Counterspell', 'Island']);
 });
 
+test('adds the cards of lists exported by deck builders', async () => {
+  const onAddCards = setupForm();
+
+  await user.click(screen.getByLabelText('card list'));
+  fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
+    target: { value: '2 Lightning Bolt (STA) 42\n\nSB: 1 Duress (STA) 28 *F*' },
+  });
+  await user.click(screen.getByRole('button', { name: 'Add cards' }));
+
+  expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt', 'Lightning Bolt', 'Duress']);
+});
+
 test('clears the card list after adding it', async () => {
   setupForm();
 

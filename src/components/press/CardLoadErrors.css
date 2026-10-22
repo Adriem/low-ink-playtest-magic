@@ -1,0 +1,13 @@
+.card-load-errors {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  border: 2px solid #a03;
+}
+
+.card-load-errors p {
+  margin: 0;
+}
+
+.card-load-errors ul {
+  margin: 0.5rem 0;
+}

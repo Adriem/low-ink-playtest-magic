@@ -1,0 +1,8 @@
+.app-error {
+  padding: 2rem 0;
+}
+
+.app-error-actions {
+  display: flex;
+  gap: 0.5rem;
+}

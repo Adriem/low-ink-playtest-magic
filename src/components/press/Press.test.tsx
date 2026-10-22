@@ -6,6 +6,7 @@ import { exportToPDF } from '../../adapters/jspdf';
 import { fetchCard } from '../../adapters/scryfall';
 import type { CardFace } from '../../domain/cards';
 import { overrideFlag, testCard, testFace } from '../../testUtils';
+import { loadFromStorage, saveToStorage } from '../../utils/storage';
 
 // jsdom has no canvas drawing, so card components are replaced with their name and a blank canvas (titled with its art fidelity)
 vi.mock('../cards/Card', () => ({
@@ -90,7 +91,7 @@ afterEach(() => {
 test('numbers the pages below each sheet', () => {
   // 9 cards fit in a sheet, so 10 cards need two
   const cards = Array.from({ length: 10 }, (_, i) => testCard({ name: `Card ${i}`, multiverseIds: [String(i)] }));
-  sessionStorage.setItem('press:cardCollection', JSON.stringify(cards));
+  saveToStorage('sessionStorage', 'press:CARD_COLLECTION@1', cards);
   render(
     <SettingsContextProvider>
       <Press />
@@ -102,8 +103,8 @@ test('numbers the pages below each sheet', () => {
 });
 
 test('draws the art with the art fidelity setting only with its flag on, else with the include art one', () => {
-  sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard]));
-  localStorage.setItem('press:settings', JSON.stringify({ artFidelity: 'contours', includeArt: 'no-filter' }));
+  saveToStorage('sessionStorage', 'press:CARD_COLLECTION@1', [singleCard]);
+  saveToStorage('localStorage', 'press:SETTINGS@1', { artFidelity: 'contours', includeArt: 'no-filter' });
   render(
     <SettingsContextProvider>
       <Press />
@@ -183,7 +184,7 @@ describe('exporting', () => {
       pageSize: 'letter',
       fileName: 'my-deck',
     });
-    expect(JSON.parse(localStorage.getItem('press:exportOptions') ?? '{}')).toEqual({
+    expect(loadFromStorage('localStorage', 'press:EXPORT_OPTIONS@1', {})).toEqual({
       pageSize: 'letter',
       fileName: 'my-deck',
     });
@@ -212,7 +213,7 @@ describe('exporting', () => {
   test('exports the cards of every sheet, including ones with the same key in different sheets', async () => {
     // Without multiverse IDs, the cards of each sheet are keyed by their position in it
     const cards = Array.from({ length: 10 }, (_, i) => testCard({ name: `Card ${i}` }));
-    sessionStorage.setItem('press:cardCollection', JSON.stringify(cards));
+    saveToStorage('sessionStorage', 'press:CARD_COLLECTION@1', cards);
     render(
       <SettingsContextProvider>
         <Press />
@@ -501,7 +502,7 @@ const pressWithKeyboard = (button: Element) => {
 
 const renderPress = () => {
   // Double-faced cards are shown as separate faces by default
-  sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard, doubleFacedCard]));
+  saveToStorage('sessionStorage', 'press:CARD_COLLECTION@1', [singleCard, doubleFacedCard]);
   const { container } = render(
     <SettingsContextProvider>
       <Press />

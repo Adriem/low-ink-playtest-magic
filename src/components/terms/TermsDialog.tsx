@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFlag } from '../../hooks/useFlag';
-import { loadFromStorage, saveToStorage } from '../../utils/storage';
+import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { Popup } from '../popup';
 
 import './TermsDialog.css';
 
-/** Local storage key the version of the terms the user agreed to is saved in */
-const TERMS_STORAGE_KEY = 'press:termsAccepted';
-/** Version of the terms: raising it when they change asks everyone to agree to them again */
-const TERMS_VERSION = 1;
+/**
+ * Local storage key of whether the user agreed to the terms. Bumping its
+ * version when they change asks everyone to agree to them again.
+ */
+const TERMS_STORAGE_KEY: StorageKey = 'press:TERMS_ACCEPTED@1';
 
 /**
  * Terms of use, which users agree to before using the app (where the
@@ -20,7 +21,7 @@ const TermsDialog = () => {
   const [hasAgreed, setHasAgreed] = useState(loadHasAgreed);
 
   const handleAgree = () => {
-    saveToStorage(localStorage, TERMS_STORAGE_KEY, TERMS_VERSION);
+    saveToStorage('localStorage', TERMS_STORAGE_KEY, true);
     setHasAgreed(true);
   };
 
@@ -30,7 +31,7 @@ const TermsDialog = () => {
 };
 
 const loadHasAgreed = (): boolean => {
-  return loadFromStorage<number>(localStorage, TERMS_STORAGE_KEY, 0) === TERMS_VERSION;
+  return loadFromStorage<boolean>('localStorage', TERMS_STORAGE_KEY, false) === true;
 };
 
 /** The terms, in a popup that only closes by agreeing to them */

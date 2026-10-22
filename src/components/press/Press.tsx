@@ -18,11 +18,11 @@ import { whenRendered } from '../cards/common/canvasRendering';
 import { useCardCollection } from '../../hooks/useCardCollection';
 import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
-import { loadFromStorage, saveToStorage } from '../../utils/storage';
+import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
 import i18n from '../../i18n';
 
-const CARD_COLLECTION_STORAGE_KEY = 'press:cardCollection';
+const CARD_COLLECTION_STORAGE_KEY: StorageKey = 'press:CARD_COLLECTION@1';
 
 // Maximum time to wait for cards to finish rendering (e.g. slow images)
 const RENDER_TIMEOUT_MS = 10000;
@@ -54,7 +54,7 @@ const Press = () => {
 
   useEffect(() => {
     const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
-    saveToStorage(sessionStorage, CARD_COLLECTION_STORAGE_KEY, loadedCards);
+    saveToStorage('sessionStorage', CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
 
   const handleAddCards = useCallback(
@@ -151,7 +151,7 @@ const exportCardsToPdf = async (canvases: HTMLCanvasElement[], options: PdfExpor
 };
 
 const loadPersistedCards = () => {
-  return loadFromStorage<CollectionCard[]>(sessionStorage, CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
+  return loadFromStorage<CollectionCard[]>('sessionStorage', CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
 };
 
 // TODO: Replace alert with a toast notification

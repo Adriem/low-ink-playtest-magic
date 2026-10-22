@@ -1,14 +1,14 @@
 import { useState, type ChangeEvent, type FormEvent, type MouseEvent, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DEFAULT_PDF_EXPORT_OPTIONS, type PageSize, type PdfExportOptions } from '../../adapters/jspdf';
-import { loadFromStorage, saveToStorage } from '../../utils/storage';
+import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isRecord } from '../../utils/object';
 import { Popup } from '../popup';
 
 import './ExportPanel.css';
 
 /** Local storage key the last export options are saved in, as a JSON object */
-const EXPORT_OPTIONS_STORAGE_KEY = 'press:exportOptions';
+const EXPORT_OPTIONS_STORAGE_KEY: StorageKey = 'press:EXPORT_OPTIONS@1';
 
 /** Page sizes, with the keys of their labels in the texts of the app */
 const PAGE_SIZE_OPTIONS: { value: PageSize; label: string }[] = [
@@ -40,7 +40,7 @@ const ExportPanel = ({
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    saveToStorage(localStorage, EXPORT_OPTIONS_STORAGE_KEY, options);
+    saveToStorage('localStorage', EXPORT_OPTIONS_STORAGE_KEY, options);
     onExport(options);
     event.currentTarget.closest('dialog')?.close();
   };
@@ -96,7 +96,7 @@ const ExportPanel = ({
  * saved or isn't valid.
  */
 const loadExportOptions = (): PdfExportOptions => {
-  const saved = loadFromStorage<Record<string, unknown>>(localStorage, EXPORT_OPTIONS_STORAGE_KEY, {}, isRecord);
+  const saved = loadFromStorage<Record<string, unknown>>('localStorage', EXPORT_OPTIONS_STORAGE_KEY, {}, isRecord);
   const pageSize = PAGE_SIZE_OPTIONS.find(({ value }) => value === saved.pageSize);
   return {
     pageSize: pageSize?.value ?? DEFAULT_PDF_EXPORT_OPTIONS.pageSize,

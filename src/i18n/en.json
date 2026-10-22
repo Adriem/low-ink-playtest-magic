@@ -140,5 +140,11 @@
     "agreement": "By using this app, you agree to these terms of use.",
     "agree": "I understand and agree",
     "continue": "Continue"
+  },
+  "app_error": {
+    "title": "Something went wrong",
+    "description": "The press broke while showing your cards. Reloading may fix it. If it doesn't, resetting deletes your card list and settings, and starts over.",
+    "reload": "Reload",
+    "reset": "Reset and reload"
   }
 }

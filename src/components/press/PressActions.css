@@ -33,6 +33,10 @@
 
 .press-actions .clear {
   margin-right: auto;
+}
+
+.press-actions .clear,
+.clear-panel .clear {
   font-weight: bold;
   color: #a03;
 }

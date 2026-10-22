@@ -236,6 +236,30 @@ describe('exporting', () => {
     });
   });
 
+  test('does not export while cards are loading', async () => {
+    vi.mocked(fetchCard).mockReturnValue(new Promise(() => {}));
+    renderPress();
+
+    fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightning Bolt' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(screen.getByRole('button', { name: 'EXPORT' })).toBeDisabled();
+  });
+
+  test('says it is exporting until it is done, and reports errors', async () => {
+    const alert = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    vi.mocked(exportToPDF).mockImplementationOnce(() => {
+      throw new Error('Out of memory');
+    });
+    renderPress();
+
+    exportPress();
+
+    expect(screen.getByRole('button', { name: 'EXPORTING…' })).toBeDisabled();
+    await waitFor(() => expect(alert).toHaveBeenCalledWith("Couldn't export the cards: Out of memory"));
+    expect(screen.getByRole('button', { name: 'EXPORT' })).toBeEnabled();
+    alert.mockRestore();
+  });
+
   test('does not export when canceling', async () => {
     renderPress();
 

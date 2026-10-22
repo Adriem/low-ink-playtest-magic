@@ -2,6 +2,8 @@
 
 Print Magic: The Gathering™ proxies that use as little ink as possible.
 
+The cards are exported to a PDF. Print it at actual size (100%), not "Fit to page", so the cards come out the size of real ones.
+
 ## Scripts
 
 Use the Node version in `.nvmrc` (e.g. with `nvm use`), the one CI and deploys use.

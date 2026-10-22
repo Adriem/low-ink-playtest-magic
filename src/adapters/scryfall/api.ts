@@ -3,7 +3,6 @@ import semaphore from 'semaphore';
 import type { Card } from '../../domain/cards';
 import { toCard } from './toCard';
 import type { ScryfallCard, ScryfallSymbology } from './types';
-import i18n from '../../i18n';
 
 const SCRYFALL_API_URL = 'https://api.scryfall.com';
 // Scryfall asks to space requests at least 50-100ms apart
@@ -46,8 +45,6 @@ export const fetchSymbology = async (): Promise<ScryfallSymbology> => {
 
   if (!response.ok) {
     const error = await response.json();
-    // TODO: Replace alert with a toast notification
-    alert(i18n.t('errors.symbology', { reason: error.details }));
     throw new Error(error.details);
   }
 

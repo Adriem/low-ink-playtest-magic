@@ -8,12 +8,13 @@ beforeEach(() => {
 });
 
 test('adds a single card by name', async () => {
-  const onAddCards = setupForm();
+  const { onAddCard, onAddCards } = setupForm();
 
   await user.type(screen.getByPlaceholderText(/colossal dreadmaw/i), '  Lightning Bolt ');
   await user.click(screen.getByRole('button', { name: 'Add' }));
 
-  expect(onAddCards).toHaveBeenCalledWith(['Lightning Bolt']);
+  expect(onAddCard).toHaveBeenCalledWith('Lightning Bolt');
+  expect(onAddCards).not.toHaveBeenCalled();
 });
 
 test('clears the card name after adding it', async () => {
@@ -27,15 +28,15 @@ test('clears the card name after adding it', async () => {
 });
 
 test('does not add anything for an empty name', async () => {
-  const onAddCards = setupForm();
+  const { onAddCard } = setupForm();
 
   await user.click(screen.getByRole('button', { name: 'Add' }));
 
-  expect(onAddCards).not.toHaveBeenCalled();
+  expect(onAddCard).not.toHaveBeenCalled();
 });
 
 test('adds a list of cards in order, ignoring empty lines', async () => {
-  const onAddCards = setupForm();
+  const { onAddCards } = setupForm();
 
   await user.click(screen.getByLabelText('card list'));
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
@@ -47,7 +48,7 @@ test('adds a list of cards in order, ignoring empty lines', async () => {
 });
 
 test('adds the cards of lists exported by deck builders', async () => {
-  const onAddCards = setupForm();
+  const { onAddCards } = setupForm();
 
   await user.click(screen.getByLabelText('card list'));
   fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), {
@@ -92,7 +93,7 @@ describe('card list shortcut', () => {
   };
 
   test('submits the list with Ctrl+Enter', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
     const textarea = await fillCardList('Lightning Bolt\nCounterspell');
 
     fireEvent.keyDown(textarea, { key: 'Enter', ctrlKey: true });
@@ -102,7 +103,7 @@ describe('card list shortcut', () => {
   });
 
   test('submits the list with Cmd+Enter', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
     const textarea = await fillCardList('Lightning Bolt');
 
     fireEvent.keyDown(textarea, { key: 'Enter', metaKey: true });
@@ -111,7 +112,7 @@ describe('card list shortcut', () => {
   });
 
   test('does not submit the list with Enter alone', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
     const textarea = await fillCardList('Lightning Bolt');
 
     fireEvent.keyDown(textarea, { key: 'Enter' });
@@ -130,7 +131,7 @@ describe('quantities', () => {
   };
 
   test('adds as many copies as the quantity of each line in the list', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
 
     await submitCardList('2 Lightning Bolt\n3x Counterspell\n1X Colossal Dreadmaw\nIsland');
 
@@ -146,7 +147,7 @@ describe('quantities', () => {
   });
 
   test('treats numbers too big to be a quantity as part of the card name', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
 
     await submitCardList('1996 World Champion\n2 1996 World Champion');
 
@@ -154,7 +155,7 @@ describe('quantities', () => {
   });
 
   test('rejects a list with a quantity of 0 without adding or clearing it', async () => {
-    const onAddCards = setupForm();
+    const { onAddCards } = setupForm();
 
     const textarea = await submitCardList('Island\n0 Lightning Bolt');
 
@@ -174,7 +175,8 @@ describe('quantities', () => {
 });
 
 const setupForm = () => {
+  const onAddCard = vi.fn();
   const onAddCards = vi.fn();
-  render(<CardSearchForm onAddCards={onAddCards} />);
-  return onAddCards;
+  render(<CardSearchForm onAddCard={onAddCard} onAddCards={onAddCards} />);
+  return { onAddCard, onAddCards };
 };

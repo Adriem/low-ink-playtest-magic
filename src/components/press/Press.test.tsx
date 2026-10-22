@@ -3,7 +3,7 @@ import type { RefCallback } from 'react';
 import Press from './Press';
 import { SettingsContextProvider } from '../settings';
 import { exportToPDF } from '../../adapters/jspdf';
-import { fetchCard } from '../../adapters/scryfall';
+import { fetchCard, fetchCollection } from '../../adapters/scryfall';
 import type { CardFace } from '../../domain/cards';
 import { overrideFlag, testCard, testFace } from '../../testUtils';
 import { loadFromStorage, saveToStorage } from '../../utils/storage';
@@ -44,6 +44,7 @@ vi.mock('../../adapters/jspdf', async (importOriginal) => ({
 }));
 vi.mock('../../adapters/scryfall', () => ({
   fetchCard: vi.fn(),
+  fetchCollection: vi.fn(),
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
@@ -141,8 +142,9 @@ test('shows a placeholder while a card is loading', () => {
 });
 
 test('reports the cards that could not be added all at once, until the next ones are added', async () => {
-  vi.mocked(fetchCard).mockImplementation((cardName) =>
-    cardName === 'Colossal Dreadmaw' ? Promise.resolve(singleCard) : Promise.reject(new Error('Not found')),
+  // Lists are fetched together, each card or why it couldn't be
+  vi.mocked(fetchCollection).mockImplementation(async (cardNames) =>
+    cardNames.map((cardName) => (cardName === 'Colossal Dreadmaw' ? singleCard : new Error('Not found'))),
   );
   render(
     <SettingsContextProvider>

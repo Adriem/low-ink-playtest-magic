@@ -25,7 +25,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
   - `error/` (the app's error boundary), `footer/`, `workbench/` (development only, left out of production builds).
 - `src/hooks/`: the card collection, sheets, card lookups.
 - `src/i18n/`: the texts (`en.json`) and the i18next setup.
-- `src/utils/`: small generic helpers (storage, arrays, objects, layout).
+- `src/utils/`: small generic helpers (storage, arrays, objects, layout, a throttled queue).
 - `src/testUtils.ts`: test helpers (`testCard`, `testFace`, `deferred`). Only tests may import it.
 
 Keep the root of `src/` as clean as possible: new modules go in the folders above.
@@ -64,8 +64,8 @@ Keep the root of `src/` as clean as possible: new modules go in the folders abov
 ## Scryfall
 
 - The API is public, with no key, and is called from the browser: Scryfall rate-limits by IP, so each user has their own limit. Don't add a server in between.
-- Card lookups are limited to 2 a second, and going over gets the client blocked (HTTP 429). Look cards up in batches (`/cards/collection`, up to 75 per request) and keep requests spaced.
-- Send `Accept: application/json`. Images (`cards.scryfall.io`) aren't rate-limited.
+- Card lookups are limited to 2 a second, and going over gets the client blocked for 30 seconds (HTTP 429). `adapters/scryfall/api.ts` takes care of it: a card added on its own is one request (`fetchCard`, `/cards/named`), a card list is one request per 75 cards (`fetchCollection`, `/cards/collection`), requests are 500 ms apart (a queue from `utils/throttledQueue.ts`), and 429s are retried next, once the block ends. Call Scryfall through it, never with `fetch` directly.
+- Requests send `Accept: application/json`. Images (`cards.scryfall.io`) aren't rate-limited, and `loadImage` loads each one once.
 
 ## Legal constraints
 

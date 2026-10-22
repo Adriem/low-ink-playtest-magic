@@ -2,7 +2,7 @@
 // (finishRender, whenRendered) for testing-library's render
 /* eslint-disable testing-library/render-result-naming-convention */
 import { deferred } from '../../../testUtils';
-import { beginRender, drawWhenLoaded, finishRender, whenRendered } from './canvasRendering';
+import { beginRender, drawWhenLoaded, finishRender, whenRendered, loadImage } from './canvasRendering';
 
 test('marks the canvas as rendered once its drawings finish', async () => {
   const { canvas, ctx } = setupCanvas();
@@ -138,3 +138,49 @@ const setupCanvas = () => {
   };
   return { canvas, ctx: ctx as unknown as CanvasRenderingContext2D & { currentTransform: string } };
 };
+
+describe('loadImage', () => {
+  // jsdom doesn't load images: they load or fail as they're told, once their source is set
+  let failingSources: string[] = [];
+  const createdSources: string[] = [];
+
+  beforeEach(() => {
+    vi.stubGlobal(
+      'Image',
+      class {
+        onload?: () => void;
+        onerror?: (error: unknown) => void;
+        crossOrigin = '';
+
+        set src(src: string) {
+          createdSources.push(src);
+          setTimeout(() => (failingSources.includes(src) ? this.onerror?.(new Error(src)) : this.onload?.()));
+        }
+      },
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    failingSources = [];
+    createdSources.length = 0;
+  });
+
+  test('loads each image once, however many times it is drawn', async () => {
+    const first = loadImage('https://example.com/once.png');
+    const second = loadImage('https://example.com/once.png');
+
+    expect(second).toBe(first);
+    await first;
+    expect(createdSources).toEqual(['https://example.com/once.png']);
+  });
+
+  test('tries images that failed to load again', async () => {
+    failingSources = ['https://example.com/flaky.png'];
+    await expect(loadImage('https://example.com/flaky.png')).rejects.toThrow();
+
+    failingSources = [];
+    await expect(loadImage('https://example.com/flaky.png')).resolves.toBeDefined();
+    expect(createdSources).toEqual(['https://example.com/flaky.png', 'https://example.com/flaky.png']);
+  });
+});

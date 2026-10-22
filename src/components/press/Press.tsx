@@ -52,10 +52,11 @@ const Press = () => {
     setFailedCardNames((names) => (names.includes(cardName) ? names : [...names, cardName]));
   }, []);
 
-  const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection, editCardAt } = useCardCollection({
-    initialCards: loadPersistedCards,
-    onCardLoadError: handleCardLoadError,
-  });
+  const { cardCollection, addCardByName, addCardsByName, removeCardAt, moveCard, clearCollection, editCardAt } =
+    useCardCollection({
+      initialCards: loadPersistedCards,
+      onCardLoadError: handleCardLoadError,
+    });
   // Collection card whose art is being edited, in a popup, and that card as edited, which is drawn meanwhile
   const [artOverrideIndex, setArtOverrideIndex] = useState<number | null>(null);
   const [artOverridePreview, setArtOverridePreview] = useState<CardModel | null>(null);
@@ -79,12 +80,20 @@ const Press = () => {
     saveToStorage('sessionStorage', CARD_COLLECTION_STORAGE_KEY, loadedCards);
   }, [cardCollection]);
 
+  const handleAddCard = useCallback(
+    (cardName: string) => {
+      setFailedCardNames([]);
+      addCardByName(cardName);
+    },
+    [addCardByName],
+  );
+
   const handleAddCards = useCallback(
     (cardNames: string[]) => {
       setFailedCardNames([]);
-      cardNames.forEach((cardName) => addCardByName(cardName));
+      addCardsByName(cardNames);
     },
-    [addCardByName],
+    [addCardsByName],
   );
 
   const handleCardLoadErrorsDismiss = useCallback(() => {
@@ -126,7 +135,7 @@ const Press = () => {
   return (
     <>
       <div ref={searchFormRef} className="container">
-        <CardSearchForm onAddCards={handleAddCards} />
+        <CardSearchForm onAddCard={handleAddCard} onAddCards={handleAddCards} />
         {failedCardNames.length > 0 && (
           <CardLoadErrors cardNames={failedCardNames} onDismiss={handleCardLoadErrorsDismiss} />
         )}

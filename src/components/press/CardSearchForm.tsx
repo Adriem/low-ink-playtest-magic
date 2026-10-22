@@ -9,9 +9,16 @@ type SearchModeChangeHandler = (multipleSearch: boolean) => void;
 /**
  * Search form to add cards by name, either one at a time or as a list.
  *
- * @param props.onAddCards - Called with the card names to add, in order
+ * @param props.onAddCard - Called with the name of a card added on its own
+ * @param props.onAddCards - Called with the names of the cards of a list, in order
  */
-const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => void }) => {
+const CardSearchForm = ({
+  onAddCard,
+  onAddCards,
+}: {
+  onAddCard: (cardName: string) => void;
+  onAddCards: (cardNames: string[]) => void;
+}) => {
   const { t } = useTranslation();
   const [multipleSearch, setMultipleSearch] = useState(false);
 
@@ -27,7 +34,6 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
       const getValue = (name: string) => {
         return String(formData.get(name) ?? '');
       };
-      let cardNames;
 
       if (multipleSearch) {
         const cardList = getField('cardNamesList');
@@ -40,17 +46,17 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
           return;
         }
 
-        cardNames = entries.flatMap(({ cardName, quantity }) => repeatCardName(cardName, quantity));
+        const cardNames = entries.flatMap(({ cardName, quantity }) => repeatCardName(cardName, quantity));
+        if (cardNames.length > 0) onAddCards(cardNames);
       } else {
-        cardNames = [getValue('cardName').trim()].filter(Boolean);
+        const cardName = getValue('cardName').trim();
+        if (cardName) onAddCard(cardName);
       }
-
-      if (cardNames.length > 0) onAddCards(cardNames);
 
       // The input starts over after adding the cards, so it's ready for the next ones
       getField(multipleSearch ? 'cardNamesList' : 'cardName').value = '';
     },
-    [multipleSearch, onAddCards, t],
+    [multipleSearch, onAddCard, onAddCards, t],
   );
 
   const handleSearchModeChange = useCallback((multiple: boolean) => {

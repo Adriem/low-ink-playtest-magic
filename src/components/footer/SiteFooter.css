@@ -6,12 +6,20 @@
   text-align: center;
   font-size: 0.875rem;
   color: gray;
+  border-top: 1px lightgray solid;
 }
 
 .site-footer p {
   margin: 0.25rem 0;
 }
 
+/* Fine print, above the copyright notice */
+.site-footer .site-footer-disclaimer {
+  margin-bottom: 0.75rem;
+  font-size: 0.8rem;
+  text-wrap: balance;
+}
+
 .site-footer a {
-  color: inherit;
+  color: dodgerblue;
 }

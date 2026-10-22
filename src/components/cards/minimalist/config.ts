@@ -51,3 +51,13 @@ export const SUBCARD_ORACLE_FONT_SIZE = 22;
 export const LOYALTY_BOX_X = 430;
 export const LOYALTY_BOX_Y = 675;
 export const LOYALTY_BOX_SCALE = 1.2;
+
+/**
+ * Where the card's footer starts, how wide it is, left of the stats and
+ * loyalty boxes, the baseline of its bottom line, and its font size when it
+ * fits
+ */
+export const FOOTER_X = 45;
+export const FOOTER_WIDTH = 335;
+export const FOOTER_Y = 682;
+export const FOOTER_MAX_FONT_SIZE = 13;

@@ -1,6 +1,7 @@
 import { testCard, testFace } from '../testUtils';
 import {
   computeCardColors,
+  getArtists,
   getDefense,
   getLoyalty,
   getPowerAndToughness,
@@ -47,4 +48,14 @@ test('gets the stats of a face', () => {
   expect(getPowerAndToughness(planeswalker)).toBeUndefined();
   expect(getDefense(testFace({ name: 'Invasion of Ravnica', stats: { defense: '4' } }))).toBe('4');
   expect(getDefense(planeswalker)).toBeUndefined();
+});
+
+test('credits the artists of faces each once, joined with " & "', () => {
+  const byGuay = testFace({ name: 'Front', artist: 'Rebecca Guay' });
+  const byMartin = testFace({ name: 'Back', artist: 'David Martin' });
+
+  expect(getArtists([byGuay, byMartin])).toBe('Rebecca Guay & David Martin');
+  expect(getArtists([byGuay, testFace({ name: 'Back', artist: 'Rebecca Guay' })])).toBe('Rebecca Guay');
+  expect(getArtists([byGuay, testFace({ name: 'Back' })])).toBe('Rebecca Guay');
+  expect(getArtists([testFace({ name: 'Front' })])).toBeUndefined();
 });

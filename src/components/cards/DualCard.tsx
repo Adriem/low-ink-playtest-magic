@@ -8,7 +8,7 @@ import {
   CARD_WIDTH,
   getCardStyle,
   type ArtFidelity,
-  type CardRenderer,
+  type CardContentsRenderer,
   type CardRenderProps,
   type CustomPalette,
   type InkLevel,
@@ -55,7 +55,13 @@ const DualCard = ({
     },
     [ref],
   );
-  const { render, palette: defaultPalette, isDrawnSideways, separatesHalves } = getCardStyle(cardStyle);
+  const {
+    renderCardContents,
+    renderFooter,
+    palette: defaultPalette,
+    isDrawnSideways,
+    separatesHalves,
+  } = getCardStyle(cardStyle);
   const { PAPER: paper, LINE: line } = resolvePalette(defaultPalette, customPalette);
   const [face1, face2] = faces;
 
@@ -66,7 +72,7 @@ const DualCard = ({
 
     beginRender(canvas);
     const faceCanvases = [face1, face2].map((face) =>
-      renderFace(render, { face, blackBordered, inkLevel, artFidelity, customPalette, unified: true }),
+      renderFace(renderCardContents, { face, blackBordered, inkLevel, artFidelity, customPalette, unified: true }),
     );
 
     // Combining the faces is part of this render, so it's skipped if a newer
@@ -99,12 +105,22 @@ const DualCard = ({
         ctx.fillStyle = line;
         ctx.fillRect(0, HALF_HEIGHT - HALVES_SEPARATOR_WIDTH / 2, CARD_WIDTH, HALVES_SEPARATOR_WIDTH);
       }
+      // Like the frame, the footer is drawn once for both halves: below the half that reads upright (e.g. a
+      // battle), if there's one, or else along the bottom of the card turned to read its halves
+      renderFooter(ctx, {
+        faces: [face1, face2],
+        placement: isDrawnSideways(face1) || isDrawnSideways(face2) ? 'upright-half' : 'right-side',
+        blackBordered,
+        artFidelity,
+        customPalette,
+      });
       drawCardFrame(ctx, { outlined, roundedCorners }, line);
     });
     void finishRender(canvas);
   }, [
     canvas,
-    render,
+    renderCardContents,
+    renderFooter,
     isDrawnSideways,
     separatesHalves,
     paper,
@@ -161,7 +177,7 @@ const drawRotatedCW = (
 /**
  * Draw a face on its own off-screen canvas.
  */
-const renderFace = (render: CardRenderer, props: CardRenderProps): HTMLCanvasElement => {
+const renderFace = (renderCardContents: CardContentsRenderer, props: CardRenderProps): HTMLCanvasElement => {
   const faceCanvas = document.createElement('canvas');
   faceCanvas.width = CARD_WIDTH;
   faceCanvas.height = CARD_HEIGHT;
@@ -169,7 +185,7 @@ const renderFace = (render: CardRenderer, props: CardRenderProps): HTMLCanvasEle
   setDisplayScale(faceCanvas, HALF_HEIGHT / CARD_WIDTH);
 
   beginRender(faceCanvas);
-  render(faceCanvas, props);
+  renderCardContents(faceCanvas, props);
   return faceCanvas;
 };
 

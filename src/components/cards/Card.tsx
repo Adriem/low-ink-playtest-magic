@@ -34,19 +34,23 @@ const Card = ({
     },
     [ref],
   );
-  const { render, palette: defaultPalette } = getCardStyle(cardStyle);
+  const { renderCardContents, renderFooter, palette: defaultPalette } = getCardStyle(cardStyle);
   const line = resolvePalette(defaultPalette, customPalette).LINE;
 
   useEffect(() => {
     if (canvas == null) return;
 
+    const ctx = get2dContext(canvas);
+
     beginRender(canvas);
-    render(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette });
-    drawCardFrame(get2dContext(canvas), { outlined, roundedCorners }, line);
+    renderCardContents(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette });
+    renderFooter(ctx, { faces: [face], placement: 'card-bottom', blackBordered, artFidelity, customPalette });
+    drawCardFrame(ctx, { outlined, roundedCorners }, line);
     void finishRender(canvas);
   }, [
     canvas,
-    render,
+    renderCardContents,
+    renderFooter,
     line,
     face,
     subFace,

@@ -25,11 +25,12 @@ import { MINIMALIST_PALETTE, type MinimalistPalette } from './palette';
 import { get2dContext } from '../common/canvasRendering';
 
 /**
- * Draw a card in the minimalist style on a canvas.
+ * Draw the contents of a card in the minimalist style on a canvas: all but
+ * its footer and frame.
  *
  * @param canvas - 500x700 canvas
  */
-export const renderMinimalistCard = (
+export const renderMinimalistCardContents = (
   canvas: HTMLCanvasElement,
   { face, subFace, subFacePosition, blackBordered, inkLevel = 'medium', customPalette, unified }: CardRenderProps,
 ) => {

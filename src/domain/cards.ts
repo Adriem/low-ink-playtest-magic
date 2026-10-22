@@ -24,6 +24,8 @@ export type CardFace = {
   colors: ColorSymbol[];
   stats?: { power: string; toughness: string } | { loyalty: string } | { defense: string };
   art: { assetUrl?: string; crop: ArtCrop };
+  /** Who illustrated the face's art, to credit them on the card */
+  artist?: string;
 };
 
 export type Card = {
@@ -75,4 +77,13 @@ export const getLoyalty = (cardFace: CardFace) => {
 
 export const getDefense = (cardFace: CardFace) => {
   return cardFace.stats && 'defense' in cardFace.stats ? cardFace.stats.defense : undefined;
+};
+
+/**
+ * The artists of faces, joined with " & " when they're not the same (e.g.
+ * "David Martin & Franz Vohwinkel"), so each is credited once.
+ */
+export const getArtists = (cardFaces: CardFace[]): string | undefined => {
+  const artists = [...new Set(cardFaces.map((cardFace) => cardFace.artist).filter(Boolean))];
+  return artists.length > 0 ? artists.join(' & ') : undefined;
 };

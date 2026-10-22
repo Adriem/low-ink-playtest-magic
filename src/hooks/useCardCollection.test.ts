@@ -157,6 +157,22 @@ const cardNames = (collection: CollectionCard[]) => {
 };
 
 // The hook's latest result, as `collection.current`
+test('edits the card at an index, leaving the other cards and placeholders as they are', () => {
+  const placeholder = { loading: true as const, loadingCardId: 7 };
+  const collection = setupCollection({
+    initialCards: [testCard({ name: 'A' }), testCard({ name: 'B' }), placeholder],
+  });
+
+  act(() => collection.current.editCardAt(1, (card) => ({ ...card, set: 'edited' })));
+  act(() => collection.current.editCardAt(2, (card) => ({ ...card, set: 'edited' })));
+
+  expect(collection.current.cardCollection).toEqual([
+    testCard({ name: 'A' }),
+    testCard({ name: 'B', set: 'edited' }),
+    placeholder,
+  ]);
+});
+
 const setupCollection = (options: Parameters<typeof useCardCollection>[0] = {}) => {
   return renderHook(() => useCardCollection(options)).result;
 };

@@ -38,7 +38,8 @@
     "move_down": "Move down",
     "delete": "Delete",
     "dismiss": "Dismiss",
-    "close": "Close"
+    "close": "Close",
+    "edit_art": "Edit art"
   },
   "loading_card": "Loading card details",
   "popup": {
@@ -161,5 +162,22 @@
     "message": "Clear the press? All its cards will be removed.",
     "cancel": "Cancel",
     "clear": "Clear"
+  },
+  "art_override": {
+    "title": "Edit art",
+    "mode": "Images",
+    "unified": "Unified",
+    "unified_hint": "One image with the arts of both faces side by side, like the card's own.",
+    "split": "Split",
+    "split_hint": "An image for each face. Leave one empty to keep that face's own art.",
+    "url": "Image URL",
+    "face_url": "Image URL of {{face}}",
+    "artist": "Artist",
+    "artist_placeholder": "Unknown",
+    "fidelity": "Art fidelity",
+    "clear": "Clear",
+    "cancel": "Cancel",
+    "save": "Save",
+    "load_error": "Couldn't load an image. It may not exist, or its site may not let other sites use it."
   }
 }

@@ -6,6 +6,7 @@ import {
   type LoadingCard,
 } from '../domain/press';
 import { useFetchCard } from './useFetchCard';
+import type { Card } from '../domain/cards';
 
 interface CardCollectionOptions {
   /** Cards to start with, or a function that returns them (called once) */
@@ -63,5 +64,15 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
     setCardCollection([]);
   }, []);
 
-  return { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection };
+  /**
+   * Change the card at an index, e.g. to override its art. Placeholders of
+   * cards still loading can't be edited.
+   */
+  const editCardAt = useCallback((index: number, edit: (card: Card) => Card) => {
+    setCardCollection((collection) =>
+      collection.map((card, i) => (i !== index || isLoadingCard(card) ? card : edit(card))),
+    );
+  }, []);
+
+  return { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection, editCardAt };
 };

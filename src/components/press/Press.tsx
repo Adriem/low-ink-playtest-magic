@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import LoadingCard from '../cards/LoadingCard';
+import ArtOverridePanel from './ArtOverridePanel';
 import BackToTopButton from './BackToTopButton';
 import CardLoadErrors from './CardLoadErrors';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
 import PressActions from './PressActions';
 import SheetSlot from './SheetSlot';
-import { useSetting, useCardPalette } from '../settings';
+import { useSetting, useCardPalette, isSettingAvailable } from '../settings';
 import { useFlag } from '../../hooks/useFlag';
 
 import './Press.css';
@@ -21,6 +22,7 @@ import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
 import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
+import type { Card as CardModel } from '../../domain/cards';
 import i18n from '../../i18n';
 
 const CARD_COLLECTION_STORAGE_KEY: StorageKey = 'press:CARD_COLLECTION@1';
@@ -50,11 +52,19 @@ const Press = () => {
     setFailedCardNames((names) => (names.includes(cardName) ? names : [...names, cardName]));
   }, []);
 
-  const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
+  const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection, editCardAt } = useCardCollection({
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,
   });
-  const cardSheets = useCardSheet(cardCollection, { doubleFacedCardTreatment });
+  // Collection card whose art is being edited, in a popup, and that card as edited, which is drawn meanwhile
+  const [artOverrideIndex, setArtOverrideIndex] = useState<number | null>(null);
+  const [artOverridePreview, setArtOverridePreview] = useState<CardModel | null>(null);
+  const cardOfArtOverride = artOverrideIndex == null ? undefined : cardCollection[artOverrideIndex];
+  const drawnCollection = useMemo(() => {
+    if (artOverrideIndex == null || !artOverridePreview) return cardCollection;
+    return cardCollection.map((card, index) => (index === artOverrideIndex ? artOverridePreview : card));
+  }, [cardCollection, artOverrideIndex, artOverridePreview]);
+  const cardSheets = useCardSheet(drawnCollection, { doubleFacedCardTreatment });
   // Keys of the items of each sheet, by sheet
   const sheetKeys = cardSheets.map((sheet, sheetNumber) =>
     sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),
@@ -85,6 +95,24 @@ const Press = () => {
     clearCollection();
   }, [clearCollection]);
 
+  const handleOverrideArt = useCallback((collectionIndex: number) => {
+    setArtOverrideIndex(collectionIndex);
+  }, []);
+
+  const handleArtOverrideSave = (card: CardModel) => {
+    if (artOverrideIndex != null) editCardAt(artOverrideIndex, () => card);
+  };
+
+  const handleArtOverridePreview = useCallback((card: CardModel) => {
+    setArtOverridePreview(card);
+  }, []);
+
+  // Changes not saved are discarded
+  const handleArtOverrideClose = () => {
+    setArtOverrideIndex(null);
+    setArtOverridePreview(null);
+  };
+
   // The canvases of the cards in the sheets, in order (loading cards have none)
   const handleExport = (options: PdfExportOptions) => {
     const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
@@ -111,7 +139,13 @@ const Press = () => {
           onExport={handleExport}
         />
       )}
-      <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
+      <CardOverlayProvider
+        collectionSize={cardCollection.length}
+        moveCard={moveCard}
+        removeCardAt={removeCardAt}
+        // Only cards drawn with art can have their art overridden
+        onOverrideArt={isSettingAvailable('artFidelity', cardVariant) ? handleOverrideArt : undefined}
+      >
         {cardSheets.map((sheet, sheetNumber) => (
           <section key={sheetNumber} className={`press-page ${cardCorners}-corners`}>
             <div className="press-sheet-scroller">
@@ -136,7 +170,7 @@ const Press = () => {
                         roundedCorners={cardCorners === 'rounded'}
                         inkLevel={inkLevel}
                         customPalette={customPalette}
-                        artFidelity={artFidelity}
+                        defaultArtFidelity={artFidelity}
                         ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                       />
                     ) : (
@@ -150,7 +184,7 @@ const Press = () => {
                         roundedCorners={cardCorners === 'rounded'}
                         inkLevel={inkLevel}
                         customPalette={customPalette}
-                        artFidelity={artFidelity}
+                        defaultArtFidelity={artFidelity}
                         ref={cardCanvases.refFor(sheetKeys[sheetNumber][position])}
                       />
                     )}
@@ -164,6 +198,15 @@ const Press = () => {
           </section>
         ))}
       </CardOverlayProvider>
+      {cardOfArtOverride && !isLoadingCard(cardOfArtOverride) && (
+        <ArtOverridePanel
+          key={artOverrideIndex}
+          card={cardOfArtOverride}
+          onPreview={handleArtOverridePreview}
+          onSave={handleArtOverrideSave}
+          onClose={handleArtOverrideClose}
+        />
+      )}
       <BackToTopButton watched={searchFormRef} />
     </>
   );

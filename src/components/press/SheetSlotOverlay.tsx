@@ -21,6 +21,8 @@ interface OverlayControlsProps extends MoveButtonsProps {
   mode: OverlayMode;
   onStartMove: () => void;
   onDelete: () => void;
+  /** Shows the "Edit art" button, where cards are drawn with art */
+  onOverrideArt?: () => void;
   /** "Dismiss" in the menu and "Close" in the move submenu */
   onDismiss: ClickHandler;
   onDangerChange: (danger: boolean) => void;
@@ -92,7 +94,7 @@ const SheetSlotOverlay = ({
 
 /**
  * Controls of the overlay, depending on its mode:
- * - `hover` (mouse or pen): "Move..." and "Delete"
+ * - `hover` (mouse or pen): "Move...", "Edit art" and "Delete"
  * - `move-submenu` (after "Move..."): the move buttons and "Close"
  * - `menu` (tap or keyboard): all the actions at once, plus "Dismiss"
  */
@@ -105,6 +107,7 @@ const OverlayControls = ({
   onMoveUp,
   onMoveDown,
   onDelete,
+  onOverrideArt,
   onDismiss,
   onDangerChange,
 }: OverlayControlsProps) => {
@@ -119,6 +122,7 @@ const OverlayControls = ({
             onMoveUp={onMoveUp}
             onMoveDown={onMoveDown}
           />
+          {onOverrideArt && <EditArtButton hidden={hidden} onClick={onOverrideArt} />}
           <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
           <hr className="sheet-slot-overlay-separator" />
           <DismissButton hidden={hidden} onClick={onDismiss} />
@@ -144,6 +148,7 @@ const OverlayControls = ({
       return (
         <>
           {(canMoveUp || canMoveDown) && <MoveSubmenuButton hidden={hidden} onClick={onStartMove} />}
+          {onOverrideArt && <EditArtButton hidden={hidden} onClick={onOverrideArt} />}
           <DeleteButton hidden={hidden} mode={mode} onClick={onDelete} onDangerChange={onDangerChange} />
         </>
       );
@@ -156,6 +161,16 @@ const MoveSubmenuButton = ({ hidden, onClick }: { hidden: boolean; onClick: () =
   return (
     <OverlayButton className="sheet-slot-overlay-start-move" hidden={hidden} onClick={onClick}>
       <i className="fa fa-arrows-alt-h" /> {t('card_overlay.move')}
+    </OverlayButton>
+  );
+};
+
+const EditArtButton = ({ hidden, onClick }: { hidden: boolean; onClick: () => void }) => {
+  const { t } = useTranslation();
+
+  return (
+    <OverlayButton className="sheet-slot-overlay-edit-art" hidden={hidden} onClick={onClick}>
+      <i className="fa fa-image" /> {t('card_overlay.edit_art')}
     </OverlayButton>
   );
 };

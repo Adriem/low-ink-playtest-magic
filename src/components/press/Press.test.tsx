@@ -12,16 +12,21 @@ import { loadFromStorage, saveToStorage } from '../../utils/storage';
 vi.mock('../cards/Card', () => ({
   default: ({
     face,
-    artFidelity,
+    defaultArtFidelity,
     ref,
   }: {
     face: CardFace;
-    artFidelity: string;
+    defaultArtFidelity: string;
     ref?: RefCallback<HTMLCanvasElement>;
   }) => (
     <div>
       {face.name}
-      <canvas ref={ref} data-name={face.name} title={`Art fidelity: ${artFidelity}`} />
+      <canvas
+        ref={ref}
+        data-name={face.name}
+        title={`Art fidelity: ${defaultArtFidelity}`}
+        aria-label={face.artOverride && `Art of ${face.artOverride.url}`}
+      />
     </div>
   ),
 }));
@@ -52,13 +57,14 @@ const doubleFacedCard = testCard({
   secondaryFace: testFace({ name: 'Back' }),
 });
 
-// jsdom has no modal dialogs, so opening one only shows it, and closing it hides it
+// jsdom has no modal dialogs, so opening one only shows it, and closing it hides it and says so
 beforeAll(() => {
   HTMLDialogElement.prototype.showModal = function () {
     this.open = true;
   };
   HTMLDialogElement.prototype.close = function () {
     this.open = false;
+    this.dispatchEvent(new Event('close'));
   };
 });
 
@@ -316,6 +322,40 @@ describe('hovering with a mouse', () => {
     expect(screen.getAllByRole('button', { name: /delete/i })).toHaveLength(2);
     expect(screen.queryByRole('button', { name: /move (up|down)/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /dismiss/i })).not.toBeInTheDocument();
+  });
+
+  test('offers to override the art of cards, opening a popup to do it', async () => {
+    const { slots } = renderPress();
+    hover(slots[0]);
+
+    fireEvent.click(screen.getAllByRole('button', { name: /edit art/i })[0]);
+
+    expect(await screen.findByRole('textbox', { name: 'Image URL', hidden: true })).toBeInTheDocument();
+  });
+
+  test('draws the card with its art as it is edited, until the popup closes without saving it', async () => {
+    const { slots } = renderPress();
+    hover(slots[0]);
+    fireEvent.click(screen.getAllByRole('button', { name: /edit art/i })[0]);
+
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Image URL', hidden: true }), {
+      target: { value: 'https://example.com/art.png' },
+    });
+
+    expect(screen.getByLabelText('Art of https://example.com/art.png')).toBeInTheDocument();
+
+    // Only the popup open is a dialog, as closed ones are hidden
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));
+
+    expect(screen.queryByLabelText('Art of https://example.com/art.png')).not.toBeInTheDocument();
+  });
+
+  test('does not offer to override the art in styles without art', () => {
+    saveToStorage('localStorage', 'press:SETTINGS@1', { cardVariant: 'minimalist' });
+    const { slots } = renderPress();
+    hover(slots[0]);
+
+    expect(screen.queryByRole('button', { name: /edit art/i })).not.toBeInTheDocument();
   });
 
   test('hovering the delete button turns all the faces red', () => {

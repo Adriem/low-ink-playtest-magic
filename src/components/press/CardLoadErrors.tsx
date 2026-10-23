@@ -14,15 +14,20 @@ const CardLoadErrors = ({ cardNames, onDismiss }: { cardNames: string[]; onDismi
 
   return (
     <div className="card-load-errors" role="alert">
+      <button
+        type="button"
+        className="card-load-errors-dismiss"
+        aria-label={t('card_load_errors.dismiss')}
+        onClick={onDismiss}
+      >
+        ×
+      </button>
       <p>{t('card_load_errors.message', { count: cardNames.length })}</p>
       <ul>
         {cardNames.map((cardName) => (
           <li key={cardName}>{cardName}</li>
         ))}
       </ul>
-      <button type="button" className="card-load-errors-dismiss" onClick={onDismiss}>
-        {t('card_load_errors.dismiss')}
-      </button>
     </div>
   );
 };

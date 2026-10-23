@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent, { type UserEvent } from '@testing-library/user-event';
 import SettingsPanel from './SettingsPanel';
 import { SettingsContextProvider, useCardPalette } from './SettingsContext';
+import { overrideFlag } from '../../testUtils';
 
 let user: UserEvent;
 
@@ -9,6 +10,8 @@ afterEach(() => localStorage.clear());
 
 beforeEach(() => {
   user = userEvent.setup();
+  // The slider, as in development (some tests turn it off)
+  overrideFlag('ART_FIDELITY_SLIDER', true);
 });
 
 test('shows a group of options for each setting, with the defaults selected', () => {
@@ -43,7 +46,7 @@ test('picks the ink level', async () => {
   expect(getSavedSettings().inkLevel).toBe('high');
 });
 
-test('picks the art fidelity with a slider through its levels', () => {
+test('picks the art fidelity with a slider through its levels, with its flag on', () => {
   renderPanel();
   const slider = screen.getByRole('slider', { name: 'Art fidelity', hidden: true });
 
@@ -58,6 +61,35 @@ test('picks the art fidelity with a slider through its levels', () => {
   fireEvent.change(slider, { target: { value: '0' } });
 
   expect(getSavedSettings().artFidelity).toBe('blank');
+  expect(screen.queryByLabelText('Include card art')).not.toBeInTheDocument();
+});
+
+describe('without the art fidelity slider', () => {
+  beforeEach(() => {
+    overrideFlag('ART_FIDELITY_SLIDER', false);
+  });
+
+  test('includes the card art or not, with a checkbox in its own group', async () => {
+    renderPanel();
+    const includeArt = screen.getByLabelText('Include card art');
+
+    expect(screen.queryByRole('slider', { name: 'Art fidelity', hidden: true })).not.toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Card art', hidden: true })).toContainElement(includeArt);
+    expect(includeArt).toBeChecked();
+
+    await user.click(includeArt);
+
+    expect(includeArt).not.toBeChecked();
+    expect(getSavedSettings().includeArt).toBe('blank');
+  });
+
+  test('disables the card art for the minimalist style, which has no art', async () => {
+    renderPanel();
+
+    await user.click(screen.getByLabelText('Minimalist'));
+
+    expect(screen.getByLabelText('Include card art')).toBeDisabled();
+  });
 });
 
 test('disables the art fidelity for the minimalist style, which has no art', async () => {
@@ -123,6 +155,7 @@ test('restores the default of every setting', async () => {
     doubleFacedCardTreatment: 'separate',
     inkLevel: 'medium',
     artFidelity: 'posterized',
+    includeArt: 'no-filter',
     cardBorder: 'outline',
     cardCorners: 'rounded',
   });

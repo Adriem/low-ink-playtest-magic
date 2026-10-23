@@ -22,7 +22,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
   - `press/`: the page: search form, sheets, card overlays (move, delete…), actions bar, export.
   - `settings/`: settings (style, ink level, art fidelity, borders, palettes), in a context saved to local storage.
   - `popup/`: `Popup`, the modal used by every popup.
-  - `footer/`, `workbench/` (development only, left out of production builds).
+  - `error/` (the app's error boundary), `footer/`, `workbench/` (development only, left out of production builds).
 - `src/hooks/`: the card collection, sheets, card lookups.
 - `src/i18n/`: the texts (`en.json`) and the i18next setup.
 - `src/utils/`: small generic helpers (storage, arrays, objects, layout).
@@ -51,7 +51,8 @@ Keep the root of `src/` as clean as possible: new modules go in the folders abov
 
 ### Data
 
-- Saved data goes through `src/utils/storage.ts` (`loadFromStorage`, `saveToStorage`), with keys prefixed `press:`. The card list is in session storage, settings and palettes in local storage.
+- Saved data goes through `src/utils/storage.ts` (`loadFromStorage`, `saveToStorage`), with keys prefixed `press:`. The card list is in session storage, settings and palettes in local storage. Keys are typed `StorageKey`, UPPER_CASE with the version of their data's shape (`press:SETTINGS@1`): bump a key's version when a change to its data's shape can't read what older releases saved (that data is then dropped). The version is saved with the data, not in the key, so old data is replaced rather than left behind. Storage may be unavailable, which the helpers handle.
+- An error boundary around the app offers to reload, or to reset the saved data, instead of a blank page.
 - Feature flags (`src/utils/flags.ts`, defined in `src/config.ts` as `Features`): UPPER_CASE names, each with a `Toggle` (`ON`, `OFF`, `ON_PROD_ONLY`, `ON_DEV_ONLY`). Read them from `window.flags`, or with `useFlag` in components. They can be changed from the browser's console (`flags.SOME_FLAG = true`). Tests start with every flag off and use `overrideFlag` from `testUtils`.
 
 ### Tests

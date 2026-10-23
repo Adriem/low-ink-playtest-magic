@@ -3,6 +3,7 @@ import userEvent, { type UserEvent } from '@testing-library/user-event';
 import SettingsPanel from './SettingsPanel';
 import { SettingsContextProvider, useCardPalette } from './SettingsContext';
 import { overrideFlag } from '../../testUtils';
+import { loadFromStorage, saveToStorage } from '../../utils/storage';
 
 let user: UserEvent;
 
@@ -105,7 +106,7 @@ test('disables the art fidelity for the minimalist style, which has no art', asy
 });
 
 test('loads the saved settings, with the defaults for missing and unknown values', () => {
-  localStorage.setItem('press:settings', JSON.stringify({ cardVariant: 'minimalist', inkLevel: 'unknown' }));
+  saveToStorage('localStorage', 'press:SETTINGS@1', { cardVariant: 'minimalist', inkLevel: 'unknown' });
 
   renderPanel();
 
@@ -139,10 +140,11 @@ test('rounds the corners of the cards with a checkbox, in the card border group'
 });
 
 test('restores the default of every setting', async () => {
-  localStorage.setItem(
-    'press:settings',
-    JSON.stringify({ cardVariant: 'minimalist', inkLevel: 'high', artFidelity: 'contours' }),
-  );
+  saveToStorage('localStorage', 'press:SETTINGS@1', {
+    cardVariant: 'minimalist',
+    inkLevel: 'high',
+    artFidelity: 'contours',
+  });
   renderPanel();
 
   await user.click(screen.getByRole('button', { name: 'Restore defaults', hidden: true }));
@@ -175,12 +177,12 @@ describe('palettes', () => {
     fireEvent.input(redPicker(), { target: { value: '#ff0000' } });
 
     expect(drawnRed()).toBe('#ff0000');
-    expect(localStorage.getItem('press:palette:realistic')).toBeNull();
+    expect(localStorage.getItem('press:PALETTE_REALISTIC')).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Save', hidden: true }));
 
     expect(drawnRed()).toBe('#ff0000');
-    expect(JSON.parse(localStorage.getItem('press:palette:realistic') ?? '{}')).toMatchObject({ RED: '#ff0000' });
+    expect(loadFromStorage('localStorage', 'press:PALETTE_REALISTIC@1', {})).toMatchObject({ RED: '#ff0000' });
   });
 
   test('discards the changes not saved when the popup closes', async () => {
@@ -190,7 +192,7 @@ describe('palettes', () => {
     fireEvent(screen.getByRole('dialog', { hidden: true }), new Event('close'));
 
     expect(drawnRed()).toBe('default');
-    expect(localStorage.getItem('press:palette:realistic')).toBeNull();
+    expect(localStorage.getItem('press:PALETTE_REALISTIC')).toBeNull();
     await user.click(screen.getByRole('button', { name: 'Edit Realistic palette', hidden: true }));
     expect(redPicker().value).toBe('#d30e0e');
   });
@@ -209,8 +211,8 @@ describe('palettes', () => {
     fireEvent.input(redPicker(), { target: { value: '#ff0000' } });
     await user.click(screen.getByRole('button', { name: 'Save', hidden: true }));
 
-    expect(JSON.parse(localStorage.getItem('press:palette:realistic') ?? '{}')).toMatchObject({ RED: '#ff0000' });
-    expect(localStorage.getItem('press:palette:minimalist')).toBeNull();
+    expect(loadFromStorage('localStorage', 'press:PALETTE_REALISTIC@1', {})).toMatchObject({ RED: '#ff0000' });
+    expect(localStorage.getItem('press:PALETTE_MINIMALIST')).toBeNull();
     expect(screen.getByRole('group', { name: 'Realistic palette', hidden: true })).toBeInTheDocument();
     expect(redPicker().value).toBe('#ff0000');
     expect(screen.queryByTitle('Changed')).not.toBeInTheDocument();
@@ -238,23 +240,23 @@ describe('palettes', () => {
     await user.click(screen.getByRole('button', { name: '← Back', hidden: true }));
 
     expect(screen.getByRole('group', { name: 'Ink level', hidden: true })).toBeInTheDocument();
-    expect(localStorage.getItem('press:palette:realistic')).toBeNull();
+    expect(localStorage.getItem('press:PALETTE_REALISTIC')).toBeNull();
   });
 
   test('restores the default colors of a palette, to save them', async () => {
-    localStorage.setItem('press:palette:realistic', JSON.stringify({ RED: '#ff0000' }));
+    saveToStorage('localStorage', 'press:PALETTE_REALISTIC@1', { RED: '#ff0000' });
     await editRealisticPalette();
 
     await user.click(screen.getByRole('button', { name: 'Restore defaults', hidden: true }));
 
     expect(redPicker().value).toBe('#d30e0e');
     expect(screen.getAllByTitle('Changed')).toHaveLength(1);
-    expect(JSON.parse(localStorage.getItem('press:palette:realistic') ?? '{}')).toEqual({ RED: '#ff0000' });
+    expect(loadFromStorage('localStorage', 'press:PALETTE_REALISTIC@1', {})).toEqual({ RED: '#ff0000' });
   });
 });
 
 const getSavedSettings = () => {
-  return JSON.parse(localStorage.getItem('press:settings') ?? '{}');
+  return loadFromStorage<Record<string, unknown>>('localStorage', 'press:SETTINGS@1', {});
 };
 
 const renderPanel = () => {

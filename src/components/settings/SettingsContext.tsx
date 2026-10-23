@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { ArtFidelity, CardStyle, CustomPalette, InkLevel } from '../cards/styles';
 import type { CardTreatment } from '../../domain/press';
-import { loadFromStorage, saveToStorage } from '../../utils/storage';
+import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isRecord } from '../../utils/object';
 
 /** The value of each setting */
@@ -30,10 +30,13 @@ export type CardCorners = 'rounded' | 'square';
 export type SettingName = keyof Settings;
 
 /** Local storage key the settings are saved in, as a JSON object */
-const SETTINGS_STORAGE_KEY = 'press:settings';
+const SETTINGS_STORAGE_KEY: StorageKey = 'press:SETTINGS@1';
 
-/** Local storage key prefix each card style's palette is saved in, as a JSON object of its colors */
-const PALETTE_STORAGE_KEY_PREFIX = 'press:palette:';
+/** Local storage key each card style's palette is saved in, as a JSON object of its colors */
+const PALETTE_STORAGE_KEYS: Record<CardStyle, StorageKey> = {
+  realistic: 'press:PALETTE_REALISTIC@1',
+  minimalist: 'press:PALETTE_MINIMALIST@1',
+};
 
 export interface SettingDefinition<T extends string> {
   /** Key of the setting's name in the texts of the app (`src/i18n`), as are its options' labels */
@@ -178,7 +181,7 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
   const savePalette = useCallback((cardStyle: CardStyle, palette: CustomPalette) => {
     setPalettes((prev) => ({ ...prev, [cardStyle]: palette }));
     setPalettePreviews((prev) => withoutPreview(prev, cardStyle));
-    saveToStorage(localStorage, PALETTE_STORAGE_KEY_PREFIX + cardStyle, palette);
+    saveToStorage('localStorage', PALETTE_STORAGE_KEYS[cardStyle], palette);
   }, []);
 
   // The preview of a card style's palette, or of every one
@@ -187,7 +190,7 @@ export const SettingsContextProvider = ({ children }: { children: ReactNode }) =
   }, []);
 
   useEffect(() => {
-    saveToStorage(localStorage, SETTINGS_STORAGE_KEY, settings);
+    saveToStorage('localStorage', SETTINGS_STORAGE_KEY, settings);
   }, [settings]);
 
   return (
@@ -224,10 +227,7 @@ const loadPalettes = (): Record<CardStyle, CustomPalette> => {
   const cardStyles = SETTINGS_DEFINITIONS.cardVariant.options.map(({ value }) => value);
   return Object.fromEntries(
     cardStyles.map((cardStyle) => {
-      return [
-        cardStyle,
-        loadFromStorage<CustomPalette>(localStorage, PALETTE_STORAGE_KEY_PREFIX + cardStyle, {}, isRecord),
-      ];
+      return [cardStyle, loadFromStorage<CustomPalette>('localStorage', PALETTE_STORAGE_KEYS[cardStyle], {}, isRecord)];
     }),
   ) as Record<CardStyle, CustomPalette>;
 };
@@ -252,7 +252,7 @@ const getDefaultSettings = (): Settings => {
  * one of its options.
  */
 const loadInitialSettings = (): Settings => {
-  const saved = loadFromStorage<Record<string, unknown>>(localStorage, SETTINGS_STORAGE_KEY, {}, isRecord);
+  const saved = loadFromStorage<Record<string, unknown>>('localStorage', SETTINGS_STORAGE_KEY, {}, isRecord);
   return {
     cardVariant: getSavedSetting(saved, 'cardVariant'),
     doubleFacedCardTreatment: getSavedSetting(saved, 'doubleFacedCardTreatment'),

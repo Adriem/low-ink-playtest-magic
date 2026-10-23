@@ -1,0 +1,25 @@
+/* Centered at the top of the page, where the search form had its room above it */
+.site-header {
+  margin: 6rem 20px 0;
+  text-align: center;
+}
+
+.site-header h1 {
+  margin: 0;
+  /* Carved capitals, with a classic fantasy feel */
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  text-wrap: balance;
+}
+
+/* Less room above it on phones, where the screen is short too, and small enough to fit on one line */
+@media (max-width: 449px) {
+  .site-header {
+    margin-top: 2rem;
+  }
+
+  .site-header h1 {
+    font-size: 1.6rem;
+  }
+}

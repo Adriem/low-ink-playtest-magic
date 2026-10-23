@@ -2,6 +2,7 @@ import '@fortawesome/fontawesome-free/js/all.min.js';
 import { lazy, Suspense } from 'react';
 import Press from './components/press/Press';
 import SiteFooter from './components/footer/SiteFooter';
+import SiteHeader from './components/header/SiteHeader';
 import TermsDialog from './components/terms/TermsDialog';
 
 import { SettingsContextProvider } from './components/settings';
@@ -23,6 +24,7 @@ function App() {
           </Suspense>
         ) : (
           <>
+            <SiteHeader />
             <Press />
             <SiteFooter />
             <TermsDialog />

@@ -1,5 +1,6 @@
 {
-  "name": "low-ink-mtg-press",
+  "name": "low-ink-playtest-magic",
+  "description": "Create ready-to-print, low-ink Magic: The Gathering™ playtest cards.",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

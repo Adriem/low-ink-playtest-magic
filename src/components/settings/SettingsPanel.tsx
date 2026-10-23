@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type ReactNode, type Ref } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFlag } from '../../hooks/useFlag';
 import type { CardStyle } from '../cards/styles';
 import { Popup } from '../popup';
 import {
@@ -70,9 +71,13 @@ const SettingsForm = ({
 }) => {
   const { t } = useTranslation();
 
+  const hasArtFidelitySlider = useFlag('ART_FIDELITY_SLIDER');
+  const hiddenArtSetting: SettingName = hasArtFidelitySlider ? 'includeArt' : 'artFidelity';
+  const names = SETTING_NAMES.filter((name) => !SETTINGS_DEFINITIONS[name].group && name !== hiddenArtSetting);
+
   return (
     <form method="dialog" className="settings-form">
-      {SETTING_NAMES.filter((name) => !SETTINGS_DEFINITIONS[name].group).map((name) =>
+      {names.map((name) =>
         name === 'cardVariant' ? (
           <CardStyleFieldset key={name} onPaletteClick={onPaletteClick} />
         ) : (
@@ -147,7 +152,8 @@ const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: Car
 };
 
 /**
- * Controls to pick the value of a setting: radio buttons, or a slider.
+ * Controls to pick the value of a setting: radio buttons, a slider, or a
+ * checkbox.
  *
  * @param props.children - Controls of other settings shown in its group, below its radio buttons
  */
@@ -169,18 +175,22 @@ const SettingFieldset = <Name extends SettingName>({
   return (
     <fieldset disabled={disabled || definition.disabled}>
       <legend>{t(definition.label)}</legend>
-      {definition.options.map((option) => (
-        <label key={option.value} className="setting-option">
-          <input
-            type="radio"
-            name={name}
-            value={option.value}
-            checked={value === option.value}
-            onChange={() => setValue(option.value)}
-          />
-          {t(option.label)}
-        </label>
-      ))}
+      {definition.control === 'checkbox' ? (
+        <SettingCheckbox name={name} disabled={disabled} />
+      ) : (
+        definition.options.map((option) => (
+          <label key={option.value} className="setting-option">
+            <input
+              type="radio"
+              name={name}
+              value={option.value}
+              checked={value === option.value}
+              onChange={() => setValue(option.value)}
+            />
+            {t(option.label)}
+          </label>
+        ))
+      )}
       {children}
     </fieldset>
   );
@@ -209,7 +219,7 @@ const SettingCheckbox = <Name extends SettingName>({ name, disabled }: { name: N
         disabled={disabled || definition.disabled}
         onChange={handleChange}
       />
-      {t(definition.label)}
+      {t(definition.checkboxLabel ?? definition.label)}
     </label>
   );
 };

@@ -1,18 +1,26 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { RefCallback } from 'react';
 import Press from './Press';
 import { SettingsContextProvider } from '../settings';
 import { exportToPDF } from '../../adapters/jspdf';
 import { fetchCard } from '../../adapters/scryfall';
 import type { CardFace } from '../../domain/cards';
-import { testCard, testFace } from '../../testUtils';
+import { overrideFlag, testCard, testFace } from '../../testUtils';
 
-// jsdom has no canvas drawing, so card components are replaced with their name and a blank canvas
+// jsdom has no canvas drawing, so card components are replaced with their name and a blank canvas (titled with its art fidelity)
 vi.mock('../cards/Card', () => ({
-  default: ({ face, ref }: { face: CardFace; ref?: RefCallback<HTMLCanvasElement> }) => (
+  default: ({
+    face,
+    artFidelity,
+    ref,
+  }: {
+    face: CardFace;
+    artFidelity: string;
+    ref?: RefCallback<HTMLCanvasElement>;
+  }) => (
     <div>
       {face.name}
-      <canvas ref={ref} data-name={face.name} />
+      <canvas ref={ref} data-name={face.name} title={`Art fidelity: ${artFidelity}`} />
     </div>
   ),
 }));
@@ -91,6 +99,24 @@ test('numbers the pages below each sheet', () => {
 
   expect(screen.getByText('Page 1 of 2')).toBeInTheDocument();
   expect(screen.getByText('Page 2 of 2')).toBeInTheDocument();
+});
+
+test('draws the art with the art fidelity setting only with its flag on, else with the include art one', () => {
+  sessionStorage.setItem('press:cardCollection', JSON.stringify([singleCard]));
+  localStorage.setItem('press:settings', JSON.stringify({ artFidelity: 'contours', includeArt: 'no-filter' }));
+  render(
+    <SettingsContextProvider>
+      <Press />
+    </SettingsContextProvider>,
+  );
+
+  expect(screen.getByTitle('Art fidelity: no-filter')).toBeInTheDocument();
+
+  act(() => {
+    overrideFlag('ART_FIDELITY_SLIDER', true);
+  });
+
+  expect(screen.getByTitle('Art fidelity: contours')).toBeInTheDocument();
 });
 
 test('shows a placeholder while a card is loading', () => {

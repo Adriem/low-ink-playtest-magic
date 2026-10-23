@@ -93,6 +93,14 @@
         "square": "Square",
         "rounded": "Rounded"
       }
+    },
+    "include_art": {
+      "label": "Card art",
+      "checkbox": "Include card art",
+      "options": {
+        "blank": "Not included",
+        "no_filter": "Included"
+      }
     }
   },
   "palette_editor": {

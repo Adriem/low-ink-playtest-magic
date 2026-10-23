@@ -10,6 +10,7 @@ export interface Settings {
   doubleFacedCardTreatment: CardTreatment;
   inkLevel: InkLevel;
   artFidelity: ArtFidelity;
+  includeArt: IncludeArt;
   cardBorder: CardBorder;
   cardCorners: CardCorners;
 }
@@ -19,6 +20,9 @@ export interface Settings {
  * border around their content
  */
 export type CardBorder = 'none' | 'outline' | 'full';
+
+/** Whether the cards draw their art (unfiltered) or not, as the art fidelity it's drawn with */
+export type IncludeArt = Extract<ArtFidelity, 'blank' | 'no-filter'>;
 
 /** Whether the cards have rounded or square corners */
 export type CardCorners = 'rounded' | 'square';
@@ -45,6 +49,8 @@ export interface SettingDefinition<T extends string> {
    * for the second
    */
   control?: 'radio' | 'slider' | 'checkbox';
+  /** Key of the checkbox's text, for a checkbox in its own group (whose name is the label) */
+  checkboxLabel?: string;
   /** Setting whose group the setting's checkbox is shown in, below its options */
   group?: SettingName;
   /** Card styles the setting applies to, and is enabled for: all of them, if not given */
@@ -92,6 +98,17 @@ export const SETTINGS_DEFINITIONS: { [Name in SettingName]: SettingDefinition<Se
     default: 'posterized',
     control: 'slider',
     // The minimalist style has no art
+    cardStyles: ['realistic'],
+  },
+  includeArt: {
+    label: 'settings.include_art.label',
+    checkboxLabel: 'settings.include_art.checkbox',
+    options: [
+      { value: 'blank', label: 'settings.include_art.options.blank' },
+      { value: 'no-filter', label: 'settings.include_art.options.no_filter' },
+    ],
+    default: 'no-filter',
+    control: 'checkbox',
     cardStyles: ['realistic'],
   },
   cardBorder: {
@@ -224,6 +241,7 @@ const getDefaultSettings = (): Settings => {
     doubleFacedCardTreatment: SETTINGS_DEFINITIONS.doubleFacedCardTreatment.default,
     inkLevel: SETTINGS_DEFINITIONS.inkLevel.default,
     artFidelity: SETTINGS_DEFINITIONS.artFidelity.default,
+    includeArt: SETTINGS_DEFINITIONS.includeArt.default,
     cardBorder: SETTINGS_DEFINITIONS.cardBorder.default,
     cardCorners: SETTINGS_DEFINITIONS.cardCorners.default,
   };
@@ -240,6 +258,7 @@ const loadInitialSettings = (): Settings => {
     doubleFacedCardTreatment: getSavedSetting(saved, 'doubleFacedCardTreatment'),
     inkLevel: getSavedSetting(saved, 'inkLevel'),
     artFidelity: getSavedSetting(saved, 'artFidelity'),
+    includeArt: getSavedSetting(saved, 'includeArt'),
     cardBorder: getSavedSetting(saved, 'cardBorder'),
     cardCorners: getSavedSetting(saved, 'cardCorners'),
   };

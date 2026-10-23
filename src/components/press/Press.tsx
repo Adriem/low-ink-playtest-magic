@@ -10,6 +10,7 @@ import { CardOverlayProvider } from './CardOverlayContext';
 import PressActions from './PressActions';
 import SheetSlot from './SheetSlot';
 import { useSetting, useCardPalette } from '../settings';
+import { useFlag } from '../../hooks/useFlag';
 
 import './Press.css';
 import { exportToPDF, type PdfExportOptions } from '../../adapters/jspdf';
@@ -30,13 +31,16 @@ const Press = () => {
   const { t } = useTranslation();
   // The back to top button shows once the search form is scrolled away
   const searchFormRef = useRef<HTMLDivElement>(null);
+
   const [cardVariant] = useSetting('cardVariant');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const [inkLevel] = useSetting('inkLevel');
-  const customPalette = useCardPalette(cardVariant);
-  const [artFidelity] = useSetting('artFidelity');
+  const [artFidelity] = useSetting(useFlag('ART_FIDELITY_SLIDER') ? 'artFidelity' : 'includeArt');
   const [cardCorners] = useSetting('cardCorners');
   const [cardBorder] = useSetting('cardBorder');
+
+  const customPalette = useCardPalette(cardVariant);
+
   const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,

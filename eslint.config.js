@@ -31,6 +31,11 @@ export default defineConfig([
       ...jsxA11y.configs.recommended.rules,
       // Props are typed with TypeScript
       'react/prop-types': 'off',
+      // Test helpers stay out of the app (tests turn this off below)
+      'no-restricted-imports': [
+        'error',
+        { patterns: [{ group: ['**/testUtils'], message: 'testUtils is only for tests (*.test.* files).' }] },
+      ],
     },
   },
   {
@@ -41,6 +46,7 @@ export default defineConfig([
     },
     rules: {
       ...testingLibrary.configs['flat/react'].rules,
+      'no-restricted-imports': 'off',
     },
   },
   {

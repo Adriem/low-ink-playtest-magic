@@ -22,7 +22,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
   - `press/`: the page: search form, sheets, card overlays (move, delete…), actions bar, export.
   - `settings/`: settings (style, ink level, art fidelity, borders, palettes), in a context saved to local storage.
   - `popup/`: `Popup`, the modal used by every popup.
-  - `error/` (the app's error boundary), `footer/`, `workbench/` (development only, left out of production builds).
+  - `error/` (the app's error boundary), `header/`, `footer/`, `workbench/` (development only, left out of production builds).
 - `src/hooks/`: the card collection, sheets, card lookups.
 - `src/i18n/`: the texts (`en.json`) and the i18next setup.
 - `src/utils/`: small generic helpers (storage, arrays, objects, layout, a throttled queue).

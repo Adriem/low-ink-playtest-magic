@@ -22,6 +22,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
   - `press/`: the page: search form, sheets, card overlays (move, delete…), actions bar, export.
   - `settings/`: settings (style, ink level, art fidelity, borders, palettes), in a context saved to local storage.
   - `popup/`: `Popup`, the modal used by every popup.
+  - `icons/`: `Icon`, which draws a Font Awesome Free icon (e.g. `faTrash` from `@fortawesome/free-solid-svg-icons`) as an inline SVG.
   - `error/` (the app's error boundary), `header/`, `footer/`, `workbench/` (development only, left out of production builds).
 - `src/hooks/`: the card collection, sheets, card lookups.
 - `src/i18n/`: the texts (`en.json`) and the i18next setup.
@@ -46,6 +47,7 @@ Keep the root of `src/` as clean as possible: new modules go in the folders abov
 
 - Every text the user sees is in `src/i18n/en.json`, with snake_case keys. Components use `useTranslation`; code outside components (e.g. canvas renderers) uses `i18n.t`.
 - Popups use `Popup` (a `<dialog>` opened with `showModal()`), rather than another dialog or its CSS. It takes the dialog's props and passes them down; `dismissible={false}` keeps clicks around it and Escape from closing it.
+- Icons are `Icon`s, imported one by one so only the ones used are bundled. Don't load icon fonts or scripts.
 - Styling is CSS only: if CSS can't do something, don't do it with JavaScript. Buttons are styled consistently (not left to the browser's defaults).
 - Layouts work on phones: no horizontal page scroll; sheets scroll sideways on their own.
 

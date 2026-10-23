@@ -21,6 +21,7 @@ import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
 import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
+import i18n from '../../i18n';
 
 const CARD_COLLECTION_STORAGE_KEY: StorageKey = 'press:CARD_COLLECTION@1';
 
@@ -59,6 +60,9 @@ const Press = () => {
     sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),
   );
   const cardCanvases = useKeyedRefs<HTMLCanvasElement>();
+  const [isExporting, setIsExporting] = useState(false);
+  // Cards still loading have nothing to export yet
+  const isLoadingCards = cardCollection.some(isLoadingCard);
 
   useEffect(() => {
     const loadedCards = cardCollection.filter((card) => !isLoadingCard(card));
@@ -85,7 +89,10 @@ const Press = () => {
   const handleExport = (options: PdfExportOptions) => {
     const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
 
-    void exportCardsToPdf(canvases, options);
+    setIsExporting(true);
+    void exportCardsToPdf(canvases, options)
+      .catch((error: Error) => window.alert(t('press.export_error', { message: error.message })))
+      .finally(() => setIsExporting(false));
   };
 
   return (
@@ -96,7 +103,14 @@ const Press = () => {
           <CardLoadErrors cardNames={failedCardNames} onDismiss={handleCardLoadErrorsDismiss} />
         )}
       </div>
-      {cardSheets.length > 0 && <PressActions onClear={handleClear} onExport={handleExport} />}
+      {cardSheets.length > 0 && (
+        <PressActions
+          canExport={!isExporting && !isLoadingCards}
+          isExporting={isExporting}
+          onClear={handleClear}
+          onExport={handleExport}
+        />
+      )}
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
         {cardSheets.map((sheet, sheetNumber) => (
           <section key={sheetNumber} className={`press-page ${cardCorners}-corners`}>
@@ -161,7 +175,7 @@ const Press = () => {
  */
 const exportCardsToPdf = async (canvases: HTMLCanvasElement[], options: PdfExportOptions) => {
   const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
-  if (rendered.includes(false)) console.warn('Exporting before every card finished rendering');
+  if (rendered.includes(false)) window.alert(i18n.t('press.export_incomplete'));
 
   exportToPDF(canvases, options);
 };

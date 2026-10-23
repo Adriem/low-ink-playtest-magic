@@ -63,4 +63,15 @@ describe('getSymbolImage', () => {
     await expect(getSymbolImage('{Z}')).resolves.toBeUndefined();
     expect(Image).not.toHaveBeenCalled();
   });
+
+  test('fetches the symbols again when fetching them failed, drawing placeholders meanwhile', async () => {
+    vi.resetModules();
+    const api = await import('./api');
+    const { getSymbolImage: getFreshSymbolImage } = await import('./symbology');
+    vi.mocked(api.fetchSymbology).mockRejectedValueOnce(new Error('Offline'));
+
+    await expect(getFreshSymbolImage('{U}')).resolves.toBeUndefined();
+    expect((await getFreshSymbolImage('{U}'))?.src).toBe('blue.svg');
+    expect(api.fetchSymbology).toHaveBeenCalledTimes(2);
+  });
 });

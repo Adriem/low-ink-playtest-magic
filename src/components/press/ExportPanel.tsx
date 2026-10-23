@@ -78,6 +78,7 @@ const ExportPanel = ({
           />
           <span>.pdf</span>
         </fieldset>
+        <p className="print-hint">{t('export_panel.print_hint')}</p>
         <menu>
           <button type="button" onClick={handleCancelClick}>
             {t('export_panel.cancel')}

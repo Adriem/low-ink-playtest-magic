@@ -1,7 +1,10 @@
-// Titles, stats, loyalty and planeswalker/saga text
-export const DISPLAY_FONT_FAMILY = 'Tahoma';
+// Titles, stats, loyalty and planeswalker/saga text. Tahoma and Verdana come
+// with Windows and macOS. Elsewhere (e.g. Android, Linux, ChromeOS), cards are
+// drawn with the closest sans-serif fonts they have, rather than with serifs
+const SANS_SERIF_FALLBACKS = "'DejaVu Sans', 'Noto Sans', Roboto, Arial, sans-serif";
+export const DISPLAY_FONT_FAMILY = `Tahoma, Verdana, ${SANS_SERIF_FALLBACKS}`;
 // Type lines and regular rules text
-export const TEXT_FONT_FAMILY = 'Verdana';
+export const TEXT_FONT_FAMILY = `Verdana, ${SANS_SERIF_FALLBACKS}`;
 
 export const TITLE_Y = 35;
 export const TITLE_HEIGHT = 110;

@@ -10,12 +10,15 @@
   },
   "press": {
     "page_number": "Page {{page}} of {{pages}}",
-    "back_to_top": "Back to top"
+    "back_to_top": "Back to top",
+    "export_error": "Couldn't export the cards: {{message}}",
+    "export_incomplete": "Some cards haven't finished drawing. They may come out blank in the PDF."
   },
   "press_actions": {
     "clear": "Clear",
     "settings": "Settings",
-    "export": "EXPORT"
+    "export": "EXPORT",
+    "exporting": "EXPORTING…"
   },
   "export_panel": {
     "page_size": "Page size",
@@ -25,7 +28,8 @@
     },
     "file_name": "File name",
     "cancel": "Cancel",
-    "export": "Export"
+    "export": "Export",
+    "print_hint": "Print it at actual size (100%), not \"Fit to page\", so the cards come out the size of real ones."
   },
   "card_overlay": {
     "actions_for": "Actions for {{cardName}}",
@@ -130,9 +134,6 @@
     "found_issues": "Found any issues?",
     "report_here": "Report here"
   },
-  "errors": {
-    "symbology": "Could not fetch symbology. Reason: {{reason}}"
-  },
   "terms": {
     "title": "Before you start",
     "personal_use": "The playtest cards you make with this app are for your personal use only. Distributing, selling or trading them is not permitted.",
@@ -155,5 +156,10 @@
     "illustrator": "Illus. {{artist}}",
     "not_for_sale": "NOT FOR SALE",
     "copyright": "™ & © Wizards of the Coast"
+  },
+  "clear_panel": {
+    "message": "Clear the press? All its cards will be removed.",
+    "cancel": "Cancel",
+    "clear": "Clear"
   }
 }

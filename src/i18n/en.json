@@ -1,6 +1,8 @@
 {
   "search_form": {
     "placeholder": "e.g. Colossal Dreadmaw",
+    "card_name_label": "Card name",
+    "card_list_label": "Card list",
     "add": "Add",
     "add_cards": "Add cards",
     "search_mode": "Search mode:",
@@ -10,6 +12,7 @@
   },
   "press": {
     "page_number": "Page {{page}} of {{pages}}",
+    "loading_card": "Loading card",
     "back_to_top": "Back to top",
     "export_error": "Couldn't export the cards: {{message}}",
     "export_incomplete": "Some cards haven't finished drawing. They may come out blank in the PDF."
@@ -17,8 +20,8 @@
   "press_actions": {
     "clear": "Clear",
     "settings": "Settings",
-    "export": "EXPORT",
-    "exporting": "EXPORTING…"
+    "export": "Export",
+    "exporting": "Exporting…"
   },
   "export_panel": {
     "page_size": "Page size",

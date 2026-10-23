@@ -219,19 +219,19 @@ describe('exporting', () => {
     vi.mocked(exportToPDF).mockClear();
   });
 
-  // EXPORT opens the export options, which export with their own button
+  // Export opens the export options, which export with their own button
   const exportPress = () => {
-    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
     fireEvent.click(screen.getByRole('button', { name: 'Export' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Export' })).getByRole('button', { name: 'Export' }));
   };
 
   test('exports with the options picked', async () => {
     renderPress();
 
-    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
     fireEvent.click(screen.getByLabelText('Letter'));
     fireEvent.change(screen.getByLabelText('File name'), { target: { value: 'my-deck' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
+    fireEvent.click(within(screen.getByRole('dialog', { name: 'Export' })).getByRole('button', { name: 'Export' }));
 
     await waitFor(() => expect(exportToPDF).toHaveBeenCalledTimes(1));
     expect(vi.mocked(exportToPDF).mock.calls[0][1]).toEqual({
@@ -250,7 +250,7 @@ describe('exporting', () => {
 
     fireEvent.change(screen.getByPlaceholderText(/colossal dreadmaw/i), { target: { value: 'Lightning Bolt' } });
     fireEvent.click(screen.getByRole('button', { name: 'Add' }));
-    expect(screen.getByRole('button', { name: 'EXPORT' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Export' })).toBeDisabled();
   });
 
   test('says it is exporting until it is done, and reports errors', async () => {
@@ -262,16 +262,16 @@ describe('exporting', () => {
 
     exportPress();
 
-    expect(screen.getByRole('button', { name: 'EXPORTING…' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Exporting…' })).toBeDisabled();
     await waitFor(() => expect(alert).toHaveBeenCalledWith("Couldn't export the cards: Out of memory"));
-    expect(screen.getByRole('button', { name: 'EXPORT' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Export' })).toBeEnabled();
     alert.mockRestore();
   });
 
   test('does not export when canceling', async () => {
     renderPress();
 
-    fireEvent.click(screen.getByRole('button', { name: 'EXPORT' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Export' }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -586,6 +586,24 @@ describe('keyboard', () => {
     expect(cardButton('Front')).toHaveFocus();
   });
 
+  test('deleting the last card moves the focus to the one before it', () => {
+    renderPress();
+
+    pressWithKeyboard(cardButton('Front'));
+    pressWithKeyboard(menuDeleteButton());
+
+    expect(cardButton('Colossal Dreadmaw')).toHaveFocus();
+  });
+
+  test('deleting a card that has others after it moves the focus to the next one', () => {
+    renderPress();
+
+    pressWithKeyboard(cardButton('Colossal Dreadmaw'));
+    pressWithKeyboard(menuDeleteButton());
+
+    expect(cardButton('Front')).toHaveFocus();
+  });
+
   test('"Dismiss" returns the focus to the card', () => {
     renderPress();
     pressWithKeyboard(cardButton('Front'));
@@ -638,6 +656,11 @@ const renderPress = () => {
 
 const cardOrder = () => {
   return screen.getAllByText(/^(Colossal Dreadmaw|Front|Back)$/).map((element) => element.textContent);
+};
+
+/** "Delete" in the open menu, the only one in the tab order */
+const menuDeleteButton = () => {
+  return screen.getAllByRole('button', { name: /delete/i }).find((button) => button.tabIndex === 0)!;
 };
 
 const cardButton = (cardName: string) => {

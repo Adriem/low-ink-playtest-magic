@@ -165,7 +165,11 @@ const Press = () => {
                     collectionIndex={item.collectionIndex}
                     face={item.kind === 'face' ? item.sheetFace : 'single'}
                     cardName={
-                      item.kind === 'loading' ? 'loading card' : item.kind === 'face' ? item.face.name : item.card.name
+                      item.kind === 'loading'
+                        ? t('press.loading_card')
+                        : item.kind === 'face'
+                          ? item.face.name
+                          : item.card.name
                     }
                   >
                     {item.kind === 'loading' ? (

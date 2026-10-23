@@ -50,7 +50,7 @@ const ExportPanel = ({
   };
 
   return (
-    <Popup ref={ref} className="export-panel">
+    <Popup ref={ref} className="export-panel" aria-label={t('export_panel.export')}>
       <form onSubmit={handleSubmit}>
         <fieldset>
           <legend>{t('export_panel.page_size')}</legend>

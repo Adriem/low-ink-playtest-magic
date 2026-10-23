@@ -43,6 +43,8 @@
 
 .press-actions .export {
   font-weight: bold;
+  /* Capitals by style, so screen readers read the word rather than spell it */
+  text-transform: uppercase;
 }
 
 dialog:not([open]) {

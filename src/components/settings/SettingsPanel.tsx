@@ -17,6 +17,7 @@ import PaletteEditor from './PaletteEditor';
 import './SettingsPanel.css';
 
 const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
+  const { t } = useTranslation();
   const [cardStyle] = useSetting('cardVariant');
   const restoreDefaults = useRestoreDefaultSettings();
   const discardPalettePreviews = useDiscardPalettePreviews();
@@ -43,7 +44,13 @@ const SettingsPanel = ({ ref }: { ref?: Ref<HTMLDialogElement> }) => {
   };
 
   return (
-    <Popup ref={ref} hasCloseButton onBack={editedPalette ? handleBack : undefined} onClose={handleClose}>
+    <Popup
+      ref={ref}
+      aria-label={t('press_actions.settings')}
+      hasCloseButton
+      onBack={editedPalette ? handleBack : undefined}
+      onClose={handleClose}
+    >
       {editedPalette ? (
         <PaletteEditor cardStyle={editedPalette} />
       ) : (

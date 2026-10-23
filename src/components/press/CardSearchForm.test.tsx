@@ -17,6 +17,16 @@ test('adds a single card by name', async () => {
   expect(onAddCards).not.toHaveBeenCalled();
 });
 
+test('labels the card name and card list fields', async () => {
+  setupForm();
+
+  expect(screen.getByRole('textbox', { name: 'Card name' })).toBeInTheDocument();
+
+  await user.click(screen.getByLabelText('card list'));
+
+  expect(screen.getByRole('textbox', { name: 'Card list' })).toBeInTheDocument();
+});
+
 test('clears the card name after adding it', async () => {
   setupForm();
   const input = screen.getByPlaceholderText(/colossal dreadmaw/i);

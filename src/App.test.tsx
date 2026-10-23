@@ -12,8 +12,9 @@ test('renders the footer, with where to report issues', () => {
   expect(screen.getByRole('link', { name: 'Report here' })).toBeInTheDocument();
 });
 
-test('renders the card search form', () => {
+test('renders the card search form, in the main part of the page', () => {
   render(<App />);
+  expect(screen.getByRole('main')).toContainElement(screen.getByRole('textbox', { name: 'Card name' }));
   expect(screen.getByPlaceholderText(/colossal dreadmaw/i)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Add' })).toBeInTheDocument();
 });

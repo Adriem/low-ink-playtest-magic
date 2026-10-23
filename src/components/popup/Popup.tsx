@@ -1,4 +1,4 @@
-import type { MouseEvent, ReactNode, Ref } from 'react';
+import type { ComponentProps, MouseEvent, SyntheticEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import './Popup.css';
@@ -6,36 +6,43 @@ import './Popup.css';
 /**
  * Modal popup, opened with `showModal()` on the dialog in `ref`. Clicking the
  * overlay around it closes it, as does Escape, or its close button, when it
- * has one. It can also have a back button, e.g. to leave a view inside it.
- * Buttons in a `<menu>` go at its bottom right.
+ * has one, unless it's not dismissible. It can also have a back button, e.g.
+ * to leave a view inside it. Buttons in a `<menu>` go at its bottom right.
+ * Other props go to the `<dialog>`.
  */
 const Popup = ({
-  ref,
   className,
+  dismissible = true,
   hasCloseButton = false,
   onBack,
-  onClose,
+  onClick,
+  onCancel,
   children,
-}: {
-  ref?: Ref<HTMLDialogElement>;
-  className?: string;
+  ...dialogProps
+}: ComponentProps<'dialog'> & {
+  /** Whether clicking around it or Escape close it, e.g. not until a choice is made */
+  dismissible?: boolean;
   /** Whether it has a close button, at its top right corner */
   hasCloseButton?: boolean;
   /** Called with its back button, at its top left corner, which it only has with this */
   onBack?: () => void;
-  /** Called when the popup closes, in any way */
-  onClose?: () => void;
-  children: ReactNode;
 }) => {
   const { t } = useTranslation();
   // Clicks on the overlay around the dialog target the dialog itself, outside its box
   const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
+    onClick?.(event);
     const dialog = event.currentTarget;
-    if (event.target !== dialog) return;
+    if (!dismissible || event.target !== dialog) return;
 
     const { left, right, top, bottom } = dialog.getBoundingClientRect();
     const isInside = event.clientX >= left && event.clientX <= right && event.clientY >= top && event.clientY <= bottom;
     if (!isInside) dialog.close();
+  };
+
+  // Escape cancels the dialog, which closes it unless prevented
+  const handleCancel = (event: SyntheticEvent<HTMLDialogElement>) => {
+    onCancel?.(event);
+    if (!dismissible) event.preventDefault();
   };
 
   const handleCloseClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -45,7 +52,12 @@ const Popup = ({
   return (
     // Clicking the overlay is a shortcut: the keyboard closes the dialog with Escape, natively
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
-    <dialog ref={ref} className={className ? `popup ${className}` : 'popup'} onClick={handleClick} onClose={onClose}>
+    <dialog
+      {...dialogProps}
+      className={className ? `popup ${className}` : 'popup'}
+      onClick={handleClick}
+      onCancel={handleCancel}
+    >
       {(onBack || hasCloseButton) && (
         <div className="popup-controls">
           {onBack && (

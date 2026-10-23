@@ -1,7 +1,9 @@
-import { initialiseFlags, type FlagDefinitions } from './utils/flags';
+import { initialiseFlags, Toggle, type FlagDefinitions } from './utils/flags';
 
-/** The app's flags. Tests have them all off (`configTests.ts`) */
-export const Features = {} satisfies FlagDefinitions;
+export const Features = {
+  /** Show ToS dialog on startup */
+  TERMS_DIALOG: Toggle.ON_PROD_ONLY,
+} satisfies FlagDefinitions;
 
 // --- Config initialization --------
 

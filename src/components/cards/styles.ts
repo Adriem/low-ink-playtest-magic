@@ -1,16 +1,21 @@
 import type { CardFace, SubCardPosition } from '../../domain/cards';
 import type { Palette } from '../../domain/colorTreatment';
-import { renderMinimalistCard } from './minimalist/render';
+import { renderMinimalistCardContents } from './minimalist/renderContent';
+import { renderMinimalistFooter } from './minimalist/renderFooter';
 import { DEFAULT_PALETTES } from './palettes';
-import { renderRealisticCard } from './realistic/render';
+import { renderRealisticCardContents } from './realistic/renderContent';
+import { renderRealisticFooter } from './realistic/renderFooter';
 
 /** Part of the card's width the oracle box takes, next to a sub-card */
 export type OracleLayout = 'full-width' | 'left-half' | 'right-half';
 
-export const CARD_WIDTH = 500;
-export const CARD_HEIGHT = 700;
+export { CARD_HEIGHT, CARD_WIDTH } from './common/cardSize';
 
-/** What a card style draws: a face, with the secondary face as a sub-card for cards like adventures */
+/**
+ * What a card style draws as a card's contents: a face, with the secondary
+ * face as a sub-card for cards like adventures. The card adds its footer and
+ * frame on top.
+ */
 export interface CardRenderProps {
   face: CardFace;
   subFace?: CardFace;
@@ -23,6 +28,25 @@ export interface CardRenderProps {
   customPalette?: CustomPalette;
   /** Drawn as a half of a unified card, which is already turned sideways to read it */
   unified?: boolean;
+}
+
+/**
+ * Where a card's footer goes, on the card's canvas:
+ * - `card-bottom`: at the bottom of a card on its own
+ * - `right-side`: along the right side of a unified card, which is its bottom
+ *   when it's turned to read its halves side by side
+ * - `upright-half`: below the half of a unified card that reads upright (e.g.
+ *   a battle), which is its top half
+ */
+export type FooterPlacement = 'card-bottom' | 'right-side' | 'upright-half';
+
+/** What a card style draws as a card's footer: the faces whose artists it credits, and where */
+export interface CardFooterProps {
+  faces: CardFace[];
+  placement: FooterPlacement;
+  blackBordered?: boolean;
+  artFidelity?: ArtFidelity;
+  customPalette?: CustomPalette;
 }
 
 /** Colors of a palette by name (e.g. `RED`), as hex values */
@@ -44,13 +68,17 @@ export type InkLevel = 'low' | 'medium' | 'high';
  */
 export type ArtFidelity = 'blank' | 'contours' | 'mid-tones' | 'posterized' | 'grayscale' | 'no-filter';
 
-/** Draws a whole card on a CARD_WIDTH x CARD_HEIGHT canvas */
-export type CardRenderer = (canvas: HTMLCanvasElement, card: CardRenderProps) => void;
+/** Draws the contents of a card on a CARD_WIDTH x CARD_HEIGHT canvas */
+export type CardContentsRenderer = (canvas: HTMLCanvasElement, card: CardRenderProps) => void;
+
+/** Draws the footer of a card */
+export type CardFooterRenderer = (ctx: CanvasRenderingContext2D, footer: CardFooterProps) => void;
 
 export type CardStyle = 'realistic' | 'minimalist';
 
 interface CardStyleDefinition {
-  render: CardRenderer;
+  renderCardContents: CardContentsRenderer;
+  renderFooter: CardFooterRenderer;
   palette: Palette;
   /** Whether a face is drawn sideways, turned counterclockwise into the card (e.g. realistic landscape faces) */
   isDrawnSideways: (face: CardFace) => boolean;
@@ -60,14 +88,16 @@ interface CardStyleDefinition {
 
 const CARD_STYLES: Record<CardStyle, CardStyleDefinition> = {
   realistic: {
-    render: renderRealisticCard,
+    renderCardContents: renderRealisticCardContents,
+    renderFooter: renderRealisticFooter,
     palette: DEFAULT_PALETTES.realistic,
     isDrawnSideways: (face) => face.orientation === 'landscape',
     separatesHalves: false,
   },
   // Minimalist landscape faces keep their title and type line upright, so the card reads in hand
   minimalist: {
-    render: renderMinimalistCard,
+    renderCardContents: renderMinimalistCardContents,
+    renderFooter: renderMinimalistFooter,
     palette: DEFAULT_PALETTES.minimalist,
     isDrawnSideways: () => false,
     separatesHalves: true,

@@ -289,3 +289,21 @@ const scryfallCard = (card: Partial<ScryfallCard> & { name: string }): ScryfallC
     ...card,
   };
 };
+
+describe('artists of faces', () => {
+  test('credits the artist of each face, or of the card for faces without their own', () => {
+    const card = toCard(
+      scryfallCard({
+        name: 'Fire // Ice',
+        layout: 'split',
+        artist: 'David Martin & Franz Vohwinkel',
+        card_faces: [{ name: 'Fire', artist: 'David Martin' }, { name: 'Ice' }],
+      }),
+    );
+
+    expect([card.mainFace.artist, card.secondaryFace?.artist]).toEqual([
+      'David Martin',
+      'David Martin & Franz Vohwinkel',
+    ]);
+  });
+});

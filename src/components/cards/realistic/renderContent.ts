@@ -29,11 +29,12 @@ import { drawWhenLoaded, get2dContext, loadImage } from '../common/canvasRenderi
 import { ART_CORNER_RADII, getPlaneswalkerLayout, type PlaneswalkerLayout } from './planeswalkerLayout';
 
 /**
- * Draw a card in the realistic style on a canvas.
+ * Draw the contents of a card in the realistic style on a canvas: all but its
+ * footer and frame.
  *
  * @param canvas - 500x700 canvas
  */
-export const renderRealisticCard = (
+export const renderRealisticCardContents = (
   canvas: HTMLCanvasElement,
   {
     face,

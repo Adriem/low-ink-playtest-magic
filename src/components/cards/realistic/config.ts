@@ -83,6 +83,22 @@ export const LANDSCAPE_ORACLE_TEXT_PADDING_Y = 6;
 export const LOYALTY_BOX_X = 439;
 export const LOYALTY_BOX_Y = 664;
 
+/** Font size of the card's footer when it fits, in both orientations */
+export const FOOTER_MAX_FONT_SIZE = 15;
+/**
+ * Baseline of the footer of unified cards, along the bottom of the turned
+ * card: a bit away from its edge, or lower, clear of the stats and loyalty
+ * boxes of halves that have them
+ */
+export const UNIFIED_FOOTER_Y = 484;
+export const UNIFIED_FOOTER_WITH_STATS_Y = 491;
+/**
+ * Where the footer below the upright top half of unified cards goes, on the
+ * card: where it starts, how wide it is, left of a battle's defense box, and
+ * the baseline of its bottom line, in the gap between the halves
+ */
+export const UPRIGHT_HALF_FOOTER = { x: 30, width: 413, y: 352 };
+
 /** Size of a card, and where its boxes go */
 export interface CardLayout {
   width: number;
@@ -100,6 +116,13 @@ export interface CardLayout {
   defenseY: number;
   /** Space between the bottom of the card background and the bottom of the card */
   backgroundMarginBottom: number;
+  /**
+   * Where the card's footer starts, the baseline of its bottom line, below
+   * the boxes and the stats box, and how wide it is
+   */
+  footerX: number;
+  footerY: number;
+  footerWidth: number;
 }
 
 /** Layout of cards by orientation: portrait ones are 500x700, landscape ones 700x500 */
@@ -118,6 +141,9 @@ export const CARD_LAYOUTS: Record<Orientation, CardLayout> = {
     defenseX: LOYALTY_BOX_X,
     defenseY: LOYALTY_BOX_Y,
     backgroundMarginBottom: 60,
+    footerX: 30,
+    footerY: 685,
+    footerWidth: 440,
   },
   landscape: {
     width: 700,
@@ -133,5 +159,9 @@ export const CARD_LAYOUTS: Record<Orientation, CardLayout> = {
     defenseX: 660,
     defenseY: 490,
     backgroundMarginBottom: 52,
+    // Left of the defense box, a bit away from the card's edge
+    footerX: 30,
+    footerY: 484,
+    footerWidth: 590,
   },
 };

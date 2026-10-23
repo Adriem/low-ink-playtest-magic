@@ -68,6 +68,7 @@ const toCardFace = (card: ScryfallCard, face: ScryfallCardFace, faceIndex: numbe
     oracleText: toOracleText(face.oracle_text),
     colors: toColors(colors),
     stats: getStats(face),
+    artist: face.artist ?? card.artist,
     art: {
       assetUrl: face.image_uris?.art_crop ?? card.image_uris?.art_crop,
       crop: getArtCrop(card, faceIndex),

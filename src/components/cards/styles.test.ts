@@ -1,8 +1,10 @@
 import { testFace } from '../../testUtils';
 import { MINIMALIST_PALETTE } from './minimalist/palette';
-import { renderMinimalistCard } from './minimalist/render';
+import { renderMinimalistCardContents } from './minimalist/renderContent';
+import { renderMinimalistFooter } from './minimalist/renderFooter';
 import { REALISTIC_PALETTE } from './realistic/palette';
-import { renderRealisticCard } from './realistic/render';
+import { renderRealisticCardContents } from './realistic/renderContent';
+import { renderRealisticFooter } from './realistic/renderFooter';
 import { getCardStyle } from './styles';
 
 // The renderers load the mana symbols from Scryfall
@@ -12,8 +14,16 @@ vi.mock('../../adapters/scryfall', () => ({
 
 describe('getCardStyle', () => {
   test('gets the renderer and palette of each style', () => {
-    expect(getCardStyle('realistic')).toMatchObject({ render: renderRealisticCard, palette: REALISTIC_PALETTE });
-    expect(getCardStyle('minimalist')).toMatchObject({ render: renderMinimalistCard, palette: MINIMALIST_PALETTE });
+    expect(getCardStyle('realistic')).toMatchObject({
+      renderCardContents: renderRealisticCardContents,
+      renderFooter: renderRealisticFooter,
+      palette: REALISTIC_PALETTE,
+    });
+    expect(getCardStyle('minimalist')).toMatchObject({
+      renderCardContents: renderMinimalistCardContents,
+      renderFooter: renderMinimalistFooter,
+      palette: MINIMALIST_PALETTE,
+    });
   });
 
   test('draws landscape faces sideways in the realistic style only', () => {

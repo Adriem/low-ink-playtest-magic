@@ -150,5 +150,10 @@
     "message_one": "Couldn't add this card. Check its spelling, or try again:",
     "message_other": "Couldn't add these {{count}} cards. Check their spelling, or try again:",
     "dismiss": "Dismiss"
+  },
+  "card_footer": {
+    "illustrator": "Illus. {{artist}}",
+    "not_for_sale": "NOT FOR SALE",
+    "copyright": "™ & © Wizards of the Coast"
   }
 }

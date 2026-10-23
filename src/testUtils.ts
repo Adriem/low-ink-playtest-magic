@@ -1,4 +1,5 @@
 import { FULL_ART_CROP, type Card, type CardFace } from './domain/cards';
+import type { Flag } from './utils/flags';
 
 export interface Deferred<T> {
   promise: Promise<T>;
@@ -39,4 +40,15 @@ export const testCard = (card: Partial<Card> & { name: string }): Card => {
     mainFace: testFace({ name: card.name }),
     ...card,
   };
+};
+
+/** Turn a flag on or off, until the test ends (setupTests turns them back off) */
+export const overrideFlag = (name: Flag, value: boolean) => {
+  Object.assign(window.flags, { [name]: value });
+};
+
+/** Turn a flag, or every flag, back off, as tests start */
+export const resetFlag = (name?: Flag) => {
+  const names = name ? [name] : (Object.keys(window.flags) as Flag[]);
+  names.forEach((flag) => Object.assign(window.flags, { [flag]: false }));
 };

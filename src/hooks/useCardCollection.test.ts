@@ -1,17 +1,19 @@
 import { act, renderHook } from '@testing-library/react';
 import { useCardCollection } from './useCardCollection';
 import { deferred, testCard, type Deferred } from '../testUtils';
-import { fetchCard } from '../adapters/scryfall';
+import { fetchCard, fetchCollection } from '../adapters/scryfall';
 import type { Card } from '../domain/cards';
 import { isLoadingCard, type CollectionCard } from '../domain/press';
 
 vi.mock('../adapters/scryfall', () => ({
   fetchCard: vi.fn(),
+  fetchCollection: vi.fn(),
   getSymbolImage: vi.fn(() => Promise.resolve(undefined)),
 }));
 
 beforeEach(() => {
   vi.mocked(fetchCard).mockReset();
+  vi.mocked(fetchCollection).mockReset();
 });
 
 test('adds a loading placeholder that is replaced once the card loads', async () => {
@@ -55,6 +57,34 @@ test('removes the placeholder and reports the error when a card fails to load', 
 
   expect(collection.current.cardCollection).toEqual([]);
   expect(onCardLoadError).toHaveBeenCalledWith('Not a card', expect.objectContaining({ message: 'Not found' }));
+});
+
+test('adds a list of cards, fetched together, each name once, and reports the ones that fail', async () => {
+  const pending = deferred<(Card | Error)[]>();
+  vi.mocked(fetchCollection).mockReturnValue(pending.promise);
+  const onCardLoadError = vi.fn();
+  const collection = setupCollection({ onCardLoadError });
+
+  act(() => collection.current.addCardsByName(['A', 'Nope', 'A']));
+  expect(cardNames(collection.current.cardCollection)).toEqual(['loading', 'loading', 'loading']);
+  expect(fetchCollection).toHaveBeenCalledWith(['A', 'Nope']);
+
+  await act(async () => pending.resolve([testCard({ name: 'A' }), new Error('Not found')]));
+
+  expect(cardNames(collection.current.cardCollection)).toEqual(['A', 'A']);
+  expect(onCardLoadError).toHaveBeenCalledWith('Nope', expect.objectContaining({ message: 'Not found' }));
+});
+
+test('only fetches the cards of a list that were not fetched before', async () => {
+  vi.mocked(fetchCard).mockResolvedValue(testCard({ name: 'A' }));
+  vi.mocked(fetchCollection).mockResolvedValue([testCard({ name: 'B' })]);
+  const collection = setupCollection();
+
+  await act(async () => collection.current.addCardByName('A'));
+  await act(async () => collection.current.addCardsByName(['A', 'B']));
+
+  expect(fetchCollection).toHaveBeenCalledWith(['B']);
+  expect(cardNames(collection.current.cardCollection)).toEqual(['A', 'A', 'B']);
 });
 
 test('fetches each card name only once', async () => {

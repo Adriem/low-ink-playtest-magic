@@ -16,18 +16,20 @@ interface CardCollectionOptions {
 }
 
 /**
- * Manage the collection of cards in the press. Cards are added by name: a
- * loading placeholder is appended right away and replaced with the card once
- * it loads. If loading fails, the placeholder is removed and `onCardLoadError`
+ * Manage the collection of cards in the press. Cards are added by name, one
+ * or several at once (e.g. a card list, fetched together): a loading
+ * placeholder is appended right away and replaced with the card once it
+ * loads. If loading fails, the placeholder is removed and `onCardLoadError`
  * is called.
  */
 export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCollectionOptions = {}) => {
-  const { findCardByName } = useFetchCard();
+  const { findCardByName, findCardsByName } = useFetchCard();
   const [cardCollection, setCardCollection] = useState<CollectionCard[]>(initialCards);
   const nextLoadingCardIdRef = useRef(0);
 
-  const addCardByName = useCallback(
-    (cardName: string) => {
+  // A placeholder for a card, replaced once it loads, or removed if it fails to
+  const addLoadingCard = useCallback(
+    (cardName: string, cardPromise: Promise<Card>) => {
       const loadingCardId = nextLoadingCardIdRef.current++;
       const isPlaceholder = (card: CollectionCard) => {
         return isLoadingCard(card) && card.loadingCardId === loadingCardId;
@@ -36,7 +38,7 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
 
       setCardCollection((collection) => [...collection, placeholder]);
 
-      void findCardByName(cardName)
+      void cardPromise
         .then((card) => {
           setCardCollection((collection) => collection.map((c) => (isPlaceholder(c) ? card : c)));
         })
@@ -45,7 +47,22 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
           onCardLoadError?.(cardName, error);
         });
     },
-    [findCardByName, onCardLoadError],
+    [onCardLoadError],
+  );
+
+  const addCardByName = useCallback(
+    (cardName: string) => {
+      addLoadingCard(cardName, findCardByName(cardName));
+    },
+    [addLoadingCard, findCardByName],
+  );
+
+  const addCardsByName = useCallback(
+    (cardNames: string[]) => {
+      const cardPromises = findCardsByName(cardNames);
+      cardNames.forEach((cardName, index) => addLoadingCard(cardName, cardPromises[index]));
+    },
+    [addLoadingCard, findCardsByName],
   );
 
   const removeCardAt = useCallback((index: number) => {
@@ -74,5 +91,5 @@ export const useCardCollection = ({ initialCards = [], onCardLoadError }: CardCo
     );
   }, []);
 
-  return { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection, editCardAt };
+  return { cardCollection, addCardByName, addCardsByName, removeCardAt, moveCard, clearCollection, editCardAt };
 };

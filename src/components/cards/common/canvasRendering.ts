@@ -102,18 +102,29 @@ export const whenRendered = (canvas: HTMLCanvasElement, timeout: number) => {
   });
 };
 
+/** Images loaded, or loading, by their URL */
+const loadedImages = new Map<string, Promise<HTMLImageElement>>();
+
 /**
  * Load an image that can be drawn on a canvas and read back (e.g. by filters
- * or the PDF export).
+ * or the PDF export). Each image is loaded (and decoded) once, and drawn as
+ * many times as needed, e.g. every time its card is drawn again. Images that
+ * fail to load are tried again the next time.
  */
-export const loadImage = (src: string) => {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
+export const loadImage = (src: string): Promise<HTMLImageElement> => {
+  const loaded = loadedImages.get(src);
+  if (loaded) return loaded;
+
+  const loading = new Promise<HTMLImageElement>((resolve, reject) => {
     const image = new Image();
     image.crossOrigin = 'Anonymous';
     image.onload = () => resolve(image);
     image.onerror = reject;
     image.src = src;
   });
+  loadedImages.set(src, loading);
+  loading.catch(() => loadedImages.delete(src));
+  return loading;
 };
 
 /**

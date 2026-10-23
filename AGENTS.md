@@ -15,7 +15,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
 
 ## Layout
 
-- `src/domain/`: the card model and pure logic, without React or the DOM: cards (`Card`, `CardFace`, art crops), the press (sheets, items), colors, rules text, mana symbols.
+- `src/domain/`: the card model and pure logic, without React or the DOM: cards (`Card`, `CardFace`, art crops), card lists (`cardList.ts`, reading lists as deck builders export them), the press (sheets, items), colors, rules text, mana symbols.
 - `src/adapters/`: the outside world. `scryfall/` fetches cards and symbols and converts Scryfall's cards to the domain's (`toCard`); `jspdf/` exports canvases to a PDF.
 - `src/components/`:
   - `cards/`: the canvas renderers, in two styles, `realistic/` and `minimalist/`, with shared drawing code in `common/`. `Card` draws one face, `DualCard` two faces as one card (e.g. split cards).

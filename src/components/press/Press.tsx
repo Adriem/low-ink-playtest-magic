@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import Card from '../cards/Card';
 import DualCard from '../cards/DualCard';
 import LoadingCard from '../cards/LoadingCard';
 import BackToTopButton from './BackToTopButton';
+import CardLoadErrors from './CardLoadErrors';
 import CardSearchForm from './CardSearchForm';
 import { CardOverlayProvider } from './CardOverlayContext';
 import PressActions from './PressActions';
@@ -20,7 +21,6 @@ import { useCardSheet } from '../../hooks/useCardSheet';
 import { useKeyedRefs } from '../../hooks/useKeyedRefs';
 import { loadFromStorage, saveToStorage, type StorageKey } from '../../utils/storage';
 import { isLoadingCard, type CollectionCard, type SheetItem } from '../../domain/press';
-import i18n from '../../i18n';
 
 const CARD_COLLECTION_STORAGE_KEY: StorageKey = 'press:CARD_COLLECTION@1';
 
@@ -42,6 +42,13 @@ const Press = () => {
 
   const customPalette = useCardPalette(cardVariant);
 
+  // Names of the cards of the last cards added that couldn't be loaded
+  const [failedCardNames, setFailedCardNames] = useState<string[]>([]);
+
+  const handleCardLoadError = useCallback((cardName: string) => {
+    setFailedCardNames((names) => (names.includes(cardName) ? names : [...names, cardName]));
+  }, []);
+
   const { cardCollection, addCardByName, removeCardAt, moveCard, clearCollection } = useCardCollection({
     initialCards: loadPersistedCards,
     onCardLoadError: handleCardLoadError,
@@ -60,10 +67,15 @@ const Press = () => {
 
   const handleAddCards = useCallback(
     (cardNames: string[]) => {
+      setFailedCardNames([]);
       cardNames.forEach((cardName) => addCardByName(cardName));
     },
     [addCardByName],
   );
+
+  const handleCardLoadErrorsDismiss = useCallback(() => {
+    setFailedCardNames([]);
+  }, []);
 
   const handleClear = useCallback(() => {
     clearCollection();
@@ -80,6 +92,9 @@ const Press = () => {
     <>
       <div ref={searchFormRef} className="container">
         <CardSearchForm onAddCards={handleAddCards} />
+        {failedCardNames.length > 0 && (
+          <CardLoadErrors cardNames={failedCardNames} onDismiss={handleCardLoadErrorsDismiss} />
+        )}
       </div>
       {cardSheets.length > 0 && <PressActions onClear={handleClear} onExport={handleExport} />}
       <CardOverlayProvider collectionSize={cardCollection.length} moveCard={moveCard} removeCardAt={removeCardAt}>
@@ -153,11 +168,6 @@ const exportCardsToPdf = async (canvases: HTMLCanvasElement[], options: PdfExpor
 
 const loadPersistedCards = () => {
   return loadFromStorage<CollectionCard[]>('sessionStorage', CARD_COLLECTION_STORAGE_KEY, [], Array.isArray);
-};
-
-// TODO: Replace alert with a toast notification
-const handleCardLoadError = (cardName: string, error: Error) => {
-  window.alert(i18n.t('press.card_load_error', { cardName, message: error.message }));
 };
 
 // Cards keep their key while moved around, so their canvases aren't drawn again

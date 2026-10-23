@@ -27,7 +27,7 @@
   pointer-events: auto;
 }
 .sheet-slot-overlay.danger {
-  background: rgba(220, 20, 20, 0.5);
+  background: var(--danger-background);
 }
 
 .sheet-slot-overlay-controls {

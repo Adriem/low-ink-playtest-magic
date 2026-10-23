@@ -1,18 +1,8 @@
 import { useCallback, useState, type FormEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MAX_QUANTITY, parseCardList } from '../../domain/cardList';
 
 import './CardSearchForm.css';
-
-const MAX_QUANTITY = 100;
-// e.g. "4 Lightning Bolt", "2x Counterspell", "1X Colossal Dreadmaw"
-const QUANTITY_PREFIX_REGEX = /^(\d+)\s*[xX]?\s+(.+)$/;
-
-interface CardListEntry {
-  /** Line of the card list it was parsed from */
-  line: string;
-  cardName: string;
-  quantity: number;
-}
 
 type SearchModeChangeHandler = (multipleSearch: boolean) => void;
 
@@ -76,32 +66,6 @@ const CardSearchForm = ({ onAddCards }: { onAddCards: (cardNames: string[]) => v
       )}
     </form>
   );
-};
-
-/**
- * Turn the content of the card list textarea into entries: one card per line,
- * ignoring empty lines.
- */
-const parseCardList = (cardList: string): CardListEntry[] => {
-  return cardList
-    .split('\n')
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map(parseCardListLine);
-};
-
-/**
- * Parse a line of the card list: an optional quantity followed by the card
- * name. Numbers too big to be a quantity are part of the name (e.g. "1996
- * World Champion"), so such cards need an explicit quantity ("1 1996 World
- * Champion").
- */
-const parseCardListLine = (line: string): CardListEntry => {
-  const match = line.match(QUANTITY_PREFIX_REGEX);
-  const quantity = match ? Number(match[1]) : 1;
-
-  if (!match || quantity > MAX_QUANTITY) return { line, cardName: line, quantity: 1 };
-  return { line, cardName: match[2].trim(), quantity };
 };
 
 const repeatCardName = (cardName: string, quantity: number) => {

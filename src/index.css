@@ -69,6 +69,8 @@ textarea {
 }
 
 :root {
+  /* Background of what's being deleted or went wrong */
+  --danger-background: rgba(220, 20, 20, 0.5);
   --colorless: rgb(145, 145, 145);
   --white: rgb(213, 194, 167);
   --blue: rgb(41, 133, 225);

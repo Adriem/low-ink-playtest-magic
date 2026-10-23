@@ -35,7 +35,8 @@ const Press = () => {
   const [cardVariant] = useSetting('cardVariant');
   const [doubleFacedCardTreatment] = useSetting('doubleFacedCardTreatment');
   const [inkLevel] = useSetting('inkLevel');
-  const [artFidelity] = useSetting(useFlag('ART_FIDELITY_SLIDER') ? 'artFidelity' : 'includeArt');
+  const hasArtFidelitySlider = useFlag('ART_FIDELITY_SLIDER');
+  const [artFidelity] = useSetting(hasArtFidelitySlider ? 'artFidelity' : 'includeArt');
   const [cardCorners] = useSetting('cardCorners');
   const [cardBorder] = useSetting('cardBorder');
 

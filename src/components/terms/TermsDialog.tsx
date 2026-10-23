@@ -17,7 +17,7 @@ const TERMS_STORAGE_KEY: StorageKey = 'press:TERMS_ACCEPTED@1';
  * `TERMS_DIALOG` flag is on), until they agree to them.
  */
 const TermsDialog = () => {
-  const isEnabled = useFlag('TERMS_DIALOG');
+  const hasTermsDialog = useFlag('TERMS_DIALOG');
   const [hasAgreed, setHasAgreed] = useState(loadHasAgreed);
 
   const handleAgree = () => {
@@ -25,7 +25,7 @@ const TermsDialog = () => {
     setHasAgreed(true);
   };
 
-  if (!isEnabled || hasAgreed) return null;
+  if (!hasTermsDialog || hasAgreed) return null;
 
   return <TermsModal onAgree={handleAgree} />;
 };

@@ -124,5 +124,12 @@
   },
   "errors": {
     "symbology": "Could not fetch symbology. Reason: {{reason}}"
+  },
+  "terms": {
+    "title": "Before you start",
+    "personal_use": "The playtest cards you make with this app are for your personal use only. Distributing, selling or trading them is not permitted.",
+    "agreement": "By using this app, you agree to these terms of use.",
+    "agree": "I understand and agree",
+    "continue": "Continue"
   }
 }

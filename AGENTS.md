@@ -45,7 +45,7 @@ Keep the root of `src/` as clean as possible: new modules go in the folders abov
 ### UI
 
 - Every text the user sees is in `src/i18n/en.json`, with snake_case keys. Components use `useTranslation`; code outside components (e.g. canvas renderers) uses `i18n.t`.
-- Popups use `Popup` (a `<dialog>` opened with `showModal()`). Extend it rather than writing another dialog or importing its CSS.
+- Popups use `Popup` (a `<dialog>` opened with `showModal()`), rather than another dialog or its CSS. It takes the dialog's props and passes them down; `dismissible={false}` keeps clicks around it and Escape from closing it.
 - Styling is CSS only: if CSS can't do something, don't do it with JavaScript. Buttons are styled consistently (not left to the browser's defaults).
 - Layouts work on phones: no horizontal page scroll; sheets scroll sideways on their own.
 

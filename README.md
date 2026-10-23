@@ -1,6 +1,6 @@
-# Low Ink MTG Press
+# Low-ink Playtest Magic
 
-Print Magic: The Gathering proxies that use as little ink as possible.
+Print Magic: The Gathering™ proxies that use as little ink as possible.
 
 ## Scripts
 

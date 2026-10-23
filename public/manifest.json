@@ -1,7 +1,7 @@
 {
-  "short_name": "Low-ink Playtest MTG",
-  "name": "Low-ink Playtest MTG",
-  "description": "Create ready-to-print, low-ink Magic: The Gathering playtest cards. Printer ink is expensive; playtesting shouldn't be.",
+  "short_name": "Low-ink Playtest Magic",
+  "name": "Low-ink Playtest Magic",
+  "description": "Create ready-to-print, low-ink Magic: The Gathering™ playtest cards. Printer ink is expensive; playtesting shouldn't be.",
   "icons": [
     {
       "src": "favicon.ico",

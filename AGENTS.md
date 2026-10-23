@@ -1,6 +1,6 @@
-# Low-ink Playtest MTG
+# Low-ink Playtest Magic
 
-A web app that prints Magic: The Gathering playtest proxies using as little ink as possible. Users add cards by name (one at a time or as a list), the app draws each card on a `<canvas>`, lays them out in sheets of 9 (3×3), and exports them to a PDF. Card data and images come from Scryfall. It's a static site, deployed to GitHub Pages, with no server.
+A web app that prints Magic: The Gathering™ playtest proxies using as little ink as possible. Users add cards by name (one at a time or as a list), the app draws each card on a `<canvas>`, lays them out in sheets of 9 (3×3), and exports them to a PDF. Card data and images come from Scryfall. It's a static site, deployed to GitHub Pages, with no server.
 
 ## Commands
 
@@ -73,6 +73,7 @@ These shape features, so check them before changing anything about art or cards:
 - Scryfall's terms forbid distorting their images: no filters (desaturating, posterizing…) on Scryfall's art in production. Filters are for art users provide themselves (art overrides). The art fidelity slider is a development-only flag.
 - Scryfall's terms require crediting the artist wherever art is shown: every card carries the artist, "™ & © Wizards of the Coast" and that it's a playtest card for personal use only, not for sale.
 - Wizards of the Coast's Fan Content Policy doesn't cover proxies, so the app stays clearly unofficial and non-commercial: the site says it's not affiliated with Wizards, who own the cards' names, text, symbols and art, and in production users agree that the cards are for personal use only.
+- The app is called "Low-ink Playtest Magic". Wherever we name the game, its full name carries the trademark sign: "Magic: The Gathering™".
 
 ## Git
 

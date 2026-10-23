@@ -42,6 +42,7 @@ const SheetSlot = ({
     handleDangerChange,
     moveCardBy,
     deleteCard,
+    overrideArt,
   } = useCardOverlayContext();
 
   const open = overlay.collectionIndex === collectionIndex;
@@ -90,6 +91,9 @@ const SheetSlot = ({
   const handleDelete = () => {
     return deleteCard(collectionIndex);
   };
+  const handleOverrideArt = () => {
+    return overrideArt?.(collectionIndex);
+  };
   const handleDismiss = (event: MouseEvent) => {
     dismissMenu({ returnFocusTo: isKeyboardClick(event) ? collectionIndex : null });
   };
@@ -127,6 +131,7 @@ const SheetSlot = ({
         onMoveUp={handleMoveUp}
         onMoveDown={handleMoveDown}
         onDelete={handleDelete}
+        onOverrideArt={overrideArt && handleOverrideArt}
         onDismiss={handleDismiss}
         onDangerChange={handleDangerChange}
       />

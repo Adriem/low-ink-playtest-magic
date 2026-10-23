@@ -97,7 +97,7 @@ const Workbench = () => {
                 faces={[face, splitHalf]}
                 inkLevel={inkLevel}
                 customPalette={customPalette}
-                artFidelity={artFidelity}
+                defaultArtFidelity={artFidelity}
                 blackBordered={cardBorder === 'full'}
                 outlined={cardBorder === 'outline'}
                 roundedCorners={cardCorners === 'rounded'}
@@ -113,7 +113,7 @@ const Workbench = () => {
                 roundedCorners={cardCorners === 'rounded'}
                 inkLevel={inkLevel}
                 customPalette={customPalette}
-                artFidelity={artFidelity}
+                defaultArtFidelity={artFidelity}
               />
             )}
           </div>

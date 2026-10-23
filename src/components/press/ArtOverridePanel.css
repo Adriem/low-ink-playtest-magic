@@ -1,0 +1,40 @@
+.art-override-panel .art-override-modes {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Each URL takes the whole width, below its label */
+.art-override-panel .art-override-url {
+  display: block;
+}
+.art-override-panel .art-override-url + .art-override-url {
+  margin-top: 0.5rem;
+}
+.art-override-panel .art-override-url input {
+  display: block;
+  width: 100%;
+}
+
+/* Clearing goes at the bottom left, apart from Cancel and Save */
+.art-override-panel .art-override-clear {
+  margin-right: auto;
+}
+
+.art-override-panel .art-override-hint {
+  margin: 0.25rem 0 0;
+  font-size: 0.875em;
+  color: gray;
+}
+
+.art-override-panel .art-override-error {
+  margin: 0.5rem 0 0;
+  color: #a03;
+}
+
+/* The slider takes the whole width */
+.art-override-panel input[type='range'] {
+  display: block;
+  width: 100%;
+  margin: 0;
+}

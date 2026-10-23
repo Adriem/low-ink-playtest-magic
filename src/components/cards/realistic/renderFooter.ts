@@ -25,11 +25,12 @@ import type { CardFooterProps } from '../styles';
  */
 export const renderRealisticFooter = (
   ctx: CanvasRenderingContext2D,
-  { faces, placement, blackBordered, artFidelity = 'posterized', customPalette }: CardFooterProps,
+  { faces, placement, blackBordered, defaultArtFidelity = 'posterized', customPalette }: CardFooterProps,
 ) => {
   const palette = resolvePalette(REALISTIC_PALETTE, customPalette);
   const footer = {
-    artist: artFidelity === 'blank' ? undefined : getArtists(faces),
+    // Only the faces whose art is drawn credit their artist
+    artist: getArtists(faces.filter((face) => (face.artOverride?.fidelity ?? defaultArtFidelity) !== 'blank')),
     maxFontSize: FOOTER_MAX_FONT_SIZE,
     fontFamily: FONT_FAMILY,
     color: blackBordered ? palette.PAPER : palette.TEXT,

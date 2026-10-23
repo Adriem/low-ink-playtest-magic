@@ -33,7 +33,7 @@ const DualCard = ({
   faces,
   blackBordered,
   inkLevel,
-  artFidelity,
+  defaultArtFidelity,
   customPalette,
   outlined,
   roundedCorners,
@@ -43,7 +43,7 @@ const DualCard = ({
   faces: [CardFace, CardFace];
   blackBordered?: boolean;
   inkLevel?: InkLevel;
-  artFidelity?: ArtFidelity;
+  defaultArtFidelity?: ArtFidelity;
   customPalette?: CustomPalette;
   ref?: RefCallback<HTMLCanvasElement>;
 }) => {
@@ -72,7 +72,14 @@ const DualCard = ({
 
     beginRender(canvas);
     const faceCanvases = [face1, face2].map((face) =>
-      renderFace(renderCardContents, { face, blackBordered, inkLevel, artFidelity, customPalette, unified: true }),
+      renderFace(renderCardContents, {
+        face,
+        blackBordered,
+        inkLevel,
+        defaultArtFidelity,
+        customPalette,
+        unified: true,
+      }),
     );
 
     // Combining the faces is part of this render, so it's skipped if a newer
@@ -111,7 +118,7 @@ const DualCard = ({
         faces: [face1, face2],
         placement: isDrawnSideways(face1) || isDrawnSideways(face2) ? 'upright-half' : 'right-side',
         blackBordered,
-        artFidelity,
+        defaultArtFidelity,
         customPalette,
       });
       drawCardFrame(ctx, { outlined, roundedCorners }, line);
@@ -129,7 +136,7 @@ const DualCard = ({
     face2,
     blackBordered,
     inkLevel,
-    artFidelity,
+    defaultArtFidelity,
     customPalette,
     outlined,
     roundedCorners,

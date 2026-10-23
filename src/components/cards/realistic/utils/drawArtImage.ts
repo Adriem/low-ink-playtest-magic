@@ -71,18 +71,18 @@ export const drawArtImage = (
 };
 
 /**
- * Draw the art in an area, cropped to the face's part for split cards, and filtered
- * for its fidelity.
+ * Draw the art in an area, cropped to the face's part for split cards (and to
+ * the area's proportions, for art that covers it), and filtered for its
+ * fidelity.
  */
 const drawFilteredArt = (
   ctx: CanvasRenderingContext2D,
   artImage: HTMLImageElement,
   { cropArt, artFidelity, x, y, width, height }: { cropArt?: ArtCrop; artFidelity: ArtFidelity } & Box,
 ) => {
-  if (cropArt && (cropArt.from !== 0 || cropArt.to !== 1)) {
-    const sourceX = artImage.naturalWidth * cropArt.from;
-    const sourceWidth = artImage.naturalWidth * (cropArt.to - cropArt.from);
-    ctx.drawImage(artImage, sourceX, 0, sourceWidth, artImage.naturalHeight, x, y, width, height);
+  if (cropArt && (cropArt.from !== 0 || cropArt.to !== 1 || cropArt.cover)) {
+    const source = getCroppedArea(artImage, cropArt, width / height);
+    ctx.drawImage(artImage, source.x, source.y, source.width, source.height, x, y, width, height);
   } else {
     ctx.drawImage(artImage, x, y, width, height);
   }
@@ -90,4 +90,31 @@ const drawFilteredArt = (
   if (artFidelity === 'mid-tones') shadeMidtonesAdaptive(ctx, x, y, width, height);
   if (artFidelity === 'posterized') posterizeLightAdaptive(ctx, x, y, width, height);
   if (artFidelity === 'grayscale') lightenGrayscale(ctx, x, y, width, height);
+};
+
+/**
+ * The part of an image to draw: its crop's span of its width, and for crops
+ * that cover their area, the middle of that span with the area's proportions.
+ *
+ * @param aspectRatio - Width of the area the art is drawn in, divided by its height
+ */
+export const getCroppedArea = (
+  { naturalWidth, naturalHeight }: { naturalWidth: number; naturalHeight: number },
+  cropArt: ArtCrop,
+  aspectRatio: number,
+): Box => {
+  const span = {
+    x: naturalWidth * cropArt.from,
+    y: 0,
+    width: naturalWidth * (cropArt.to - cropArt.from),
+    height: naturalHeight,
+  };
+  if (!cropArt.cover) return span;
+
+  if (span.width / span.height > aspectRatio) {
+    const width = span.height * aspectRatio;
+    return { ...span, x: span.x + (span.width - width) / 2, width };
+  }
+  const height = span.width / aspectRatio;
+  return { ...span, y: (span.height - height) / 2, height };
 };

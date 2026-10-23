@@ -48,6 +48,8 @@ interface CardOverlayContextValue {
   handleDangerChange: (danger: boolean) => void;
   moveCardBy: (collectionIndex: number, offset: number, event?: ClickLike) => void;
   deleteCard: (collectionIndex: number) => void;
+  /** Override the art of a card, where cards are drawn with art */
+  overrideArt?: (collectionIndex: number) => void;
 }
 
 const CLOSED_OVERLAY: OverlayState = {
@@ -80,11 +82,14 @@ export const CardOverlayProvider = ({
   collectionSize,
   moveCard,
   removeCardAt,
+  onOverrideArt,
   children,
 }: {
   collectionSize: number;
   moveCard: (fromIndex: number, toIndex: number) => void;
   removeCardAt: (index: number) => void;
+  /** Called to override the art of a card, which cards only offer with it */
+  onOverrideArt?: (collectionIndex: number) => void;
   children: ReactNode;
 }) => {
   const [overlay, setOverlay] = useState(CLOSED_OVERLAY);
@@ -169,6 +174,16 @@ export const CardOverlayProvider = ({
     [dismissMenu, removeCardAt],
   );
 
+  const overrideArt = useMemo(
+    () =>
+      onOverrideArt &&
+      ((collectionIndex: number) => {
+        dismissMenu();
+        onOverrideArt(collectionIndex);
+      }),
+    [dismissMenu, onOverrideArt],
+  );
+
   // Clicking or tapping anywhere outside a sticky overlay dismisses it
   const isOverlaySticky = overlay.collectionIndex != null && isSticky(overlay);
   useEffect(() => {
@@ -196,6 +211,7 @@ export const CardOverlayProvider = ({
       handleDangerChange,
       moveCardBy,
       deleteCard,
+      overrideArt,
     }),
     [
       overlay,
@@ -208,6 +224,7 @@ export const CardOverlayProvider = ({
       handleDangerChange,
       moveCardBy,
       deleteCard,
+      overrideArt,
     ],
   );
 

@@ -20,7 +20,7 @@ const Card = ({
   subFacePosition,
   blackBordered,
   inkLevel,
-  artFidelity,
+  defaultArtFidelity,
   customPalette,
   outlined,
   roundedCorners,
@@ -43,8 +43,16 @@ const Card = ({
     const ctx = get2dContext(canvas);
 
     beginRender(canvas);
-    renderCardContents(canvas, { face, subFace, subFacePosition, blackBordered, inkLevel, artFidelity, customPalette });
-    renderFooter(ctx, { faces: [face], placement: 'card-bottom', blackBordered, artFidelity, customPalette });
+    renderCardContents(canvas, {
+      face,
+      subFace,
+      subFacePosition,
+      blackBordered,
+      inkLevel,
+      defaultArtFidelity,
+      customPalette,
+    });
+    renderFooter(ctx, { faces: [face], placement: 'card-bottom', blackBordered, defaultArtFidelity, customPalette });
     drawCardFrame(ctx, { outlined, roundedCorners }, line);
     void finishRender(canvas);
   }, [
@@ -57,7 +65,7 @@ const Card = ({
     subFacePosition,
     blackBordered,
     inkLevel,
-    artFidelity,
+    defaultArtFidelity,
     customPalette,
     outlined,
     roundedCorners,

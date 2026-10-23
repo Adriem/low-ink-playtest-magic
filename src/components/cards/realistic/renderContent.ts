@@ -14,6 +14,7 @@ import { CARD_LAYOUTS, FONT_FAMILY, SAGA_CREATURE_TYPELINE_Y, SAGA_TYPELINE_Y } 
 import { drawSagaCreatureOracleBox } from './utils/drawSagaCreatureOracleBox';
 import { drawSagaOracleAndArtBox } from './utils/drawSagaOracleAndArtBox';
 import {
+  getDrawnArt,
   getDefense,
   getLoyalty,
   getPowerAndToughness,
@@ -42,11 +43,13 @@ export const renderRealisticCardContents = (
     subFacePosition,
     blackBordered,
     inkLevel = 'medium',
-    artFidelity = 'posterized',
+    defaultArtFidelity = 'posterized',
     customPalette,
   }: CardRenderProps,
 ) => {
   const palette = resolvePalette(REALISTIC_PALETTE, customPalette);
+  // Art of the user's own is drawn with its own fidelity
+  const artFidelity = face.artOverride?.fidelity ?? defaultArtFidelity;
   const cardColorTreatment = getCardColorTreatment(face);
   const cardName = face.name;
   const cardManaCost = face.manaCost;
@@ -55,7 +58,7 @@ export const renderRealisticCardContents = (
   const powerAndToughness = getPowerAndToughness(face);
   const cardLoyalty = getLoyalty(face);
 
-  const { assetUrl: cardArtUrl, crop: cropArt } = face.art;
+  const { assetUrl: cardArtUrl, crop: cropArt } = getDrawnArt(face);
 
   const ctx = get2dContext(canvas);
   ctx.fillStyle = getCanvasColor(palette, blackBordered);
@@ -198,8 +201,8 @@ const drawLandscapeCard = (
   });
   drawArtBox(ctx, {
     palette,
-    cardArtUrl: face.art.assetUrl,
-    cropArt: face.art.crop,
+    cardArtUrl: getDrawnArt(face).assetUrl,
+    cropArt: getDrawnArt(face).crop,
     artFidelity,
     cardColorTreatment,
     orientation,

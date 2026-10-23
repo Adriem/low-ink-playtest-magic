@@ -1,4 +1,4 @@
-import type { CardFace, SubCardPosition } from '../../domain/cards';
+import type { ArtFidelity, CardFace, SubCardPosition } from '../../domain/cards';
 import type { Palette } from '../../domain/colorTreatment';
 import { renderMinimalistCardContents } from './minimalist/renderContent';
 import { renderMinimalistFooter } from './minimalist/renderFooter';
@@ -23,7 +23,8 @@ export interface CardRenderProps {
   /** With a black border around the card's content, as wide as the canvas around it */
   blackBordered?: boolean;
   inkLevel?: InkLevel;
-  artFidelity?: ArtFidelity;
+  /** How faithfully art is drawn, unless a face's art override has a fidelity of its own */
+  defaultArtFidelity?: ArtFidelity;
   /** Colors of the card style's palette that replace its defaults, e.g. ones saved by the user */
   customPalette?: CustomPalette;
   /** Drawn as a half of a unified card, which is already turned sideways to read it */
@@ -45,7 +46,8 @@ export interface CardFooterProps {
   faces: CardFace[];
   placement: FooterPlacement;
   blackBordered?: boolean;
-  artFidelity?: ArtFidelity;
+  /** How faithfully art is drawn, unless a face's art override has a fidelity of its own */
+  defaultArtFidelity?: ArtFidelity;
   customPalette?: CustomPalette;
 }
 
@@ -60,13 +62,7 @@ export type CustomPalette = Partial<Record<string, string>>;
  */
 export type InkLevel = 'low' | 'medium' | 'high';
 
-/**
- * How the art of a card is drawn: `blank` leaves the art box blank,
- * `contours` traces only its contours, `mid-tones` shades only its midtones,
- * `posterized` reduces it to a few light grays, `grayscale` turns it to light
- * grayscale, and `no-filter` draws it as it is.
- */
-export type ArtFidelity = 'blank' | 'contours' | 'mid-tones' | 'posterized' | 'grayscale' | 'no-filter';
+export type { ArtFidelity } from '../../domain/cards';
 
 /** Draws the contents of a card on a CARD_WIDTH x CARD_HEIGHT canvas */
 export type CardContentsRenderer = (canvas: HTMLCanvasElement, card: CardRenderProps) => void;

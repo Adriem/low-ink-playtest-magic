@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ArtOverridePanel from './ArtOverridePanel';
 import { loadImage } from '../cards/common/canvasRendering';
@@ -86,16 +86,36 @@ test('overrides each face with an image of its own', async () => {
   );
 });
 
-test('previews the card as edited, with every change, before saving it', async () => {
-  const { onPreview, onSave } = renderPanel(singleCard);
+test('previews the URLs once typing pauses, and the other changes right away, before saving them', () => {
+  vi.useFakeTimers();
+  try {
+    const { onPreview, onSave } = renderPanel(singleCard);
+    const withArt = expect.objectContaining({ mainFace: expect.objectContaining({ artOverride: expect.anything() }) });
 
-  await userEvent.type(screen.getByRole('textbox', { name: 'Image URL' }), 'https://example.com/art.png');
-  await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    // Typed bit by bit, 100 ms apart
+    ['https://e', 'https://example.com/a', 'https://example.com/art.png'].forEach((url) => {
+      fireEvent.change(screen.getByRole('textbox', { name: 'Image URL' }), { target: { value: url } });
+      act(() => vi.advanceTimersByTime(100));
+    });
 
-  expect(onPreview).toHaveBeenLastCalledWith(
-    overrideArt(singleCard, { kind: 'unified', url: 'https://example.com/art.png' }, 'posterized'),
-  );
-  expect(onSave).not.toHaveBeenCalled();
+    // No partial URL was previewed while typing
+    expect(onPreview).not.toHaveBeenCalledWith(withArt);
+
+    act(() => vi.advanceTimersByTime(500));
+
+    expect(onPreview).toHaveBeenLastCalledWith(
+      overrideArt(singleCard, { kind: 'unified', url: 'https://example.com/art.png' }, 'posterized'),
+    );
+
+    fireEvent.change(screen.getByRole('slider', { name: 'Art fidelity' }), { target: { value: '1' } });
+
+    expect(onPreview).toHaveBeenLastCalledWith(
+      overrideArt(singleCard, { kind: 'unified', url: 'https://example.com/art.png' }, 'contours'),
+    );
+    expect(onSave).not.toHaveBeenCalled();
+  } finally {
+    vi.useRealTimers();
+  }
 });
 
 test('enables the art fidelity only with an image URL', async () => {

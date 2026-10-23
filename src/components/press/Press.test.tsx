@@ -344,7 +344,8 @@ describe('hovering with a mouse', () => {
       target: { value: 'https://example.com/art.png' },
     });
 
-    expect(screen.getByLabelText('Art of https://example.com/art.png')).toBeInTheDocument();
+    // Once typing pauses
+    expect(await screen.findByLabelText('Art of https://example.com/art.png')).toBeInTheDocument();
 
     // Only the popup open is a dialog, as closed ones are hidden
     fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancel' }));

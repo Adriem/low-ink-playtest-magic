@@ -43,12 +43,12 @@ test('exports the press with the options asked for in a popup, saying how to pri
   const onExport = vi.fn();
   renderActions({ onExport });
 
-  await user.click(screen.getByRole('button', { name: 'EXPORT' }));
+  await user.click(screen.getByRole('button', { name: 'Export' }));
   expect(onExport).not.toHaveBeenCalled();
   expect(screen.getByRole('group', { name: 'Page size' })).toBeInTheDocument();
-  expect(screen.getByRole('dialog')).toHaveTextContent('actual size (100%)');
+  expect(screen.getByRole('dialog', { name: 'Export' })).toHaveTextContent('actual size (100%)');
 
-  await user.click(screen.getByRole('button', { name: 'Export' }));
+  await user.click(within(screen.getByRole('dialog', { name: 'Export' })).getByRole('button', { name: 'Export' }));
   expect(onExport).toHaveBeenCalledWith({ pageSize: 'a4', fileName: 'mtg-playtest-press' });
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 });
@@ -56,7 +56,7 @@ test('exports the press with the options asked for in a popup, saying how to pri
 test('says it is exporting, and does not export again meanwhile', () => {
   renderActions({ canExport: false, isExporting: true });
 
-  expect(screen.getByRole('button', { name: 'EXPORTING…' })).toBeDisabled();
+  expect(screen.getByRole('button', { name: 'Exporting…' })).toBeDisabled();
 });
 
 test('opens the settings', async () => {
@@ -67,7 +67,7 @@ test('opens the settings', async () => {
 
   await user.click(screen.getByRole('button', { name: 'Settings' }));
 
-  expect(screen.getByRole('dialog')).toBeInTheDocument();
+  expect(screen.getByRole('dialog', { name: 'Settings' })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: 'Card style' })).toBeInTheDocument();
 });
 

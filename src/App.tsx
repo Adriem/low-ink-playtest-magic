@@ -25,7 +25,9 @@ function App() {
         ) : (
           <>
             <SiteHeader />
-            <Press />
+            <main>
+              <Press />
+            </main>
             <SiteFooter />
             <TermsDialog />
           </>

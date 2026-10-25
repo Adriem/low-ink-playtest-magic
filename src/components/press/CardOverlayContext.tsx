@@ -97,6 +97,8 @@ export const CardOverlayProvider = ({
   const hoveredCollectionIndexRef = useRef<number | null>(null);
   // Card buttons of the main face of each collection card, to return focus to them
   const cardButtonsRef = useRef(new Map<number, HTMLButtonElement>());
+  // Position of the card deleted last, whose place the focus goes to once it's gone
+  const deletedCollectionIndexRef = useRef<number | null>(null);
 
   const openHover = useCallback((collectionIndex: number) => {
     setOverlay((current) =>
@@ -169,10 +171,21 @@ export const CardOverlayProvider = ({
   const deleteCard = useCallback(
     (collectionIndex: number) => {
       dismissMenu();
+      deletedCollectionIndexRef.current = collectionIndex;
       removeCardAt(collectionIndex);
     },
     [dismissMenu, removeCardAt],
   );
+
+  // Rather than being lost with the deleted card, the focus goes to the card that takes its place, or to the one
+  // before it if it was the last
+  useEffect(() => {
+    const deletedIndex = deletedCollectionIndexRef.current;
+    if (deletedIndex == null) return;
+
+    deletedCollectionIndexRef.current = null;
+    cardButtonsRef.current.get(Math.min(deletedIndex, collectionSize - 1))?.focus();
+  }, [collectionSize]);
 
   const overrideArt = useMemo(
     () =>

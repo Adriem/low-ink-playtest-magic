@@ -86,7 +86,12 @@ const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMo
 
   return (
     <>
-      <input className="card-name-input" name="cardName" placeholder={t('search_form.placeholder')} />
+      <input
+        className="card-name-input"
+        name="cardName"
+        aria-label={t('search_form.card_name_label')}
+        placeholder={t('search_form.placeholder')}
+      />
       <input className="submit-card-search single" type="submit" value={t('search_form.add')} />
       <SearchModeToggle multipleSearch={false} onChange={onSearchModeChange} />
     </>
@@ -120,6 +125,7 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
         className="card-name-input"
         name="cardNamesList"
         rows={4}
+        aria-label={t('search_form.card_list_label')}
         placeholder={t('search_form.placeholder')}
         onKeyDown={handleKeyDown}
         onInput={handleInput}

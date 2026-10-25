@@ -1,4 +1,3 @@
-import { jsPDF } from 'jspdf';
 import { chunk } from '../../utils/array';
 
 /** Size of a card, as real cards measure (nominally 2.5 x 3.5 inches, or 63.5 x 88.9 mm) */
@@ -29,9 +28,12 @@ type CardImage = string | HTMLImageElement | HTMLCanvasElement | Uint8Array;
  * on white, so their transparent corners print white: JPEG has no
  * transparency, so they would turn black.
  *
+ * jsPDF is loaded the first time, as only exports need it, rather than with
+ * the app.
+ *
  * @param cardImages - List of card images to be displayed
  */
-export const exportToPDF = (
+export const exportToPDF = async (
   cardImages: Iterable<CardImage> | ArrayLike<CardImage>,
   { pageSize, fileName }: PdfExportOptions = DEFAULT_PDF_EXPORT_OPTIONS,
 ) => {
@@ -47,6 +49,7 @@ export const exportToPDF = (
   const cardRows = chunk(images, colsPerPage);
   const cardPages = chunk(cardRows, rowsPerPage);
 
+  const { jsPDF } = await import('jspdf');
   const doc = new jsPDF({ unit: 'mm', orientation: 'portrait', format: pageSize });
 
   for (const [pageIndex, pageRows] of cardPages.entries()) {

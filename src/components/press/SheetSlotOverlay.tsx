@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { faArrowLeft, faArrowRight, faArrowsLeftRight, faImage, faTrash } from '@fortawesome/free-solid-svg-icons';
+import Icon from '../icons/Icon';
 import type { OverlayFocus, OverlayMode } from './CardOverlayContext';
 import type { SheetFace } from '../../domain/press';
 
@@ -160,7 +162,7 @@ const MoveSubmenuButton = ({ hidden, onClick }: { hidden: boolean; onClick: () =
 
   return (
     <OverlayButton className="sheet-slot-overlay-start-move" hidden={hidden} onClick={onClick}>
-      <i className="fa fa-arrows-alt-h" /> {t('card_overlay.move')}
+      <Icon icon={faArrowsLeftRight} /> {t('card_overlay.move')}
     </OverlayButton>
   );
 };
@@ -170,7 +172,7 @@ const EditArtButton = ({ hidden, onClick }: { hidden: boolean; onClick: () => vo
 
   return (
     <OverlayButton className="sheet-slot-overlay-edit-art" hidden={hidden} onClick={onClick}>
-      <i className="fa fa-image" /> {t('card_overlay.edit_art')}
+      <Icon icon={faImage} /> {t('card_overlay.edit_art')}
     </OverlayButton>
   );
 };
@@ -182,12 +184,12 @@ const MoveButtons = ({ hidden, canMoveUp, canMoveDown, onMoveUp, onMoveDown }: M
     <>
       {canMoveUp && (
         <OverlayButton className="sheet-slot-overlay-move-up" hidden={hidden} onClick={onMoveUp}>
-          <i className="fa fa-arrow-left" /> {t('card_overlay.move_up')}
+          <Icon icon={faArrowLeft} /> {t('card_overlay.move_up')}
         </OverlayButton>
       )}
       {canMoveDown && (
         <OverlayButton className="sheet-slot-overlay-move-down" hidden={hidden} onClick={onMoveDown}>
-          <i className="fa fa-arrow-right" /> {t('card_overlay.move_down')}
+          <Icon icon={faArrowRight} /> {t('card_overlay.move_down')}
         </OverlayButton>
       )}
     </>
@@ -225,7 +227,7 @@ const DeleteButton = ({
 
   return (
     <OverlayButton className="sheet-slot-overlay-delete" hidden={hidden} onClick={onClick} {...dangerHandlers}>
-      <i className="fa fa-trash" /> {t('card_overlay.delete')}
+      <Icon icon={faTrash} /> {t('card_overlay.delete')}
     </OverlayButton>
   );
 };

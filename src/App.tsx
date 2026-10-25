@@ -1,4 +1,3 @@
-import '@fortawesome/fontawesome-free/js/all.min.js';
 import { lazy, Suspense } from 'react';
 import Press from './components/press/Press';
 import SiteFooter from './components/footer/SiteFooter';

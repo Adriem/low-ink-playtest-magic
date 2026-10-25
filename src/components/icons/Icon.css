@@ -1,0 +1,8 @@
+/* In line with the text, as tall as it, like Font Awesome's own icons */
+svg.icon {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  overflow: visible;
+  vertical-align: -0.125em;
+}

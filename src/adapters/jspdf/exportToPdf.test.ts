@@ -11,8 +11,8 @@ beforeEach(() => {
   vi.mocked(jsPDF).mockClear();
 });
 
-test('lays out the cards in A4 pages of 3x3 cards, in millimeters, and downloads it as mtg-playtest-press.pdf by default', () => {
-  exportToPDF(cardImages(10));
+test('lays out the cards in A4 pages of 3x3 cards, in millimeters, and downloads it as mtg-playtest-press.pdf by default', async () => {
+  await exportToPDF(cardImages(10));
   const pdf = createdPdf();
 
   expect(jsPDF).toHaveBeenCalledWith({ unit: 'mm', orientation: 'portrait', format: 'a4' });
@@ -21,8 +21,8 @@ test('lays out the cards in A4 pages of 3x3 cards, in millimeters, and downloads
   expect(pdf.save).toHaveBeenCalledWith('mtg-playtest-press.pdf');
 });
 
-test('draws each card at the size of real cards, centered in its page', () => {
-  exportToPDF(cardImages(9));
+test('draws each card at the size of real cards, centered in its page', async () => {
+  await exportToPDF(cardImages(9));
   const positions = createdPdf().addImage.mock.calls.map(([, , x, y, width, height]) => [x, y, width, height]);
 
   // An A4 page is 210 x 297 mm, and cards are 63 x 88 mm
@@ -34,8 +34,8 @@ test('draws each card at the size of real cards, centered in its page', () => {
   expect(positions[8]).toEqual([xOffset + 126, yOffset + 176, 63, 88]);
 });
 
-test('lays out letter pages, centering the cards in them', () => {
-  exportToPDF(cardImages(10), { pageSize: 'letter', fileName: 'press' });
+test('lays out letter pages, centering the cards in them', async () => {
+  await exportToPDF(cardImages(10), { pageSize: 'letter', fileName: 'press' });
   const pdf = createdPdf();
 
   expect(jsPDF).toHaveBeenCalledWith({ unit: 'mm', orientation: 'portrait', format: 'letter' });
@@ -44,7 +44,7 @@ test('lays out letter pages, centering the cards in them', () => {
   expect(pdf.addImage.mock.calls[0].slice(2, 4)).toEqual([(215.9 - 3 * 63) / 2, (279.4 - 3 * 88) / 2]);
 });
 
-test('puts the cards drawn on canvases on white, so transparent corners come out white', () => {
+test('puts the cards drawn on canvases on white, so transparent corners come out white', async () => {
   const drawn: unknown[][] = [];
   const ctx = {
     fillRect: (...args: unknown[]) => drawn.push(['fillRect', ctx.fillStyle, ...args]),
@@ -56,7 +56,7 @@ test('puts the cards drawn on canvases on white, so transparent corners come out
   card.width = 500;
   card.height = 700;
 
-  exportToPDF([card]);
+  await exportToPDF([card]);
   getContext.mockRestore();
 
   expect(drawn).toEqual([
@@ -68,8 +68,8 @@ test('puts the cards drawn on canvases on white, so transparent corners come out
   expect([image.width, image.height]).toEqual([500, 700]);
 });
 
-test('adds the cards as JPEG images', () => {
-  exportToPDF(cardImages(1));
+test('adds the cards as JPEG images', async () => {
+  await exportToPDF(cardImages(1));
 
   expect(createdPdf().addImage.mock.calls[0].slice(0, 2)).toEqual(['card-0', 'JPEG']);
 });
@@ -78,8 +78,8 @@ test.each([
   ['commander-deck', 'commander-deck.pdf'],
   ['deck.PDF', 'deck.PDF'],
   ['  ', 'mtg-playtest-press.pdf'],
-])('downloads the file named %j as %j', (fileName, expected) => {
-  exportToPDF(cardImages(1), { pageSize: 'a4', fileName });
+])('downloads the file named %j as %j', async (fileName, expected) => {
+  await exportToPDF(cardImages(1), { pageSize: 'a4', fileName });
 
   expect(createdPdf().save).toHaveBeenCalledWith(expected);
 });

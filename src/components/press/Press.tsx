@@ -233,7 +233,7 @@ const exportCardsToPdf = async (canvases: HTMLCanvasElement[], options: PdfExpor
   const rendered = await Promise.all(canvases.map((canvas) => whenRendered(canvas, RENDER_TIMEOUT_MS)));
   if (rendered.includes(false)) window.alert(i18n.t('press.export_incomplete'));
 
-  exportToPDF(canvases, options);
+  await exportToPDF(canvases, options);
 };
 
 const loadPersistedCards = () => {

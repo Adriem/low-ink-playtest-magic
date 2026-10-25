@@ -12,10 +12,13 @@ import {
 import { loadImage } from '../cards/common/canvasRendering';
 import { Popup } from '../popup';
 import { SETTINGS_DEFINITIONS } from '../settings';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 
 import './ArtOverridePanel.css';
 
 const FIDELITY_OPTIONS = SETTINGS_DEFINITIONS.artFidelity.options;
+/** How long typing has to pause before the card previews the URLs, rather than loading every partial one */
+const URL_PREVIEW_DELAY_MS = 500;
 
 /** One image for both faces of a card, or one per face */
 type ImagesMode = ArtOverrideImages['kind'];
@@ -59,21 +62,27 @@ const ArtOverridePanel = ({
   const [artist, setArtist] = useState(() => getOverrideArtist(card));
   const [hasLoadError, setHasLoadError] = useState(false);
   const fidelityIndex = FIDELITY_OPTIONS.findIndex((option) => option.value === fidelity);
-  const images: ArtOverrideImages =
-    mode === 'unified'
-      ? { kind: 'unified', url: unifiedUrl.trim() }
-      : { kind: 'split', urls: faceUrls.map((url) => url.trim()) };
-  const urls = (images.kind === 'unified' ? [images.url] : images.urls).filter((url): url is string => !!url);
-  const editedCard = urls.length > 0 ? overrideArt(card, images, fidelity, artist) : clearArtOverrides(card);
+  const editedCard = editCard(card, { mode, unifiedUrl, faceUrls, fidelity, artist });
+  const urls = getUrls(mode, unifiedUrl, faceUrls);
+  // The card previews the URLs once typing pauses, and the rest of the changes right away
+  const previewedUnifiedUrl = useDebouncedValue(unifiedUrl, URL_PREVIEW_DELAY_MS);
+  const previewedFaceUrls = useDebouncedValue(faceUrls, URL_PREVIEW_DELAY_MS);
+  const previewedCard = editCard(card, {
+    mode,
+    unifiedUrl: previewedUnifiedUrl,
+    faceUrls: previewedFaceUrls,
+    fidelity,
+    artist,
+  });
 
   useEffect(() => {
     ref.current?.showModal();
   }, []);
 
-  const previewEditedCard = useEffectEvent(() => onPreview(editedCard));
+  const previewCard = useEffectEvent(() => onPreview(previewedCard));
   useEffect(() => {
-    previewEditedCard();
-  }, [mode, unifiedUrl, faceUrls, fidelity, artist]);
+    previewCard();
+  }, [mode, previewedUnifiedUrl, previewedFaceUrls, fidelity, artist]);
 
   const close = () => {
     ref.current?.close();
@@ -208,6 +217,36 @@ const ArtOverridePanel = ({
       </form>
     </Popup>
   );
+};
+
+/**
+ * The card as edited: with its art overridden by the images of its URLs, or
+ * its own art without them.
+ */
+const editCard = (
+  card: Card,
+  {
+    mode,
+    unifiedUrl,
+    faceUrls,
+    fidelity,
+    artist,
+  }: { mode: ImagesMode; unifiedUrl: string; faceUrls: string[]; fidelity: ArtFidelity; artist: string },
+): Card => {
+  const images: ArtOverrideImages =
+    mode === 'unified'
+      ? { kind: 'unified', url: unifiedUrl.trim() }
+      : { kind: 'split', urls: faceUrls.map((url) => url.trim()) };
+  return getUrls(mode, unifiedUrl, faceUrls).length > 0
+    ? overrideArt(card, images, fidelity, artist)
+    : clearArtOverrides(card);
+};
+
+/**
+ * The URLs of the images, without the empty ones.
+ */
+const getUrls = (mode: ImagesMode, unifiedUrl: string, faceUrls: string[]): string[] => {
+  return (mode === 'unified' ? [unifiedUrl] : faceUrls).map((url) => url.trim()).filter(Boolean);
 };
 
 /**

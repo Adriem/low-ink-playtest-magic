@@ -64,7 +64,7 @@ export const saveToStorage = (area: StorageArea, key: StorageKey, value: unknown
 
 /**
  * Remove all the data the app saved, leaving other data alone (e.g. of other
- * sites on the same domain, like GitHub Pages').
+ * sites on the same domain).
  */
 export const clearSavedData = () => {
   (['localStorage', 'sessionStorage'] as const).forEach((area) => {

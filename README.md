@@ -2,7 +2,7 @@
 
 Print Magic: The Gathering™ playtest proxies that use as little ink as possible.
 
-**[Open the app](https://adriem.github.io/low-ink-mtg-press/)**
+**[Open the app](https://playtest-magic.adriem.me/)**
 
 Add the cards you want to try, one by one or as a whole deck list, and the app draws each one as a printable playtest card, with as much or as little ink as you choose. It lays them out 9 to a page, and exports them to a PDF to print, cut out and sleeve in front of a real card.
 

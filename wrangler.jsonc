@@ -1,0 +1,10 @@
+// Cloudflare Workers, which serves the built app as static assets: no Worker script.
+// Workers Builds deploys main (npx wrangler deploy) and every other branch as a Preview (npx wrangler preview).
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "low-ink-playtest-magic",
+  "compatibility_date": "2026-10-25",
+  "assets": {
+    "directory": "./dist",
+  },
+}

@@ -3,7 +3,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react()],
-  // Relative asset paths, so the build works under any path (e.g. GitHub Pages)
+  // Relative asset paths, so the build works under any path (e.g. a preview's)
   base: './',
   server: {
     port: 3000,

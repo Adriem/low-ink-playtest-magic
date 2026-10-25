@@ -5,6 +5,9 @@
 /dist
 /coverage
 
+# Wrangler's local state and cache
+/.wrangler
+
 # Local environment files
 .env*.local
 

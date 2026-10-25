@@ -1,6 +1,6 @@
 # Low-ink Playtest Magic
 
-A web app that prints Magic: The Gathering™ playtest proxies using as little ink as possible. Users add cards by name (one at a time or as a list), the app draws each card on a `<canvas>`, lays them out in sheets of 9 (3×3), and exports them to a PDF. Card data and images come from Scryfall. It's a static site, deployed to GitHub Pages, with no server.
+A web app that prints Magic: The Gathering™ playtest proxies using as little ink as possible. Users add cards by name (one at a time or as a list), the app draws each card on a `<canvas>`, lays them out in sheets of 9 (3×3), and exports them to a PDF. Card data and images come from Scryfall. It's a static site, served by Cloudflare Workers as static assets (`wrangler.jsonc`), with no server code.
 
 ## Commands
 
@@ -8,6 +8,7 @@ Use the Node version in `.nvmrc` (`nvm use`).
 
 - `npm start`: development server. The card workbench, a development-only page for tuning renderers, is at `/workbench`.
 - `npm run lint`, `npm run format:check` (`npm run format` to fix), `npm run typecheck`, `npx vitest run`, `npm run build`: what CI runs (`.github/workflows/ci.yml`), in that order. Run them all before pushing.
+- Deploys: Cloudflare's Workers Builds builds `main` and deploys it (`npx wrangler deploy`), and deploys every other branch as a Preview, whose URL it posts on its pull request.
 
 ## Stack
 

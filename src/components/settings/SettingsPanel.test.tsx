@@ -20,7 +20,7 @@ test('shows a group of options for each setting, with the defaults selected', ()
 
   expect(screen.getByRole('group', { name: 'Card style', hidden: true })).toBeInTheDocument();
   expect(screen.getByLabelText('Realistic')).toBeChecked();
-  expect(screen.getByRole('group', { name: 'Double-Faced card treatment', hidden: true })).toBeInTheDocument();
+  expect(screen.getByRole('group', { name: 'Double-faced card treatment', hidden: true })).toBeInTheDocument();
   expect(screen.getByLabelText('Medium')).toBeChecked();
 });
 
@@ -52,11 +52,11 @@ test('picks the art fidelity with a slider through its levels, with its flag on'
   const slider = screen.getByRole('slider', { name: 'Art fidelity', hidden: true });
 
   expect(slider).toHaveValue('3');
-  expect(slider).toHaveAttribute('aria-valuetext', '4');
+  expect(slider).toHaveAttribute('aria-valuetext', '4 (posterized)');
 
   fireEvent.change(slider, { target: { value: '1' } });
 
-  expect(slider).toHaveAttribute('aria-valuetext', '2');
+  expect(slider).toHaveAttribute('aria-valuetext', '2 (contours)');
   expect(getSavedSettings().artFidelity).toBe('contours');
 
   fireEvent.change(slider, { target: { value: '0' } });
@@ -151,7 +151,10 @@ test('restores the default of every setting', async () => {
 
   expect(screen.getByLabelText('Realistic')).toBeChecked();
   expect(screen.getByLabelText('Medium')).toBeChecked();
-  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toHaveAttribute('aria-valuetext', '4');
+  expect(screen.getByRole('slider', { name: 'Art fidelity', hidden: true })).toHaveAttribute(
+    'aria-valuetext',
+    '4 (posterized)',
+  );
   expect(getSavedSettings()).toEqual({
     cardVariant: 'realistic',
     doubleFacedCardTreatment: 'separate',

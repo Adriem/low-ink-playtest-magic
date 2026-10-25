@@ -61,7 +61,7 @@
       }
     },
     "double_faced_card_treatment": {
-      "label": "Double-Faced card treatment",
+      "label": "Double-faced card treatment",
       "options": {
         "unified": "Unified",
         "separate": "Separate"
@@ -78,12 +78,12 @@
     "art_fidelity": {
       "label": "Art fidelity",
       "options": {
-        "blank": "1",
-        "contours": "2",
-        "mid_tones": "3",
-        "posterized": "4",
-        "grayscale": "5",
-        "no_filter": "6"
+        "blank": "1 (blank)",
+        "contours": "2 (contours)",
+        "mid_tones": "3 (mid-tones)",
+        "posterized": "4 (posterized)",
+        "grayscale": "5 (grayscale)",
+        "no_filter": "6 (no filter)"
       }
     },
     "card_border": {

@@ -155,7 +155,7 @@ test('starts from how the art was overridden', () => {
 
   expect(screen.getByRole('radio', { name: 'Split' })).toBeChecked();
   expect(screen.getByRole('textbox', { name: 'Image URL of Fire' })).toHaveValue('https://example.com/fire.png');
-  expect(screen.getByRole('slider', { name: 'Art fidelity' })).toHaveAttribute('aria-valuetext', '2');
+  expect(screen.getByRole('slider', { name: 'Art fidelity' })).toHaveAttribute('aria-valuetext', '2 (contours)');
   // An unknown artist shows as the placeholder
   expect(screen.getByRole('textbox', { name: 'Artist' })).toHaveValue('');
 });

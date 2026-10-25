@@ -8,6 +8,12 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  build: {
+    rolldownOptions: {
+      // Dependencies' license comments (e.g. Font Awesome's, whose icons ask for credit) stay in the build
+      output: { comments: { legal: true } },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,

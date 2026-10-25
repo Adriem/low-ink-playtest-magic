@@ -43,6 +43,14 @@ The cards it makes are **playtest cards, for your personal, casual use only**: t
 
 Card data and images come from [Scryfall](https://scryfall.com), following its [API guidelines](https://scryfall.com/docs/api): the app doesn't alter Scryfall's art, and doesn't imply Scryfall endorses it.
 
+The images you add yourself with **Edit art** are yours to choose: you're responsible for having the right to use them, and to change them as the app does (e.g. filtering them), under their terms.
+
+## Credits
+
+- Card data, art and mana symbols: [Scryfall](https://scryfall.com).
+- Icons: [Font Awesome Free](https://fontawesome.com) by Fonticons, Inc., licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) ([license](https://fontawesome.com/license/free)).
+- Title font: [Cinzel](https://fonts.google.com/specimen/Cinzel) by Natanael Gama, licensed under the [SIL Open Font License 1.1](https://openfontlicense.org).
+
 ## Supported browsers
 
 Recent versions of Chrome, Edge, Firefox and Safari, on computers and phones.

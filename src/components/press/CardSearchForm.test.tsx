@@ -27,6 +27,22 @@ test('labels the card name and card list fields', async () => {
   expect(screen.getByRole('textbox', { name: 'Card list' })).toBeInTheDocument();
 });
 
+test("turns off autocorrect, automatic capitals, suggestions and spell checking, which card names don't suit", async () => {
+  setupForm();
+  const expectNoTypingAids = (field: HTMLElement) => {
+    expect(field).toHaveAttribute('autocomplete', 'off');
+    expect(field).toHaveAttribute('autocorrect', 'off');
+    expect(field).toHaveAttribute('autocapitalize', 'off');
+    expect(field).toHaveAttribute('spellcheck', 'false');
+  };
+
+  expectNoTypingAids(screen.getByRole('textbox', { name: 'Card name' }));
+
+  await user.click(screen.getByLabelText('card list'));
+
+  expectNoTypingAids(screen.getByRole('textbox', { name: 'Card list' }));
+});
+
 test('clears the card name after adding it', async () => {
   setupForm();
   const input = screen.getByPlaceholderText(/colossal dreadmaw/i);

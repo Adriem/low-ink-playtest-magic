@@ -7,6 +7,12 @@ import './CardSearchForm.css';
 type SearchModeChangeHandler = (multipleSearch: boolean) => void;
 
 /**
+ * Card names are made up words (e.g. "Dreadmaw"), so phones' autocorrect,
+ * automatic capitals and suggestions, and spell checking only get in the way
+ */
+const CARD_NAME_TYPING = { autoComplete: 'off', autoCorrect: 'off', autoCapitalize: 'off', spellCheck: false } as const;
+
+/**
  * Search form to add cards by name, either one at a time or as a list.
  *
  * @param props.onAddCard - Called with the name of a card added on its own
@@ -89,6 +95,7 @@ const SingleCardFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMo
       <input
         className="card-name-input"
         name="cardName"
+        {...CARD_NAME_TYPING}
         aria-label={t('search_form.card_name_label')}
         placeholder={t('search_form.placeholder')}
       />
@@ -125,6 +132,7 @@ const CardListFields = ({ onSearchModeChange }: { onSearchModeChange: SearchMode
         className="card-name-input"
         name="cardNamesList"
         rows={4}
+        {...CARD_NAME_TYPING}
         aria-label={t('search_form.card_list_label')}
         placeholder={t('search_form.placeholder')}
         onKeyDown={handleKeyDown}

@@ -138,6 +138,7 @@
   "footer": {
     "disclaimer": "Low-ink Playtest Magic is unofficial fan-made software, not affiliated with, endorsed, sponsored or approved by Wizards of the Coast. Magic: The Gathering™, its card names, rules text, mana and set symbols, and card art are trademarks and copyrights of Wizards of the Coast LLC and of their artists.",
     "copyright": "Everything else, including the code, © {{year}} {{holder}}.",
+    "license": "The code is free software, licensed under the <license>GNU AGPL v3</license>. <repo>Source code</repo>",
     "found_issues": "Found any issues?",
     "report_here": "Report here"
   },

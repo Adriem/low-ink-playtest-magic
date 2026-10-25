@@ -17,6 +17,18 @@ test('says the cards belong to Wizards of the Coast', () => {
   ).toBeInTheDocument();
 });
 
+test('links to the license of the code and to its source, in new tabs', () => {
+  render(<SiteFooter />);
+
+  expect(screen.getByRole('link', { name: 'GNU AGPL v3' })).toHaveAttribute(
+    'href',
+    'https://www.gnu.org/licenses/agpl-3.0.html',
+  );
+  const source = screen.getByRole('link', { name: 'Source code' });
+  expect(source).toHaveAttribute('href', 'https://github.com/Adriem/low-ink-mtg-press');
+  expect(source).toHaveAttribute('target', '_blank');
+});
+
 test('links to reporting an issue on GitHub, in a new tab', () => {
   render(<SiteFooter />);
 

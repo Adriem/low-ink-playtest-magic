@@ -2,6 +2,7 @@
   "name": "low-ink-playtest-magic",
   "description": "Create ready-to-print, low-ink Magic: The Gathering™ playtest cards.",
   "version": "0.1.0",
+  "license": "AGPL-3.0-only",
   "private": true,
   "homepage": "https://adriem.github.io/low-ink-mtg-press/",
   "repository": {

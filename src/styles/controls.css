@@ -31,6 +31,8 @@
   --button-edge-shadow-hover: #999;
   --button-danger-color: #aa0033;
   --button-danger-background-hover: #dcc4c6;
+  --button-danger-edge-light-hover: #fbeef0;
+  --button-danger-edge-shadow-hover: #b0898f;
 
   --field-background: #fcfcfc;
   --field-edge-light: white;
@@ -107,7 +109,16 @@ input[type='reset'] {
 /* Slightly red while hovered, as a warning before clicking */
 button.danger:hover:not(:disabled),
 input[type='reset']:hover:not(:disabled) {
+  border-color: var(--button-danger-edge-light-hover) var(--button-danger-edge-light-hover)
+    var(--button-danger-edge-shadow-hover) var(--button-danger-edge-shadow-hover);
   background: var(--button-danger-background-hover);
+}
+/* Pressed: the light and shadow edges swap. Only while still hovered, so it
+   turns grey as a whole when the pointer moves away while pressing */
+button.danger:hover:active:not(:disabled),
+input[type='reset']:hover:active:not(:disabled) {
+  border-color: var(--button-danger-edge-shadow-hover) var(--button-danger-edge-shadow-hover)
+    var(--button-danger-edge-light-hover) var(--button-danger-edge-light-hover);
 }
 
 /* A shadow lighter than the page, blurred, so it stands out over the cards */

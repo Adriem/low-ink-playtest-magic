@@ -88,8 +88,8 @@ const SheetSlot = ({
   const handleMoveDown = (event: MouseEvent) => {
     return moveCardBy(collectionIndex, 1, event);
   };
-  const handleDelete = () => {
-    return deleteCard(collectionIndex);
+  const handleDelete = (event: MouseEvent) => {
+    return deleteCard(collectionIndex, event);
   };
   const handleOverrideArt = () => {
     return overrideArt?.(collectionIndex);

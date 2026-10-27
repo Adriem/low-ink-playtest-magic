@@ -2,3 +2,8 @@
 .terms-dialog {
   max-width: 32rem;
 }
+
+/* The terms, in the fine print's font */
+.terms-dialog p {
+  font: var(--font-legal);
+}

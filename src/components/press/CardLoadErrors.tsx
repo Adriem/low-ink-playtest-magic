@@ -16,7 +16,7 @@ const CardLoadErrors = ({ cardNames, onDismiss }: { cardNames: string[]; onDismi
     <div className="card-load-errors" role="alert">
       <button
         type="button"
-        className="card-load-errors-dismiss"
+        className="icon-button card-load-errors-dismiss"
         aria-label={t('card_load_errors.dismiss')}
         onClick={onDismiss}
       >

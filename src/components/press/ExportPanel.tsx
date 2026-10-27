@@ -83,7 +83,7 @@ const ExportPanel = ({
           <button type="button" onClick={handleCancelClick}>
             {t('export_panel.cancel')}
           </button>
-          <button type="submit" className="export">
+          <button type="submit" className="primary">
             {t('export_panel.export')}
           </button>
         </menu>

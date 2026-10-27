@@ -66,7 +66,7 @@ const Popup = ({
             </button>
           )}
           {hasCloseButton && (
-            <button type="button" className="popup-close" aria-label={t('popup.close')} onClick={handleCloseClick}>
+            <button type="button" className="icon-button" aria-label={t('popup.close')} onClick={handleCloseClick}>
               ×
             </button>
           )}

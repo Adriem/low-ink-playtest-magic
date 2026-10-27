@@ -1,6 +1,5 @@
+/* Apart from the URLs below (the modes are apart from each other like any popup's radio buttons) */
 .art-override-panel .art-override-modes {
-  display: flex;
-  gap: 1rem;
   margin-bottom: 0.5rem;
 }
 

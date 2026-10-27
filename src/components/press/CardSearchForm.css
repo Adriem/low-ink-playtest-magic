@@ -12,10 +12,19 @@
   }
 }
 
-/* Takes the rest of the line, shrinking as much as needed for the button to fit */
+/* Takes the rest of the line, shrinking as much as needed for the button to
+   fit. Its rounded right end tucks under the button, as if joined to it */
 .card-search-form input.card-name-input {
   flex: 1;
   min-width: 0;
+  margin-right: -8px;
+}
+@media (pointer: coarse) {
+  .card-search-form input.card-name-input {
+    margin-right: -12px;
+    /* Its text keeps clear of the button over its end */
+    padding-right: 20px;
+  }
 }
 
 .card-search-form .submit-card-search.single {
@@ -28,10 +37,19 @@
   }
 }
 
-/* As wide as the form, and only taller or shorter when resized */
+/* As wide as the form, and only taller or shorter when resized. Inset a
+   little, in line with the rounded ends of the single-line field */
 .card-search-form textarea.card-name-input {
   width: 100%;
+  margin-right: 5px;
+  margin-left: 5px;
   resize: vertical;
+}
+@media (pointer: coarse) {
+  .card-search-form textarea.card-name-input {
+    margin-right: 7px;
+    margin-left: 7px;
+  }
 }
 
 /* On its own line, on the right, below the text area */
@@ -53,5 +71,23 @@
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
-  cursor: pointer;
+}
+
+/* Each option on one line */
+.card-search-form .search-mode label,
+.card-search-form .search-mode #search-mode-label {
+  white-space: nowrap;
+}
+
+/* Too narrow for the title and both options (they need about 345px): the
+   title goes, as the options say what they are. Screen readers still read it,
+   as it names the group */
+@media (max-width: 399px) {
+  .card-search-form .search-mode #search-mode-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
 }

@@ -35,6 +35,9 @@ export interface OverlayState {
 /** A click, or anything else that tells whether it came from the keyboard */
 type ClickLike = { detail: number };
 
+/** A click, with where the pointer was */
+type PointerClickLike = ClickLike & { clientX: number; clientY: number };
+
 interface CardOverlayContextValue {
   overlay: OverlayState;
   hoveredCollectionIndexRef: RefObject<number | null>;
@@ -47,7 +50,7 @@ interface CardOverlayContextValue {
   handleStartMove: () => void;
   handleDangerChange: (danger: boolean) => void;
   moveCardBy: (collectionIndex: number, offset: number, event?: ClickLike) => void;
-  deleteCard: (collectionIndex: number) => void;
+  deleteCard: (collectionIndex: number, event?: PointerClickLike) => void;
   /** Override the art of a card, where cards are drawn with art */
   overrideArt?: (collectionIndex: number) => void;
 }
@@ -59,6 +62,9 @@ const CLOSED_OVERLAY: OverlayState = {
   focus: null,
   focusRequestId: 0,
 };
+
+/** "Delete" in an open overlay */
+const OPEN_DELETE_BUTTON = '.sheet-slot-overlay.open .sheet-slot-overlay-delete';
 
 const CardOverlayContext = createContext<CardOverlayContextValue | null>(null);
 
@@ -99,6 +105,8 @@ export const CardOverlayProvider = ({
   const cardButtonsRef = useRef(new Map<number, HTMLButtonElement>());
   // Position of the card deleted last, whose place the focus goes to once it's gone
   const deletedCollectionIndexRef = useRef<number | null>(null);
+  // Where the pointer clicked to delete it, if it wasn't from the keyboard
+  const deletedAtRef = useRef<{ x: number; y: number } | null>(null);
 
   const openHover = useCallback((collectionIndex: number) => {
     setOverlay((current) =>
@@ -169,9 +177,10 @@ export const CardOverlayProvider = ({
   );
 
   const deleteCard = useCallback(
-    (collectionIndex: number) => {
+    (collectionIndex: number, event?: PointerClickLike) => {
       dismissMenu();
       deletedCollectionIndexRef.current = collectionIndex;
+      deletedAtRef.current = event && !isKeyboardClick(event) ? { x: event.clientX, y: event.clientY } : null;
       removeCardAt(collectionIndex);
     },
     [dismissMenu, removeCardAt],
@@ -185,6 +194,14 @@ export const CardOverlayProvider = ({
 
     deletedCollectionIndexRef.current = null;
     cardButtonsRef.current.get(Math.min(deletedIndex, collectionSize - 1))?.focus();
+
+    // The next card's "Delete" may now be under the pointer, which browsers only tell once it moves: the overlay
+    // turns red right away, so it's clear that clicking again deletes that card too
+    const deletedAt = deletedAtRef.current;
+    deletedAtRef.current = null;
+    if (deletedAt && document.elementFromPoint(deletedAt.x, deletedAt.y)?.closest(OPEN_DELETE_BUTTON)) {
+      setOverlay((current) => ({ ...current, danger: true }));
+    }
   }, [collectionSize]);
 
   const overrideArt = useMemo(

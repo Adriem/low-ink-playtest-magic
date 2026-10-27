@@ -90,9 +90,19 @@ afterAll(() => {
   delete (window as { PointerEvent?: unknown }).PointerEvent;
 });
 
+// jsdom has no layout, so no element under a point: tests say which one is
+beforeAll(() => {
+  document.elementFromPoint = () => null;
+});
+
+afterAll(() => {
+  delete (document as Partial<Document>).elementFromPoint;
+});
+
 afterEach(() => {
   sessionStorage.clear();
   localStorage.clear();
+  vi.restoreAllMocks();
 });
 
 test('numbers the pages below each sheet', () => {
@@ -384,6 +394,32 @@ describe('hovering with a mouse', () => {
     expect(screen.getByText('Colossal Dreadmaw')).toBeInTheDocument();
   });
 
+  test('after deleting, stays red if the next card\'s "Delete" is under the pointer', () => {
+    const { slots } = renderPress();
+    hover(slots[0]);
+    const elementFromPoint = vi.spyOn(document, 'elementFromPoint').mockImplementation(() => {
+      // Once the next card has taken the deleted one's place
+      return screen.getAllByRole('button', { name: /delete/i })[0];
+    });
+
+    fireEvent.click(screen.getAllByRole('button', { name: /delete/i })[0], { detail: 1, clientX: 10, clientY: 20 });
+
+    expect(elementFromPoint).toHaveBeenCalledWith(10, 20);
+    expect(dangerOverlaysNow()).toEqual([true, true]);
+  });
+
+  test('after deleting, is not red if the pointer is somewhere else', () => {
+    const { slots } = renderPress();
+    hover(slots[0]);
+    vi.spyOn(document, 'elementFromPoint').mockImplementation(() => {
+      return screen.getAllByRole('button', { name: /edit art/i })[0];
+    });
+
+    fireEvent.click(screen.getAllByRole('button', { name: /delete/i })[0], { detail: 1, clientX: 10, clientY: 20 });
+
+    expect(dangerOverlaysNow()).toEqual([false, false]);
+  });
+
   describe('move state', () => {
     test('shows the move buttons and "Close", but not "Delete"', () => {
       const { slots } = renderPress();
@@ -653,6 +689,12 @@ const renderPress = () => {
   };
 
   return { slots, overlays, openOverlays, dangerOverlays };
+};
+
+/** Which overlays are red, for the cards shown now (e.g. after deleting one) */
+const dangerOverlaysNow = () => {
+  // eslint-disable-next-line testing-library/no-node-access
+  return [...document.querySelectorAll('.sheet-slot-overlay')].map((overlay) => overlay.classList.contains('danger'));
 };
 
 const cardOrder = () => {

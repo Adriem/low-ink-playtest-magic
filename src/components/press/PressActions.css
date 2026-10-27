@@ -19,7 +19,7 @@
    supported: Chrome and Edge 133+). A shadow, so the bar keeps its height */
 @container scroll-state(stuck: top) {
   .press-actions-bar {
-    box-shadow: 0 2px 0 black;
+    box-shadow: 0 var(--pinline-width) 0 var(--pinline-color);
   }
 }
 
@@ -31,20 +31,9 @@
   gap: 0.5rem;
 }
 
-.press-actions .clear {
+/* The first action (Clear) goes on the left, apart from the others */
+.press-actions-bar > .container > :first-child {
   margin-right: auto;
-}
-
-.press-actions .clear,
-.clear-panel .clear {
-  font-weight: bold;
-  color: #a03;
-}
-
-.press-actions .export {
-  font-weight: bold;
-  /* Capitals by style, so screen readers read the word rather than spell it */
-  text-transform: uppercase;
 }
 
 dialog:not([open]) {

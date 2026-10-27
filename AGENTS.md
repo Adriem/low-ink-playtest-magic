@@ -27,6 +27,7 @@ Vite, React 19, TypeScript, i18next with react-i18next, jsPDF. Tests: Vitest wit
   - `error/` (the app's error boundary), `header/`, `footer/`, `workbench/` (development only, left out of production builds).
 - `src/hooks/`: the card collection, sheets, card lookups.
 - `src/i18n/`: the texts (`en.json`) and the i18next setup.
+- `src/styles/`: site-wide styles: the fonts (`fonts.css`) and the buttons and text fields (`controls.css`, with utility classes like `primary`, `danger`, `link-button`, `icon-button` and `floating`).
 - `src/utils/`: small generic helpers (storage, arrays, objects, layout, a throttled queue).
 - `src/testUtils.ts`: test helpers (`testCard`, `testFace`, `deferred`). Only tests may import it.
 

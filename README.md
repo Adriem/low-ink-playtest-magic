@@ -58,9 +58,9 @@ The code is free software: © Adrian Moreno, licensed under the [GNU Affero Gene
 
 The license covers the project's own code. The cards' names, text, symbols and art belong to Wizards of the Coast and their artists, card data and images come from Scryfall, and the icons and fonts have their own licenses (see [Credits](#credits)).
 
-### Text and data mining
+## How it's made
 
-Apart from the license, and without adding any restriction to it, the author expressly reserves the right to use the project's content for text and data mining, including training artificial intelligence models, as Article 4(3) of [Directive (EU) 2019/790](https://eur-lex.europa.eu/eli/dir/2019/790/oj) allows. The site states it in a machine-readable way too (`tdm-reservation`, following the W3C's [TDMRep](https://www.w3.org/community/tdmrep/)).
+Most of the code since October 2026 was written with [Claude Code](https://claude.com/claude-code), Anthropic's coding agent, working to my direction: I decide what to build and how (the features, the architecture, the trade-offs, the look), set the conventions it follows ([`AGENTS.md`](AGENTS.md)), and review, test and adjust its work before it's merged, often by hand. Commits and pull requests made in those sessions link to them (`Claude-Session`).
 
 ## Supported browsers
 

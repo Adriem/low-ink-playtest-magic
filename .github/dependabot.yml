@@ -1,0 +1,19 @@
+# Weekly pull requests to keep dependencies up to date, minor and patch updates
+# grouped into one per ecosystem so they don't pile up
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

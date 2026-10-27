@@ -9,24 +9,19 @@ export const fitTextInTwoLines = (
     maxHeight,
   }: { text: string; line1MaxWidth: number; line2MaxWidth: number; maxHeight: number },
 ) => {
-  let line1 = '';
-  let line2 = '';
-  let textFitsVertically = false;
-  let textFitsHorizontally = false;
-
-  do {
-    [line1, line2] = wrapFirstLineOfText(ctx, { text, lineMaxWidth: line1MaxWidth });
+  // Smaller and smaller, until the text fits
+  while (true) {
+    const [line1, line2] = wrapFirstLineOfText(ctx, { text, lineMaxWidth: line1MaxWidth });
 
     const line1Metrics = ctx.measureText(line1);
     const line2Metrics = ctx.measureText(line2);
 
-    textFitsVertically = getLineHeight(line1Metrics) + (line2.length && getLineHeight(line2Metrics)) <= maxHeight;
-    textFitsHorizontally = line2Metrics.width <= line2MaxWidth;
+    const textFitsVertically = getLineHeight(line1Metrics) + (line2.length && getLineHeight(line2Metrics)) <= maxHeight;
+    const textFitsHorizontally = line2Metrics.width <= line2MaxWidth;
+    if (textFitsVertically && textFitsHorizontally) return [line1, line2];
 
-    if (!textFitsVertically || !textFitsHorizontally) reduceTextSize(ctx);
-  } while (!textFitsVertically || !textFitsHorizontally);
-
-  return [line1, line2];
+    reduceTextSize(ctx);
+  }
 };
 
 const wrapFirstLineOfText = (

@@ -226,7 +226,7 @@ const DeleteButton = ({
         };
 
   return (
-    <OverlayButton className="sheet-slot-overlay-delete" hidden={hidden} onClick={onClick} {...dangerHandlers}>
+    <OverlayButton className="danger sheet-slot-overlay-delete" hidden={hidden} onClick={onClick} {...dangerHandlers}>
       <Icon icon={faTrash} /> {t('card_overlay.delete')}
     </OverlayButton>
   );
@@ -253,8 +253,8 @@ const CloseButton = ({ hidden, onClick }: { hidden: boolean; onClick: ClickHandl
 };
 
 /**
- * Button of the overlay, big, like other buttons of the main actions. Hidden
- * buttons (of closed overlays) are out of the tab order.
+ * Button of the overlay. Hidden buttons (of closed overlays) are out of the tab
+ * order.
  */
 const OverlayButton = ({
   hidden,
@@ -263,12 +263,7 @@ const OverlayButton = ({
   ...buttonProps
 }: ButtonHTMLAttributes<HTMLButtonElement> & { hidden: boolean }) => {
   return (
-    <button
-      type="button"
-      className={className ? `big-button ${className}` : 'big-button'}
-      tabIndex={hidden ? -1 : 0}
-      {...buttonProps}
-    >
+    <button type="button" className={className} tabIndex={hidden ? -1 : 0} {...buttonProps}>
       {children}
     </button>
   );

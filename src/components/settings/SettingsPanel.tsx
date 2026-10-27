@@ -147,6 +147,7 @@ const CardStyleFieldset = ({ onPaletteClick }: { onPaletteClick: (cardStyle: Car
           </label>
           <button
             type="button"
+            className="link-button"
             aria-label={t('settings.edit_palette_of', { cardStyle: t(option.label) })}
             onClick={() => onPaletteClick(option.value)}
           >

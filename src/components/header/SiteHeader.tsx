@@ -1,7 +1,5 @@
 import { useTranslation } from 'react-i18next';
 
-// Bundled with the site, so pages don't load fonts from elsewhere
-import '@fontsource/cinzel/700.css';
 import './SiteHeader.css';
 
 /**

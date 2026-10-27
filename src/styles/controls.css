@@ -1,0 +1,224 @@
+/* Buttons and text fields, styled like the boxes of the cards: rounded ends,
+   a thin dark pinline around them, and a light and a shadow edge.
+
+   Buttons look raised (light on top and on the right) and pressed while
+   active, and text fields look sunken (the other way around). Variants are
+   utility classes, meant to be reused:
+   - button.primary: the main action of a group (e.g. Export), bolder and in capitals
+   - button.danger, input[type='reset']: actions that remove things (e.g. Clear, Delete)
+   - button.link-button: a button that looks like a link (e.g. Back, Edit palette)
+   - button.icon-button: a button that's only an icon or a symbol (e.g. ×)
+   - button.floating: a button floating over the page (e.g. Back to top) */
+
+:root {
+  /* Focus outlines, links and link buttons */
+  --accent: rgb(41, 133, 225);
+
+  /* The thin dark line around controls, also under the actions bar */
+  --pinline-width: 2px;
+  --pinline-color: #444;
+  --pinline: 0 0 0 var(--pinline-width) var(--pinline-color);
+  --pinline-focus: 0 0 0 2px var(--accent);
+  /* The pinline, and a focus ring around it, apart from it */
+  --pinline-focus-ring: var(--pinline), 0 0 0 4px white, 0 0 0 6px var(--accent);
+
+  /* Dimmer than primary buttons' text, which stands out in black */
+  --button-color: #222222;
+  --button-background: #d3d3d3;
+  --button-background-hover: #c9c9c9;
+  --button-edge-light: white;
+  --button-edge-shadow: #a9a9a9;
+  --button-edge-shadow-hover: #999;
+  --button-danger-color: #aa0033;
+
+  --field-background: #fcfcfc;
+  --field-edge-light: white;
+  --field-edge-shadow: #d3d3d3;
+}
+
+/* Buttons --------------------------------------------------------------- */
+
+button,
+input[type='submit'],
+input[type='reset'] {
+  margin: 4px 0;
+  padding: 0 12px;
+  border: 2px solid;
+  /* Raised: light on top and on the right, shadow below and on the left */
+  border-color: var(--button-edge-light) var(--button-edge-light) var(--button-edge-shadow) var(--button-edge-shadow);
+  border-radius: 10px / 25px;
+  background: var(--button-background);
+  box-shadow: var(--pinline);
+  color: var(--button-color);
+  font: var(--font-buttons);
+  cursor: pointer;
+  /* Their text isn't for selecting: a double click would select it */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+button:hover,
+input[type='submit']:hover,
+input[type='reset']:hover {
+  border-color: var(--button-edge-light) var(--button-edge-light) var(--button-edge-shadow-hover)
+    var(--button-edge-shadow-hover);
+  background: var(--button-background-hover);
+}
+
+/* Pressed: the light and shadow edges swap */
+button:active,
+input[type='submit']:active,
+input[type='reset']:active {
+  border-color: var(--button-edge-shadow) var(--button-edge-shadow) var(--button-edge-light) var(--button-edge-light);
+  background: var(--button-background);
+}
+
+/* A ring around the pinline, only while focused from the keyboard */
+button:focus-visible,
+input[type='submit']:focus-visible,
+input[type='reset']:focus-visible {
+  outline: none;
+  box-shadow: var(--pinline-focus-ring);
+}
+
+button:disabled,
+input[type='submit']:disabled,
+input[type='reset']:disabled {
+  border-color: var(--button-edge-light) var(--button-edge-light) var(--button-edge-shadow) var(--button-edge-shadow);
+  background: var(--button-background);
+  color: #666;
+  cursor: default;
+  opacity: 0.6;
+}
+
+button.primary,
+input[type='submit'].primary {
+  color: black;
+  font: var(--font-buttons-primary);
+  /* Capitals by style, so screen readers read the word rather than spell it */
+  text-transform: uppercase;
+}
+
+button.danger,
+input[type='reset'] {
+  color: var(--button-danger-color);
+}
+
+/* A shadow lighter than the page, blurred, so it stands out over the cards */
+button.floating {
+  box-shadow:
+    var(--pinline),
+    0 0 12px 6px rgba(255, 255, 255, 0.9);
+}
+button.floating:focus-visible {
+  box-shadow:
+    var(--pinline-focus-ring),
+    0 0 12px 6px rgba(255, 255, 255, 0.9);
+}
+
+/* Buttons without the box: only their text or icon */
+button.link-button,
+button.icon-button {
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+button.link-button:hover,
+button.link-button:active,
+button.icon-button:hover,
+button.icon-button:active {
+  background: none;
+}
+button.link-button:focus-visible,
+button.icon-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+button.link-button {
+  color: var(--accent);
+  font: inherit;
+  text-decoration: underline;
+}
+
+button.icon-button {
+  padding: 0 0.25em;
+  color: inherit;
+  font-size: 1.4em;
+  line-height: 1;
+}
+
+/* Text fields ------------------------------------------------------------ */
+
+input[type='text'],
+input[type='url'],
+input[type='search'],
+input:not([type]),
+textarea {
+  margin: 4px 0;
+  padding: 0 12px;
+  border: 2px solid;
+  /* Sunken: shadow on top and on the right, light below and on the left */
+  border-color: var(--field-edge-shadow) var(--field-edge-shadow) var(--field-edge-light) var(--field-edge-light);
+  background: var(--field-background);
+  box-shadow: var(--pinline);
+}
+
+/* Single-line fields have rounded ends like buttons; text areas, square corners */
+input[type='text'],
+input[type='url'],
+input[type='search'],
+input:not([type]) {
+  border-radius: 10px / 25px;
+}
+
+input[type='text']:focus,
+input[type='url']:focus,
+input[type='search']:focus,
+input:not([type]):focus,
+textarea:focus {
+  outline: none;
+  box-shadow: var(--pinline-focus);
+}
+
+/* Touch screens: more room around the text, so controls are easier to tap */
+@media (pointer: coarse) {
+  button,
+  input[type='submit'],
+  input[type='reset'],
+  input[type='text'],
+  input[type='url'],
+  input[type='search'],
+  input:not([type]),
+  textarea {
+    padding: 6px 16px;
+  }
+}
+
+/* Fieldsets ---------------------------------------------------------------- */
+
+/* A plain frame: browsers draw their default (a groove) each their own way, and
+   Safari's looks blurry */
+fieldset {
+  margin: 0;
+  padding: 0.25em 0.75em 0.75em;
+  border: 1px solid #c8c8c8;
+  border-radius: 4px;
+}
+
+legend {
+  padding: 0 0.25em;
+}
+
+/* Clickable labels -------------------------------------------------------- */
+
+/* Labels of radio buttons and checkboxes act as buttons: their text isn't for selecting */
+label:has(> input[type='radio']),
+label:has(> input[type='checkbox']) {
+  -webkit-user-select: none;
+  user-select: none;
+}

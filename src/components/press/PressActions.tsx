@@ -57,13 +57,13 @@ const PressActions = ({
       <div className="press-actions">
         <div className="press-actions-bar">
           <div className="container">
-            <button type="button" className="clear" onClick={handleClearClick}>
+            <button type="button" className="danger" onClick={handleClearClick}>
               {t('press_actions.clear')}
             </button>
             <button type="button" onClick={handleSettingsClick}>
               {t('press_actions.settings')}
             </button>
-            <button type="button" className="export big-button" disabled={!canExport} onClick={handleExportClick}>
+            <button type="button" className="primary" disabled={!canExport} onClick={handleExportClick}>
               {t(isExporting ? 'press_actions.exporting' : 'press_actions.export')}
             </button>
           </div>
@@ -75,7 +75,7 @@ const PressActions = ({
           <button type="button" onClick={handleClearCancelClick}>
             {t('clear_panel.cancel')}
           </button>
-          <button type="button" className="clear" onClick={handleClearConfirmClick}>
+          <button type="button" className="danger" onClick={handleClearConfirmClick}>
             {t('clear_panel.clear')}
           </button>
         </menu>

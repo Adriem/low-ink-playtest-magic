@@ -13,6 +13,11 @@ html {
 
 body {
   margin: 0;
+  font: var(--font-regular);
+}
+
+a {
+  color: var(--accent);
 }
 
 img,
@@ -34,38 +39,6 @@ svg {
     margin-right: 20px;
     margin-left: 20px;
   }
-}
-
-/* Buttons with the font size Chrome gives them (13.33px), whatever the browser
-   (text fields keep theirs: iPhones zoom in on focused ones with smaller text
-   than 16px) */
-button,
-input[type='submit'] {
-  font-size: 10pt;
-}
-
-/* The same padding on every button and text field (text areas too), whatever
-   the browser: a bit more on touch screens, so they're easier to tap */
-button,
-input[type='submit'],
-input[type='text'],
-input:not([type]),
-textarea {
-  padding: 1px 6px;
-}
-@media (pointer: coarse) {
-  button,
-  input[type='submit'],
-  input[type='text'],
-  input:not([type]),
-  textarea {
-    padding: 0.5em 1em;
-  }
-}
-
-/* Buttons for the main actions, as big on desktop as on touch screens */
-.big-button {
-  padding: 0.5em 1em;
 }
 
 :root {

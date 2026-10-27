@@ -50,6 +50,7 @@ The images you add yourself with **Edit art** are yours to choose: you're respon
 - Card data, art and mana symbols: [Scryfall](https://scryfall.com).
 - Icons: [Font Awesome Free](https://fontawesome.com) by Fonticons, Inc., licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) ([license](https://fontawesome.com/license/free)).
 - Title font: [Cinzel](https://fonts.google.com/specimen/Cinzel) by Natanael Gama, licensed under the [SIL Open Font License 1.1](https://openfontlicense.org).
+- Text font: [Inknut Antiqua](https://fonts.google.com/specimen/Inknut+Antiqua) by Claus Eggers Sørensen, licensed under the [SIL Open Font License 1.1](https://openfontlicense.org).
 
 ## License
 

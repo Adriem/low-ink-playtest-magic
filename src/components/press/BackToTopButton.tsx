@@ -1,5 +1,7 @@
 import { useEffect, useState, type RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
+import { faArrowUp } from '@fortawesome/free-solid-svg-icons';
+import Icon from '../icons/Icon';
 
 import './BackToTopButton.css';
 
@@ -29,8 +31,8 @@ const BackToTopButton = ({ watched }: { watched: RefObject<Element | null> }) =>
   if (isWatchedVisible) return null;
 
   return (
-    <button type="button" className="back-to-top big-button" onClick={handleClick}>
-      {t('press.back_to_top')}
+    <button type="button" className="back-to-top floating" onClick={handleClick}>
+      <Icon icon={faArrowUp} /> {t('press.back_to_top')}
     </button>
   );
 };

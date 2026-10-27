@@ -37,10 +37,6 @@
   gap: 0.5rem;
 }
 
-.sheet-slot-overlay-controls button {
-  font-weight: bold;
-}
-
 .sheet-slot-overlay-separator {
   width: 100%;
   margin: 0.5rem 0;

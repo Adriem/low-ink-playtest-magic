@@ -4,22 +4,31 @@
   position: relative;
 }
 
-.sheet-slot-card-button {
+/* A button over the whole card, without the look of other buttons
+   (src/styles/controls.css): only an outline while focused from the keyboard */
+button.sheet-slot-card-button {
   position: absolute;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
   z-index: 1;
+  margin: 0;
   padding: 0;
   border: none;
   border-radius: var(--card-corner-radius, 0);
   background: transparent;
+  box-shadow: none;
   cursor: pointer;
 }
-.sheet-slot-card-button:focus-visible {
-  outline: 3px solid rgb(30, 100, 220);
+button.sheet-slot-card-button:hover,
+button.sheet-slot-card-button:active {
+  background: transparent;
+}
+button.sheet-slot-card-button:focus-visible {
+  outline: 3px solid var(--accent);
   outline-offset: -3px;
+  box-shadow: none;
 }
 
 .sheet-slot .card {

@@ -2,11 +2,19 @@
 .site-footer {
   max-width: 750px;
   margin: 0 auto;
-  padding: 1.5rem 20px;
+  /* Room below for the "Back to top" button, which floats over the bottom of the page */
+  padding: 1.5rem 20px 5rem;
   text-align: center;
+  font: var(--font-legal);
   font-size: 0.875rem;
   color: gray;
   border-top: 1px lightgray solid;
+}
+/* More on touch screens, where the button is bigger */
+@media (pointer: coarse) {
+  .site-footer {
+    padding-bottom: 6rem;
+  }
 }
 
 .site-footer p {

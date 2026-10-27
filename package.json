@@ -59,5 +59,13 @@
     "vite": "^8.3.5",
     "vitest": "^5.0.5",
     "wrangler": "^4.154.0"
+  },
+  "overrides": {
+    "eslint-plugin-jsx-a11y": {
+      "eslint": "$eslint"
+    },
+    "eslint-plugin-react": {
+      "eslint": "$eslint"
+    }
   }
 }

@@ -30,6 +30,7 @@
   --button-edge-shadow: #a9a9a9;
   --button-edge-shadow-hover: #999;
   --button-danger-color: #aa0033;
+  --button-danger-background-hover: #dcc4c6;
 
   --field-background: #fcfcfc;
   --field-edge-light: white;
@@ -102,6 +103,11 @@ input[type='submit'].primary {
 button.danger,
 input[type='reset'] {
   color: var(--button-danger-color);
+}
+/* Slightly red while hovered, as a warning before clicking */
+button.danger:hover:not(:disabled),
+input[type='reset']:hover:not(:disabled) {
+  background: var(--button-danger-background-hover);
 }
 
 /* A shadow lighter than the page, blurred, so it stands out over the cards */

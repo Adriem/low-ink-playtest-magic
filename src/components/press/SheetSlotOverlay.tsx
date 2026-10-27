@@ -22,7 +22,7 @@ interface MoveButtonsProps {
 interface OverlayControlsProps extends MoveButtonsProps {
   mode: OverlayMode;
   onStartMove: () => void;
-  onDelete: () => void;
+  onDelete: ClickHandler;
   /** Shows the "Edit art" button, where cards are drawn with art */
   onOverrideArt?: () => void;
   /** "Dismiss" in the menu and "Close" in the move submenu */
@@ -208,7 +208,7 @@ const DeleteButton = ({
 }: {
   hidden: boolean;
   mode: OverlayMode;
-  onClick: () => void;
+  onClick: ClickHandler;
   onDangerChange: (danger: boolean) => void;
 }) => {
   const { t } = useTranslation();

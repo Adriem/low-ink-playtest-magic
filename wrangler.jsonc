@@ -7,4 +7,6 @@
   "assets": {
     "directory": "./dist",
   },
+  // Lets npx wrangler preview deploy branches as Previews, with the settings above
+  "previews": {},
 }

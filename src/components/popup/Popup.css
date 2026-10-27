@@ -2,6 +2,8 @@
   min-width: 320px;
   border: var(--pinline-width) solid black;
   border-radius: 7px;
+  /* Scrolling a long popup to its end doesn't carry on to the page behind it */
+  overscroll-behavior: contain;
 }
 
 /* On phones, popups take most of the screen's width instead */

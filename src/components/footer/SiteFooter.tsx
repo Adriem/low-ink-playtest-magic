@@ -5,7 +5,7 @@ import './SiteFooter.css';
 
 const COPYRIGHT_HOLDER = 'Adrian Moreno';
 /** Where users report issues: a new issue of the project on GitHub */
-const NEW_ISSUE_URL = 'https://github.com/Adriem/low-ink-mtg-press/issues/new';
+const NEW_ISSUE_URL = 'https://github.com/Adriem/low-ink-playtest-magic/issues/new';
 /** The site's source code, which the AGPL asks sites running it to offer to their users */
 
 /**

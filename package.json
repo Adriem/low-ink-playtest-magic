@@ -7,10 +7,10 @@
   "homepage": "https://playtest-magic.adriem.me/",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Adriem/low-ink-mtg-press.git"
+    "url": "git+https://github.com/Adriem/low-ink-playtest-magic.git"
   },
   "bugs": {
-    "url": "https://github.com/Adriem/low-ink-mtg-press/issues"
+    "url": "https://github.com/Adriem/low-ink-playtest-magic/issues"
   },
   "engines": {
     "node": ">=24"

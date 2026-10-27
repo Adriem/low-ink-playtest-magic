@@ -21,6 +21,6 @@ test('links to reporting an issue on GitHub, in a new tab', () => {
   render(<SiteFooter />);
 
   const link = screen.getByRole('link', { name: 'Report here' });
-  expect(link).toHaveAttribute('href', 'https://github.com/Adriem/low-ink-mtg-press/issues/new');
+  expect(link).toHaveAttribute('href', 'https://github.com/Adriem/low-ink-playtest-magic/issues/new');
   expect(link).toHaveAttribute('target', '_blank');
 });

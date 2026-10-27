@@ -67,8 +67,12 @@ const Press = () => {
   }, [cardCollection, artOverrideIndex, artOverridePreview]);
   const cardSheets = useCardSheet(drawnCollection, { doubleFacedCardTreatment });
   // Keys of the items of each sheet, by sheet
-  const sheetKeys = cardSheets.map((sheet, sheetNumber) =>
-    sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),
+  const sheetKeys = useMemo(
+    () =>
+      cardSheets.map((sheet, sheetNumber) =>
+        sheet.map((item, position) => `${sheetNumber}:${calculateItemKey(sheet, item, position)}`),
+      ),
+    [cardSheets],
   );
   const cardCanvases = useKeyedRefs<HTMLCanvasElement>();
   const [isExporting, setIsExporting] = useState(false);
@@ -108,29 +112,35 @@ const Press = () => {
     setArtOverrideIndex(collectionIndex);
   }, []);
 
-  const handleArtOverrideSave = (card: CardModel) => {
-    if (artOverrideIndex != null) editCardAt(artOverrideIndex, () => card);
-  };
+  const handleArtOverrideSave = useCallback(
+    (card: CardModel) => {
+      if (artOverrideIndex != null) editCardAt(artOverrideIndex, () => card);
+    },
+    [artOverrideIndex, editCardAt],
+  );
 
   const handleArtOverridePreview = useCallback((card: CardModel) => {
     setArtOverridePreview(card);
   }, []);
 
   // Changes not saved are discarded
-  const handleArtOverrideClose = () => {
+  const handleArtOverrideClose = useCallback(() => {
     setArtOverrideIndex(null);
     setArtOverridePreview(null);
-  };
+  }, []);
 
   // The canvases of the cards in the sheets, in order (loading cards have none)
-  const handleExport = (options: PdfExportOptions) => {
-    const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
+  const handleExport = useCallback(
+    (options: PdfExportOptions) => {
+      const canvases = sheetKeys.flat().flatMap((key) => cardCanvases.get(key) ?? []);
 
-    setIsExporting(true);
-    void exportCardsToPdf(canvases, options)
-      .catch((error: Error) => window.alert(t('press.export_error', { message: error.message })))
-      .finally(() => setIsExporting(false));
-  };
+      setIsExporting(true);
+      void exportCardsToPdf(canvases, options)
+        .catch((error: Error) => window.alert(t('press.export_error', { message: error.message })))
+        .finally(() => setIsExporting(false));
+    },
+    [sheetKeys, cardCanvases, t],
+  );
 
   return (
     <>
@@ -244,12 +254,17 @@ const loadPersistedCards = () => {
 const calculateItemKey = (sheet: SheetItem[], item: SheetItem, position: number) => {
   if (item.kind === 'loading') return `loading_${item.loadingCardId}`;
 
-  const cardId = item.card.multiverseIds[0];
+  const cardId = getCardId(item.card);
   const cardOccurrenceInSheet = sheet
     .slice(0, position)
-    .filter((previous) => previous.kind !== 'loading' && previous.card.multiverseIds[0] === cardId).length;
+    .filter((previous) => previous.kind !== 'loading' && getCardId(previous.card) === cardId).length;
 
   return `${cardId}__${cardOccurrenceInSheet}`;
+};
+
+/** What tells a card apart: its first multiverse ID, or its set and name for cards without (e.g. Arena-only ones) */
+const getCardId = (card: CardModel) => {
+  return card.multiverseIds[0] ?? `${card.set}:${card.name}`;
 };
 
 export default Press;

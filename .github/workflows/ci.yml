@@ -5,6 +5,15 @@ on:
   push:
     branches: [main]
 
+# Only reads the code
+permissions:
+  contents: read
+
+# A newer push to a pull request cancels the checks still running for the older one
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   check:
     runs-on: ubuntu-latest

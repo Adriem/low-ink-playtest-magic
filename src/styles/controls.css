@@ -212,7 +212,7 @@ textarea:focus {
   input[type='search'],
   input:not([type]),
   textarea {
-    padding: 6px 16px;
+    padding: 4px 16px;
   }
 }
 
@@ -233,9 +233,27 @@ legend {
 
 /* Clickable labels -------------------------------------------------------- */
 
-/* Labels of radio buttons and checkboxes act as buttons: their text isn't for selecting */
+/* Labels of radio buttons and checkboxes act as buttons: they show the pointer, and their text isn't for selecting */
 label:has(> input[type='radio']),
 label:has(> input[type='checkbox']) {
+  cursor: pointer;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* Unless their control is disabled */
+label:has(> input[type='radio']:disabled),
+label:has(> input[type='checkbox']:disabled) {
+  cursor: default;
+}
+
+/* Taller on touch screens, so they're easier to tap. Inline blocks, so the
+   padding makes room (without specificity, so labels laid out otherwise, e.g.
+   as blocks or flex items, keep it) */
+@media (pointer: coarse) {
+  :where(label:has(> input[type='radio']), label:has(> input[type='checkbox'])) {
+    display: inline-block;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
 }

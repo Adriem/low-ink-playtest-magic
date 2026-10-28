@@ -68,7 +68,7 @@ Recent versions of Chrome, Edge, Firefox and Safari, on computers and phones.
 
 ## Contributing
 
-Bugs and ideas are welcome as [issues](https://github.com/Adriem/low-ink-playtest-magic/issues). Changes go through pull requests against `main`. [`AGENTS.md`](AGENTS.md) describes how the code is organized, and its conventions.
+Bugs and ideas are welcome as [issues](https://github.com/Adriem/low-ink-playtest-magic/issues), and security problems as private reports ([`SECURITY.md`](SECURITY.md)). Changes go through pull requests against `main`. [`AGENTS.md`](AGENTS.md) describes how the code is organized, and its conventions.
 
 Use the Node version in `.nvmrc` (e.g. with `nvm use`), the one CI and deploys use, and install the dependencies with `npm ci`.
 

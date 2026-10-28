@@ -1,0 +1,38 @@
+name: Bug report
+description: Something doesn't work, or a card doesn't look right.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you did, what you expected, and what happened instead. For a card drawn wrong, a screenshot helps most.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reproduce it
+      description: The cards (their names, or the list you pasted) and the steps.
+      placeholder: |
+        1. Add "Fire // Ice"
+        2. Set the ink level to Low
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: settings
+    attributes:
+      label: Settings
+      description: The card style, ink level, card border and double-faced card treatment, if they matter.
+      placeholder: Realistic, medium ink, outline, separate
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: Safari on iPhone 15, Chrome 141 on Windows
+  - type: textarea
+    id: cause
+    attributes:
+      label: Likely cause
+      description: Optional. If you have an idea where it comes from, say so, and whether you've verified it.

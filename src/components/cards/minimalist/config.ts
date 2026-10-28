@@ -31,7 +31,6 @@ export const SIDE_BORDER_WIDTH = 16;
 
 export const STATSLINE_X = 429;
 export const STATSLINE_Y = 654;
-export const STATSLINE_HEIGHT = 40;
 export const STATSLINE_FONT_SIZE = 40;
 
 export const TITLE_WIDTH = 420;

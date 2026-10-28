@@ -58,22 +58,6 @@ const doubleFacedCard = testCard({
   secondaryFace: testFace({ name: 'Back' }),
 });
 
-// jsdom has no modal dialogs, so opening one only shows it, and closing it hides it and says so
-beforeAll(() => {
-  HTMLDialogElement.prototype.showModal = function () {
-    this.open = true;
-  };
-  HTMLDialogElement.prototype.close = function () {
-    this.open = false;
-    this.dispatchEvent(new Event('close'));
-  };
-});
-
-afterAll(() => {
-  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).showModal;
-  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).close;
-});
-
 // jsdom has no PointerEvent, which the overlay needs to tell mouse and touch apart
 beforeAll(() => {
   window.PointerEvent = class PointerEvent extends MouseEvent {

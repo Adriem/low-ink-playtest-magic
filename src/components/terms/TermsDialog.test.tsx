@@ -4,15 +4,10 @@ import TermsDialog from './TermsDialog';
 import { overrideFlag } from '../../testUtils';
 
 beforeEach(() => {
-  // jsdom has no modal dialogs
-  HTMLDialogElement.prototype.showModal = function () {
-    this.setAttribute('open', '');
-  };
   overrideFlag('TERMS_DIALOG', true);
 });
 
 afterEach(() => {
-  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).showModal;
   localStorage.clear();
 });
 

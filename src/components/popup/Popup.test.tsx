@@ -54,8 +54,8 @@ test('passes other props to the dialog, e.g. what it is labelled by', () => {
     </Popup>,
   );
 
-  // Only open dialogs have a name (jsdom has no showModal)
-  screen.getByRole('dialog', { hidden: true }).setAttribute('open', '');
+  // Only open dialogs are found, with their name: Popup doesn't open itself
+  (screen.getByRole('dialog', { hidden: true }) as HTMLDialogElement).showModal();
 
   expect(screen.getByRole('dialog', { name: 'Terms' })).toBeInTheDocument();
 });

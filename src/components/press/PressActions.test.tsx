@@ -3,22 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { SettingsContextProvider } from '../settings';
 import PressActions from './PressActions';
 
-// jsdom has no modal dialogs, so opening one only shows it, and closing it hides it
-beforeAll(() => {
-  HTMLDialogElement.prototype.showModal = function () {
-    this.open = true;
-  };
-  HTMLDialogElement.prototype.close = function () {
-    this.open = false;
-  };
-});
-
 afterEach(() => localStorage.clear());
-
-afterAll(() => {
-  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).showModal;
-  delete (HTMLDialogElement.prototype as Partial<HTMLDialogElement>).close;
-});
 
 test('clears the press once confirmed', async () => {
   const user = userEvent.setup();

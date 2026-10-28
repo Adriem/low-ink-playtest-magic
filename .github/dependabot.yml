@@ -9,6 +9,11 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # TypeScript 7.0 has no JavaScript API, which typescript-eslint needs to parse the code, so lint can't run on it.
+      # 7.1 brings one: remove this once typescript-eslint supports it (typescript-eslint/typescript-eslint#10940)
+      - dependency-name: typescript
+        versions: ['7.0.x']
 
   - package-ecosystem: github-actions
     directory: /

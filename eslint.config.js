@@ -18,7 +18,8 @@ export default defineConfig([
       sourceType: 'module',
       globals: { ...globals.browser },
     },
-    settings: { react: { version: 'detect' } },
+    // Not 'detect': eslint-plugin-react detects it with context.getFilename(), which ESLint 10 removed
+    settings: { react: { version: '19.3' } },
     plugins: {
       react,
       'react-hooks': reactHooks,

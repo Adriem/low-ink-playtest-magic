@@ -1,4 +1,4 @@
-import { fitFontSizeInXY, fitTextIntoBox, measureRichTextWidth, wrapText } from './canvasText';
+import { fitFontSizeInX, fitFontSizeInXY, fitTextIntoBox, measureRichTextWidth, wrapText } from './canvasText';
 
 describe('measureRichTextWidth', () => {
   test('measures each piece in its format', () => {
@@ -56,6 +56,16 @@ describe('wrapText', () => {
   });
 });
 
+describe('fitFontSizeInX', () => {
+  test('stops shrinking the text at the smallest font size, when it still does not fit', () => {
+    const ctx = createCtx();
+
+    fitFontSizeInX(ctx, 'aaaaa', 10);
+
+    expect(ctx.font).toBe('6px Serif');
+  });
+});
+
 describe('fitFontSizeInXY', () => {
   test('separates the lines of each paragraph with an empty line', () => {
     expect(
@@ -65,6 +75,14 @@ describe('fitFontSizeInXY', () => {
 
   test('has no lines without paragraphs', () => {
     expect(fitFontSizeInXY(createCtx(), [], 100, 100)).toEqual([]);
+  });
+
+  test('stops shrinking the text at the smallest font size, when it still does not fit', () => {
+    const ctx = createCtx();
+
+    fitFontSizeInXY(ctx, [[{ text: 'a', format: 'regular' }]], 100, 5);
+
+    expect(ctx.font).toBe('6px Serif');
   });
 });
 

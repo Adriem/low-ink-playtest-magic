@@ -3,7 +3,7 @@ const FONT_SIZE_REGEX = /(\d+(?:\.\d+)?)px/;
 export const EMPTY_LINE_RELATIVE_SIZE = 0.25;
 const PARAGRAPH_SPACING_RELATIVE_SIZE = 0.75;
 /** Smallest font size text is shrunk to, to fit it in a box */
-const MIN_FONT_SIZE = 6;
+export const MIN_FONT_SIZE = 6;
 
 /** Text in a single format */
 export type FormattedText = { text: string; format: 'regular' | 'italic' };
@@ -67,10 +67,7 @@ const toLine = (words: RichText): RichText => {
   }, []);
 };
 
-/**
- * Get the font size (in pixels) of the current canvas context
- *
- */
+/** Font size (in pixels) of the canvas's current font */
 export const getFontSize = (ctx: CanvasRenderingContext2D): number => {
   const match = ctx.font.match(FONT_SIZE_REGEX);
   if (!match) throw new Error(`No font size in the canvas font: ${ctx.font}`);
@@ -91,12 +88,8 @@ export const reduceTextSize = (ctx: CanvasRenderingContext2D, reduceAmount = 1) 
 };
 
 /**
- * Calculate the line height (in pixels) from a TextMetrics
- * fits within a specified max width.
- *
- * NOTE: This method updates the canvas configuration
- *
- * @returns Height in pixels of the given measures
+ * Height (in pixels) of a line of text, from its measures: the font's full
+ * height, the same whatever the line's characters.
  */
 export const getLineHeight = (textMetrics: TextMetrics): number => {
   return textMetrics.fontBoundingBoxAscent + textMetrics.fontBoundingBoxDescent;
@@ -104,7 +97,7 @@ export const getLineHeight = (textMetrics: TextMetrics): number => {
 
 /**
  * Automatically reduce the font size of the canvas until a given text
- * fits within a specified max width.
+ * fits within a specified max width, or reaches the smallest size.
  *
  * NOTE: This method updates the canvas configuration
  *
@@ -112,12 +105,13 @@ export const getLineHeight = (textMetrics: TextMetrics): number => {
  * @param maxWidth - Maximum width where the text must be placed
  */
 export const fitFontSizeInX = (ctx: CanvasRenderingContext2D, text: string, maxWidth: number) => {
-  while (ctx.measureText(text).width > maxWidth) reduceTextSize(ctx);
+  while (ctx.measureText(text).width > maxWidth && getFontSize(ctx) > MIN_FONT_SIZE) reduceTextSize(ctx);
 };
 
 /**
  * Automatically reduce the font size of the canvas until a given text
- * wraps and fits within a specified max width and height.
+ * wraps and fits within a specified max width and height, or reaches the
+ * smallest size.
  *
  * NOTE: This method updates the canvas configuration
  *
@@ -152,7 +146,8 @@ export const fitFontSizeInXY = (
       return line.length ? height + lineHeight : height + lineHeight * EMPTY_LINE_RELATIVE_SIZE;
     }, 0);
 
-    if (textHeight > maxHeight) reduceTextSize(ctx);
+    if (textHeight > maxHeight && getFontSize(ctx) > MIN_FONT_SIZE) reduceTextSize(ctx);
+    else break;
   } while (textHeight > maxHeight);
 
   return textLines;

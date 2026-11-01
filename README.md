@@ -28,8 +28,9 @@ Your cards stay while the tab is open, and your settings are kept for the next t
 
 ## Privacy
 
-The app has no server, no account, no analytics and no tracking. It runs in your browser, which talks to:
+The app has no server, no account, no cookies and no tracking. It runs in your browser, which talks to:
 
+- [Cloudflare](https://www.cloudflare.com), which serves the site. For visitors outside the European Union, it also counts visits with [Cloudflare Web Analytics](https://www.cloudflare.com/web-analytics/): pages viewed, where visitors come from (country, referring site), their browser and device, and how fast the page loads. It doesn't use cookies or fingerprinting, and doesn't identify you. Visitors in the EU aren't counted at all
 - [Scryfall](https://scryfall.com), to look up the cards you add by name (`api.scryfall.com`), and for their art (`cards.scryfall.io`) and mana symbols (`svgs.scryfall.io`). Like any website, Scryfall sees your IP address
 - The sites of the images you add yourself with **Edit art**
 

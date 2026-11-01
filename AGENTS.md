@@ -62,7 +62,7 @@ Keep the root of `src/` as clean as possible: new modules go in the folders abov
 ### Tests
 
 - Tests sit next to the code they test (`*.test.ts(x)`).
-- jsdom has no `showModal` or `IntersectionObserver`: tests stub `showModal`, and `setupTests.ts` provides an `IntersectionObserver` that never reports.
+- jsdom has no modal dialogs or `IntersectionObserver`: `setupTests.ts` stands in for them. `showModal()` and `close()` only toggle a dialog's `open` attribute (which jsdom's styles show or hide it by) and fire `close`; nothing else modal (backdrop, focus, Escape) happens. Its `IntersectionObserver` never reports, and tests can replace it.
 - Canvas rendering can't be checked in jsdom: check renderer changes visually, e.g. in the workbench or by rendering the cards in a browser.
 
 ## Scryfall

@@ -1,0 +1,27 @@
+/* The 404 page, outside the app: system fonts, as the app's are bundled under hashed names */
+body {
+  display: grid;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  place-items: center;
+  box-sizing: border-box;
+  font:
+    400 1.125rem/1.5 Georgia,
+    'Times New Roman',
+    serif;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+}
+
+p {
+  margin: 0.5rem 0;
+}
+
+a {
+  color: rgb(41, 133, 225);
+}

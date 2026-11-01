@@ -9,6 +9,7 @@ Use the Node version in `.nvmrc` (`nvm use`).
 - `npm start`: development server. The card workbench, a development-only page for tuning renderers, is at `/workbench`.
 - `npm run lint`, `npm run format:check` (`npm run format` to fix), `npm run typecheck`, `npx vitest run`, `npm run build`: what CI runs (`.github/workflows/ci.yml`), in that order. Run them all before pushing.
 - Deploys: Cloudflare's Workers Builds builds `main` and deploys it (`npx wrangler deploy`), and deploys every other branch as a Preview, whose URL it posts on its pull request.
+- Headers: `public/_headers` sets the site's headers, including a Content Security Policy that only lets the app load scripts, styles and fonts from itself (and Cloudflare Web Analytics) and send requests to Scryfall's API. A new host the app fetches from, or loads scripts or styles from, has to be added there, or browsers block it. Paths that don't exist get `public/404.html`.
 
 ## Stack
 

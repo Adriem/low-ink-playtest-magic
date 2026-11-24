@@ -34,7 +34,7 @@
     "jspdf": "^4.2.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.1.8"
+    "react-i18next": "^18.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
